@@ -1,0 +1,14 @@
+{
+  "name": "capstone-dicoding",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "install:all": "npm install",
+    "dev:client": "npm run dev --workspace=client",
+    "dev:server": "npm run start --workspace=server",
+    "dev": "npm run dev --workspaces --if-present" 
+  }
+}

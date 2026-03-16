@@ -1,0 +1,7 @@
+# Ignore node_modules in all subdirectories (client and server)
+node_modules/
+# Ignore environment variables
+.env
+# (Add any other client-specific ignores here, like build folders)
+/client/build/
+/client/dist/
