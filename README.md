@@ -8,7 +8,7 @@ Monorepo:
 ## Requirements
 
 - **Git**: `https://git-scm.com/`
-- **Node.js (LTS recommended)**: `https://nodejs.org/`
+- **Node.js (LTS recommended)**: `https://nodejs.org/` (Node 20+ recommended)
 - **Package manager**: npm (comes with Node)
 
 ## Clone the repository
@@ -82,6 +82,13 @@ Copy `.env.example` to `.env` (don’t commit `.env`):
 ```bash
 cp .env.example .env
 ```
+
+Required for auth:
+
+- `CLIENT_URL` (example: `http://localhost:5173`)
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `JWT_SECRET`
 
 ### Install dependencies (from project root)
 
