@@ -2,6 +2,9 @@
 node_modules/
 # Ignore environment variables
 .env
+# Ignore local env files
+.env.*
+!.env.example
 # (Add any other client-specific ignores here, like build folders)
 /client/build/
 /client/dist/

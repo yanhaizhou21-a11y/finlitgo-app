@@ -8,7 +8,16 @@
   "scripts": {
     "install:all": "npm install",
     "dev:client": "npm run dev --workspace=client",
-    "dev:server": "npm run start --workspace=server",
-    "dev": "npm run dev --workspaces --if-present" 
+    "dev:server": "npm run dev --workspace=server",
+    "start:server": "npm run start --workspace=server",
+    "dev": "npm run dev --workspaces --if-present"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "jsonwebtoken": "^9.0.3",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0"
   }
 }

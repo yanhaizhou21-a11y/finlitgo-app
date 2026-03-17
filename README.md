@@ -1,14 +1,15 @@
 ## Capstone Dicoding
 
-Project capstone repository.
+Monorepo:
+- `client/` = Vite + React frontend
+- `server/` = Express backend
+- `shared/` = shared constants/types (optional)
 
 ## Requirements
 
-- **Git**: install from `https://git-scm.com/`
-- **Code editor**: Cursor / VS Code recommended
-
-If this project uses a specific runtime (Node/Python/Java/etc.), add it here (example):
-- **Node.js (LTS)**: `https://nodejs.org/`
+- **Git**: `https://git-scm.com/`
+- **Node.js (LTS recommended)**: `https://nodejs.org/`
+- **Package manager**: npm (comes with Node)
 
 ## Clone the repository
 
@@ -29,33 +30,80 @@ git remote -v
 
 ## Project setup & run
 
-Because setups differ per project, use the matching section below.
+### Folder structure
 
-### If this is a Node.js project
+```text
+project-root/
+├── client/                 # Vite frontend
+│   ├── public/
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── store/
+│   │   ├── types/
+│   │   ├── utils/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
+│
+├── server/                 # Express backend
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── utils/
+│   │   ├── config/
+│   │   └── app.js
+│   ├── server.js           # Entry point
+│   ├── index.js            # Backward-compatible entrypoint
+│   └── package.json
+│
+├── shared/
+│   ├── types/
+│   └── constants/
+│
+├── .env.example
+├── .gitignore
+├── package.json            # Workspaces (client + server)
+└── README.md
+```
+
+### Environment variables
+
+Copy `.env.example` to `.env` (don’t commit `.env`):
 
 ```bash
-# install dependencies
+cp .env.example .env
+```
+
+### Install dependencies (from project root)
+
+```bash
 npm install
-
-# run (pick one that exists in package.json)
-npm run dev
-# or
-npm start
 ```
 
-### If this is a Python project
+### Run development servers
+
+Run these in **two terminals**:
 
 ```bash
-python -m venv .venv
-
-# Windows PowerShell
-.venv\Scripts\Activate.ps1
-
-pip install -r requirements.txt
-python main.py
+# terminal 1: frontend
+npm run dev:client
 ```
 
-If none of these match your project, update this README with the correct commands.
+```bash
+# terminal 2: backend
+npm run dev:server
+```
+
+Backend default: `http://localhost:5000`
 
 ## GitHub workflow (clone, branch, push, revert)
 
