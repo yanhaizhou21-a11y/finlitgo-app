@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom'
+import { Link
+
+ } from 'react-router-dom'
 
 export default function Login() {
   return (
@@ -13,7 +15,7 @@ export default function Login() {
       </form>
       <div className="mt-3 flex flex-col gap-2 text-sm text-white/80">
         <Link className="hover:text-white" to="/password-recovery">Forgot password?</Link>
-        <span>No account? <Link className="text-white font-semibold" to="/register">Create an account</Link></span>
+       
       </div>
     </div>
   )
