@@ -4,7 +4,7 @@ const Problems = () => {
   return (
     <section className="w-full bg-[#18181A] py-24 px-6 md:px-12 flex flex-col items-center">
       <h2 className="text-3xl md:text-4xl font-semibold text-center text-white mb-16 max-w-lg">
-        Masalah finansial yang kita hadapi
+        Masalah finansial yang kita hadapi bersama
       </h2>
       
       <div className="flex flex-col md:flex-row gap-8 justify-center items-center max-w-6xl w-full">
