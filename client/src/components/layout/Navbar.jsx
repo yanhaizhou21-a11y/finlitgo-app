@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('Home');
+  const location = useLocation();
 
   const navLinks = [
-    { name: 'Home', href: '#' },
-    { name: 'Class', href: '#' },
-    { name: 'Blog', href: '#' },
-    { name: 'Ai assist', href: '#' },
+    { name: 'Home', href: '/' },
+    { name: 'Class', href: '/class' },
+    { name: 'Blog', href: '/blog' },
+    { name: 'Ai assist', href: '/ai-assist' },
   ];
 
   return (
@@ -39,12 +40,11 @@ const Navbar = () => {
         {/* Desktop Menu */}
         <div className="hidden md:flex gap-6 items-center">
           {navLinks.map((link) => {
-            const isActive = activeTab === link.name;
+            const isActive = link.href === '/' ? location.pathname === '/' : location.pathname.startsWith(link.href);
             return (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
-                onClick={() => setActiveTab(link.name)}
+                to={link.href}
                 className={`relative overflow-hidden rounded-full px-5 py-2 text-white text-base font-normal transition-all duration-300 group ${
                   isActive
                     ? 'bg-white/20 border border-white/50 backdrop-blur-md shadow-sm hover:-translate-y-0.5 hover:shadow-lg hover:border-white/70 hover:bg-white/30'
@@ -53,7 +53,7 @@ const Navbar = () => {
               >
                 <span className="relative z-10">{link.name}</span>
                 <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-sweep pointer-events-none"></div>
-              </a>
+              </Link>
             );
           })}
         </div>
@@ -74,21 +74,21 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div className={`md:hidden absolute top-0 left-0 w-full h-screen bg-[#6d28d9]/95 backdrop-blur-lg transform transition-transform duration-300 ease-in-out flex flex-col justify-center items-center gap-6 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        {navLinks.map((link) => (
-          <a
-            key={link.name}
-            href={link.href}
-            onClick={() => {
-              setActiveTab(link.name);
-              setIsOpen(false);
-            }}
-            className={`text-white text-2xl font-light hover:bg-white/20 px-8 py-3 rounded-full transition-colors w-64 text-center ${
-              activeTab === link.name ? 'bg-white/20' : ''
-            }`}
-          >
-            {link.name}
-          </a>
-        ))}
+        {navLinks.map((link) => {
+          const isActive = link.href === '/' ? location.pathname === '/' : location.pathname.startsWith(link.href);
+          return (
+            <Link
+              key={link.name}
+              to={link.href}
+              onClick={() => setIsOpen(false)}
+              className={`text-white text-2xl font-light hover:bg-white/20 px-8 py-3 rounded-full transition-colors w-64 text-center ${
+                isActive ? 'bg-white/20' : ''
+              }`}
+            >
+              {link.name}
+            </Link>
+          );
+        })}
         
         <div className="mt-8 flex flex-col gap-4 w-64">
           <a href="#" className="flex items-center justify-center bg-white/20 border border-white/50 rounded-full px-6 py-4 text-white text-xl shadow-lg transition-colors hover:bg-white/30 w-full" onClick={() => setIsOpen(false)}>Log In</a>
