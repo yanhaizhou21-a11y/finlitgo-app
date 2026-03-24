@@ -8,7 +8,7 @@ const Hero = () => {
       <div className="w-full max-w-[1139px] flex justify-end mb-6 z-10">
         <div className="relative w-[280px]">
           <input 
-            type="text" 
+            type="text"   
             placeholder="search" 
             className="w-full bg-white/40 backdrop-blur-md rounded-full py-2.5 px-6 pr-10 text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white/50 border border-white/20 shadow-inner"
           />
