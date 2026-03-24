@@ -1,9 +1,20 @@
 import React from 'react';
+import LiquidChrome from '../Background/LiquidChrome';
 
 const Hero = () => {
   return (
-    <main className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-[#000000] via-[#7a46ff] to-[#9b51ff] pt-[120px] pb-10 px-6 relative overflow-hidden">
+    <main className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-[#141414] via-[#6D28D9] to-[#A78BFA] pt-[120px] pb-10 px-6 relative overflow-hidden">
       
+      {/* LiquidChrome WebGL Background */}
+      <div className="absolute inset-0 z-0 pointer-events-auto mix-blend-screen opacity-90">
+        <LiquidChrome
+          baseColor={[109/255, 40/255, 217/255]} // #6D28D9 in normalized RGB 
+          speed={0.5}
+          amplitude={0.6}
+          interactive={true}
+        />
+      </div>
+
       {/* Search Bar - aligned right above the hero card */}
       <div className="w-full max-w-[1139px] flex justify-end mb-6 z-10">
         <div className="relative w-[280px]">

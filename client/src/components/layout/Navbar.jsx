@@ -91,8 +91,8 @@ const Navbar = () => {
         })}
         
         <div className="mt-8 flex flex-col gap-4 w-64">
-          <a href="#" className="flex items-center justify-center bg-white/20 border border-white/50 rounded-full px-6 py-4 text-white text-xl shadow-lg transition-colors hover:bg-white/30 w-full" onClick={() => setIsOpen(false)}>Log In</a>
-          <a href="#" className="flex items-center justify-center bg-white/20 border border-white/50 rounded-full px-6 py-4 text-white text-xl shadow-lg transition-colors hover:bg-white/30 w-full" onClick={() => setIsOpen(false)}>Sign Up</a>
+          <a href="/login" className="flex items-center justify-center bg-white/20 border border-white/50 rounded-full px-6 py-4 text-white text-xl shadow-lg transition-colors hover:bg-white/30 w-full" onClick={() => setIsOpen(false)}>Log In</a>
+          <a href="/register" className="flex items-center justify-center bg-white/20 border border-white/50 rounded-full px-6 py-4 text-white text-xl shadow-lg transition-colors hover:bg-white/30 w-full" onClick={() => setIsOpen(false)}>Sign Up</a>
         </div>
       </div>
     </nav>
