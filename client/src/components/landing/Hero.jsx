@@ -1,17 +1,25 @@
 import React from 'react';
-import LiquidChrome from '../Background/LiquidChrome';
+import GradientBlinds from '../Background/GradientBlinds';
 
 const Hero = () => {
   return (
     <main className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-[#141414] via-[#6D28D9] to-[#A78BFA] pt-[120px] pb-10 px-6 relative overflow-hidden">
       
-      {/* LiquidChrome WebGL Background */}
-      <div className="absolute inset-0 z-0 pointer-events-auto mix-blend-screen opacity-90">
-        <LiquidChrome
-          baseColor={[109/255, 40/255, 217/255]} // #6D28D9 in normalized RGB 
-          speed={0.5}
-          amplitude={0.6}
-          interactive={true}
+      {/* GradientBlinds Background */}
+      <div className="absolute inset-0 z-0 pointer-events-auto opacity-90">
+        <GradientBlinds
+          gradientColors={['#FF9FFC', '#5227FF']}
+          angle={0}
+          noise={0.3}
+          blindCount={12}
+          blindMinWidth={50}
+          spotlightRadius={0.5}
+          spotlightSoftness={1}
+          spotlightOpacity={1}
+          mouseDampening={0.15}
+          distortAmount={0}
+          shineDirection="left"
+          mixBlendMode="screen"
         />
       </div>
 

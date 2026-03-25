@@ -26,10 +26,10 @@ const SignUp = ({ onToggle }) => {
       animate={{ opacity: 1, x: 0, position: 'relative', width: '100%' }}
       exit={{ opacity: 0, x: -20, position: 'absolute', width: '100%' }}
       transition={{ duration: 0.4, ease: 'easeInOut' }}
-      className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.2)] flex flex-col w-full"
+      className="flex flex-col w-full px-2"
     >
-      <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
-      <p className="text-sm text-gray-300 font-light mb-8">Sign up to get started.</p>
+      <h2 className="text-4xl font-serif text-black mb-2 text-center md:text-left">Create Account</h2>
+      <p className="text-sm text-gray-500 font-light mb-8 text-center md:text-left">Sign up to get started.</p>
 
       <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
         <InputField
@@ -57,22 +57,22 @@ const SignUp = ({ onToggle }) => {
           onChange={handleChange}
         />
         
-        <button type="submit" className="mt-2 w-full py-3.5 px-4 bg-[#0ea5a4] hover:bg-[#0c8f8e] text-white rounded-full font-semibold transition-all duration-300 hover:shadow-[0_8px_16px_rgba(14,165,164,0.3)] hover:-translate-y-0.5 border border-transparent">
+        <button type="submit" className="mt-2 w-full py-3.5 px-4 bg-black hover:bg-gray-800 text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:-translate-y-0.5 border border-transparent">
           Sign Up
         </button>
       </form>
 
-      <div className="flex items-center my-6 text-gray-300 text-sm">
-        <div className="flex-1 border-b border-white/20 mr-3"></div>
+      <div className="flex items-center my-6 text-gray-500 text-sm">
+        <div className="flex-1 border-b border-gray-200 mr-3"></div>
         or
-        <div className="flex-1 border-b border-white/20 ml-3"></div>
+        <div className="flex-1 border-b border-gray-200 ml-3"></div>
       </div>
       
       <GoogleButton onClick={handleGoogleLogin} />
 
-      <div className="text-center mt-6 text-sm text-gray-300">
+      <div className="text-center mt-6 text-sm text-gray-500">
         Already have an account?{' '}
-        <button className="text-[#0ea5a4] font-semibold hover:underline bg-transparent border-none p-0" onClick={onToggle}>
+        <button className="text-black font-semibold hover:underline bg-transparent border-none p-0" onClick={onToggle}>
           Sign In
         </button>
       </div>
