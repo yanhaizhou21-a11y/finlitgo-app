@@ -3,11 +3,15 @@ import StaggeredMenu from './StaggeredMenu';
 
 const HamburgerMenu = ({ navLinks }) => {
   // Konversi format navLinks dari Navbar ke format StaggeredMenu
-  const menuItems = navLinks.map((link) => ({
-    label: link.name,
-    ariaLabel: `Go to ${link.name}`,
-    link: link.href,
-  }));
+  const menuItems = [
+    ...navLinks.map((link) => ({
+      label: link.name,
+      ariaLabel: `Go to ${link.name}`,
+      link: link.href,
+    })),
+    { label: 'Log In', ariaLabel: 'Log into your account', link: '#' },
+    { label: 'Sign Up', ariaLabel: 'Create a new account', link: '#' },
+  ];
 
   const socialItems = [
     { label: 'Instagram', link: 'https://instagram.com' },
