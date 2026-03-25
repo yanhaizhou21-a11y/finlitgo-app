@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import HamburgerMenu from './HamburgerMenu';
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
   const navLinks = [
@@ -16,26 +16,13 @@ const Navbar = () => {
     <nav className="absolute top-0 left-0 w-full z-50 py-4 lg:py-6 transition-all duration-300">
       <div className="flex justify-between items-center max-w-7xl w-full mx-auto px-6 md:px-8">
         
-        {/* Logo */}
-        <div className="text-2xl font-normal text-white tracking-wide cursor-pointer z-50">
+        {/* Logo - Hidden on mobile because StaggeredMenu has its own logo in the header */}
+        <div className="hidden md:block text-2xl font-normal text-white tracking-wide cursor-pointer z-50">
           FINLITGO
         </div>
 
-        {/* Hamburger Menu Icon for Mobile */}
-        <div className="md:hidden z-50 flex items-center">
-          <button 
-            onClick={() => setIsOpen(!isOpen)}
-            className="text-white focus:outline-none"
-          >
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
+        {/* Hamburger Menu (Mobile) */}
+        <HamburgerMenu navLinks={navLinks} />
 
         {/* Desktop Menu */}
         <div className="hidden md:flex gap-6 items-center">
@@ -69,30 +56,6 @@ const Navbar = () => {
             <span className="relative z-10">Sign Up</span>
             <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-sweep pointer-events-none"></div>
           </a>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      <div className={`md:hidden absolute top-0 left-0 w-full h-screen bg-[#6d28d9]/95 backdrop-blur-lg transform transition-transform duration-300 ease-in-out flex flex-col justify-center items-center gap-6 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        {navLinks.map((link) => {
-          const isActive = link.href === '/' ? location.pathname === '/' : location.pathname.startsWith(link.href);
-          return (
-            <Link
-              key={link.name}
-              to={link.href}
-              onClick={() => setIsOpen(false)}
-              className={`text-white text-2xl font-light hover:bg-white/20 px-8 py-3 rounded-full transition-colors w-64 text-center ${
-                isActive ? 'bg-white/20' : ''
-              }`}
-            >
-              {link.name}
-            </Link>
-          );
-        })}
-        
-        <div className="mt-8 flex flex-col gap-4 w-64">
-          <a href="#" className="flex items-center justify-center bg-white/20 border border-white/50 rounded-full px-6 py-4 text-white text-xl shadow-lg transition-colors hover:bg-white/30 w-full" onClick={() => setIsOpen(false)}>Log In</a>
-          <a href="#" className="flex items-center justify-center bg-white/20 border border-white/50 rounded-full px-6 py-4 text-white text-xl shadow-lg transition-colors hover:bg-white/30 w-full" onClick={() => setIsOpen(false)}>Sign Up</a>
         </div>
       </div>
     </nav>
