@@ -111,6 +111,13 @@ npm run dev:client
 # terminal 2: backend
 npm run dev:server
 ```
+```bash
+npx shadcn@latest add @aceternity/resizable-navbar-demo
+
+npx shadcn@latest add @react-bits/GradientBlinds-JS-TW
+
+npx shadcn@latest add @react-bits/PrismaticBurst-JS-TW
+```
 
 Backend default: `http://localhost:5000`
 
