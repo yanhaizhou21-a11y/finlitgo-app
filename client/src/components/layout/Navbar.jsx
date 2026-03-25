@@ -1,7 +1,5 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import HamburgerMenu from './HamburgerMenu';
-
 const Navbar = () => {
   const location = useLocation();
 
@@ -16,13 +14,10 @@ const Navbar = () => {
     <nav className="absolute top-0 left-0 w-full z-50 py-4 lg:py-6 transition-all duration-300">
       <div className="flex justify-between items-center max-w-7xl w-full mx-auto px-6 md:px-8">
         
-        {/* Logo - Hidden on mobile because StaggeredMenu has its own logo in the header */}
-        <div className="hidden md:block text-2xl font-normal text-white tracking-wide cursor-pointer z-50">
+        {/* Logo */}
+        <div className="text-2xl font-normal text-white tracking-wide cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95">
           FINLITGO
         </div>
-
-        {/* Hamburger Menu (Mobile) */}
-        <HamburgerMenu navLinks={navLinks} />
 
         {/* Desktop Menu */}
         <div className="hidden md:flex gap-6 items-center">
