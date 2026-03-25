@@ -2,11 +2,21 @@
 
 @theme {
   --animate-sweep: sweep 0.5s ease-in-out forwards;
+  --font-orbitron: 'Orbitron', sans-serif;
+  --font-exo: 'Exo 2', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+  --font-space: 'Space Grotesk', sans-serif;
+  
+  --font-sans: 'Inter', sans-serif;
 }
 
 @keyframes sweep {
   0% { left: -100%; }
   100% { left: 100%; }
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 :root {

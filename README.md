@@ -1,5 +1,14 @@
 ## Capstone Dicoding
 
+**About Finlitgo:**
+Finlitgo is an education and money management site designed for the Gen-Z demographic, making financial literacy engaging and accessible.
+
+**Key Frontend Dependencies:**
+- `framer-motion` & `motion`: For advanced UI animations
+- `ogl`: For lightweight WebGL backgrounds
+- `@tabler/icons-react`: For scalable UI icons
+- `tailwind-merge` & `clsx`: For dynamic Tailwind class management (shadcn/ui standard)
+
 Monorepo:
 - `client/` = Vite + React frontend
 - `server/` = Express backend

@@ -18,7 +18,7 @@ const InputField = ({ label, type = 'text', name, placeholder, value, onChange, 
           value={value}
           onChange={onChange}
           required={required}
-          className="w-full px-4 py-3 bg-white/40 backdrop-blur-sm border border-white/40 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0ea5a4]/50 focus:border-transparent transition-all duration-300 placeholder-gray-500 shadow-sm"
+          className="w-full px-4 py-3 border border-gray-100 bg-[#F9FAFB] rounded-xl text-gray-900 focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all duration-300 placeholder-gray-400"
         />
         {isPassword && (
           <button
