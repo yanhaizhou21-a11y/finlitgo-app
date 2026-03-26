@@ -14,12 +14,20 @@
   color-scheme: dark;
 }
 
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #141414;
   color: #ffffff;
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
 }
 
 #root {
