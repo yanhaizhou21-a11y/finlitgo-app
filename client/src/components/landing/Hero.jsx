@@ -2,7 +2,7 @@ import React from 'react';
 
 const Hero = () => {
   return (
-    <main className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-[#000000] via-[#7a46ff] to-[#9b51ff] pt-[120px] pb-10 px-6 relative overflow-hidden">
+    <main className="min-h-screen w-full flex flex-col items-center justify-center pt-[120px] pb-10 px-6 relative overflow-hidden">
       
       {/* Search Bar - aligned right above the hero card */}
       <div className="w-full max-w-[1139px] flex justify-end mb-6 z-10">
