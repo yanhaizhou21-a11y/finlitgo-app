@@ -1,13 +1,21 @@
 import React from 'react';
 import Navbar from '../../components/layout/Navbar';
+import Footer from '../../components/layout/Footer';
 
 export default function ClassPage() {
   return (
-    <div className="site-mockup-bg min-h-screen flex flex-col">
+    <div className="site-mockup-bg w-full min-h-screen text-white flex flex-col font-sans overflow-x-hidden">
       <Navbar />
-      <div className="flex-1 flex items-center justify-center text-white text-3xl font-light">
-        Class Page
+      
+      {/* Placeholder content that is tall enough to scroll */}
+      <div className="flex-1 flex flex-col items-center justify-center min-h-[200vh]">
+        <h1 className="text-white text-3xl font-light tracking-widest opacity-20 uppercase">
+          Class Page Content Ready to be Built
+        </h1>
+      
       </div>
+
+      <Footer />
     </div>
   );
 }
