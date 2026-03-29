@@ -6,6 +6,7 @@ export default function AuthLayout({ backTo = '/login', children }) {
       <div className="w-full max-w-sm">
         <Link
           to={backTo}
+          state={{ noTransition: true }}
           className="mb-3 inline-flex items-center rounded-full bg-black/25 px-4 py-1 text-[11px] font-medium text-white/90 transition hover:bg-black/35"
         >
           &lt; Back
