@@ -1,22 +1,47 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from 'firebase/auth';
+import { auth } from '../../services/firebase';
 import InputField from './InputField';
 import GoogleButton from './GoogleButton';
 
-const SignUp = ({ onToggle }) => {
+const SignUp = ({ onToggle, onSuccess }) => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Signing up with', formData);
+    setLoading(true);
+    setError(null);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      // optionally update immediately the display name
+      await updateProfile(userCredential.user, { displayName: formData.name });
+      onSuccess(userCredential.user);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    alert('Logged in with Google');
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      onSuccess(userCredential.user);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -29,7 +54,9 @@ const SignUp = ({ onToggle }) => {
       className="flex flex-col w-full px-2"
     >
       <h2 className="text-4xl font-serif text-black mb-2 text-center md:text-left">Create Account</h2>
-      <p className="text-sm text-gray-500 font-light mb-8 text-center md:text-left">Sign up to get started.</p>
+      <p className="text-sm text-gray-500 font-light mb-8 text-center md:text-left font-space">Sign up to get started.</p>
+
+      {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
 
       <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
         <InputField
@@ -57,8 +84,8 @@ const SignUp = ({ onToggle }) => {
           onChange={handleChange}
         />
         
-        <button type="submit" className="mt-2 w-full py-3.5 px-4 bg-black hover:bg-gray-800 text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:-translate-y-0.5 border border-transparent">
-          Sign Up
+        <button type="submit" disabled={loading} className="mt-2 w-full py-3.5 px-4 bg-black hover:bg-gray-800 text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:-translate-y-0.5 border border-transparent disabled:opacity-50 disabled:hover:-translate-y-0">
+          {loading ? 'Creating Account...' : 'Sign Up'}
         </button>
       </form>
 
@@ -68,11 +95,11 @@ const SignUp = ({ onToggle }) => {
         <div className="flex-1 border-b border-gray-200 ml-3"></div>
       </div>
       
-      <GoogleButton onClick={handleGoogleLogin} />
+      <GoogleButton onClick={handleGoogleLogin} disabled={loading} />
 
       <div className="text-center mt-6 text-sm text-gray-500">
         Already have an account?{' '}
-        <button className="text-black font-semibold hover:underline bg-transparent border-none p-0" onClick={onToggle}>
+        <button className="text-black font-semibold hover:underline bg-transparent border-none p-0" onClick={onToggle} disabled={loading}>
           Sign In
         </button>
       </div>

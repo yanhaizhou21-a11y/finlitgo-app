@@ -1,22 +1,45 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth } from '../../services/firebase';
 import InputField from './InputField';
 import GoogleButton from './GoogleButton';
 
-const SignIn = ({ onToggle }) => {
+const SignIn = ({ onToggle, onSuccess }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Signing in with', formData);
+    setLoading(true);
+    setError(null);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      onSuccess(userCredential.user);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    alert('Logged in with Google');
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      onSuccess(userCredential.user);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -29,7 +52,9 @@ const SignIn = ({ onToggle }) => {
       className="flex flex-col w-full px-2"
     >
       <h2 className="text-4xl font-serif text-black mb-2 text-center md:text-left">Welcome Back</h2>
-      <p className="text-sm text-gray-500 font-light mb-8 text-center md:text-left">Enter your email and password to access your account</p>
+      <p className="text-sm text-gray-500 font-light mb-8 text-center md:text-left font-space">Enter your email and password to access your account</p>
+
+      {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
 
       <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
         <InputField
@@ -54,12 +79,12 @@ const SignIn = ({ onToggle }) => {
               <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black" />
               Remember me
             </label>
-            <a href="#" className="text-sm text-gray-600 hover:text-black font-medium transition-colors" onClick={(e) => e.preventDefault()}>Forgot Password</a>
+            <a href="#" className="text-sm text-gray-600 hover:text-black font-medium transition-colors font-space" onClick={(e) => e.preventDefault()}>Forgot Password</a>
           </div>
         </div>
         
-        <button type="submit" className="mt-4 w-full py-3.5 px-4 bg-black hover:bg-gray-800 text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:-translate-y-0.5 border border-transparent">
-          Sign In
+        <button type="submit" disabled={loading} className="mt-4 w-full py-3.5 px-4 bg-black hover:bg-gray-800 text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:-translate-y-0.5 border border-transparent disabled:opacity-50 disabled:hover:-translate-y-0">
+          {loading ? 'Signing In...' : 'Sign In'}
         </button>
       </form>
 
@@ -69,11 +94,11 @@ const SignIn = ({ onToggle }) => {
         <div className="flex-1 border-b border-gray-200 ml-3"></div>
       </div>
       
-      <GoogleButton onClick={handleGoogleLogin} />
+      <GoogleButton onClick={handleGoogleLogin} disabled={loading} />
 
       <div className="text-center mt-6 text-sm text-gray-500">
         Don't have an account?{' '}
-        <button className="text-black font-semibold hover:underline bg-transparent border-none p-0" onClick={onToggle}>
+        <button className="text-black font-semibold hover:underline bg-transparent border-none p-0" onClick={onToggle} disabled={loading}>
           Sign Up
         </button>
       </div>

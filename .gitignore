@@ -10,3 +10,5 @@ node_modules/
 /client/dist/
 #firebase thing
 firebase.json
+firebase.js
+

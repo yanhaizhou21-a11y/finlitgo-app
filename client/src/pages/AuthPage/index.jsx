@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PrismaticBurst from '../../components/Background/PrismaticBurst';
 import AuthContainer from '../../components/Auth/AuthContainer';
 
@@ -43,6 +44,17 @@ const AuthPage = () => {
       {/* Right Column (Form Area) */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 relative overflow-y-auto">
         
+        {/* Back Button */}
+        <Link 
+          to="/" 
+          className="absolute top-12 left-8 md:left-12 flex items-center gap-2 text-gray-400 hover:text-black transition-colors z-20 font-exo"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span className="font-medium text-sm">Back</span>
+        </Link>
+
         {/* Logo/Brand at top-center */}
         <div className="absolute top-12 left-1/2 transform -translate-x-1/2 flex items-center justify-center gap-2 text-xl font-semibold">
            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
