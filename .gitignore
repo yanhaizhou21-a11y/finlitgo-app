@@ -8,3 +8,5 @@ node_modules/
 # (Add any other client-specific ignores here, like build folders)
 /client/build/
 /client/dist/
+#firebase thing
+firebase.json
