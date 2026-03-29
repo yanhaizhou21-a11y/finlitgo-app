@@ -1,4 +1,6 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import SmoothScroll from './components/common/SmoothScroll';
 import HomePage from './pages/HomePage';
 import ClassPage from './pages/ClassPage';
 import BlogPage from './pages/BlogPage';
@@ -8,6 +10,7 @@ import AuthPage from './pages/AuthPage';
 function App() {
   return (
     <Router>
+      <SmoothScroll />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/class" element={<ClassPage />} />
