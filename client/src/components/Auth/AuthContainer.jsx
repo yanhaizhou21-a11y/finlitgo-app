@@ -27,7 +27,7 @@ const AuthContainer = () => {
       const userSnap = await getDoc(userRef);
       if (userSnap.exists() && userSnap.data().username && userSnap.data().dateOfBirth) {
         // User profile is already complete
-        navigate('/');
+        navigate('/dashboard');
       } else {
         // Needs profile completion
         setView('completeProfile');
@@ -40,7 +40,7 @@ const AuthContainer = () => {
   };
 
   const handleProfileComplete = () => {
-    navigate('/');
+    navigate('/dashboard');
   };
 
   return (

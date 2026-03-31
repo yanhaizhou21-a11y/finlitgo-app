@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#252525"/>
+  
+  <!-- Crescent shape -->
+  <path d="M 100 20 C 150 20 190 60 190 110 C 170 70 140 50 100 50 C 60 50 30 70 10 110 C 10 60 50 20 100 20 Z" fill="#ffffff"/>
+  
+  <!-- Money Bills -->
+  <rect x="75" y="45" width="50" height="40" rx="5" fill="#3D3D3D" transform="rotate(-20 100 65)"/>
+  <rect x="80" y="50" width="50" height="40" rx="5" fill="#808080" transform="rotate(-10 105 70)"/>
+  <rect x="85" y="55" width="50" height="40" rx="5" fill="#FFFFFF"/>
+  <text x="110" y="85" font-family="'Inter', sans-serif" font-weight="bold" font-size="24" fill="#252525" text-anchor="middle">$</text>
+  
+  <!-- Hand Outline -->
+  <!-- Hand Wrist -->
+  <path d="M 45 100 h 10 v 35 h -10 Z" fill="#ffffff" rx="3"/>
+  <!-- Hand Palm -->
+  <path d="M 60 115 Q 85 100 110 115 Q 140 120 145 110 Q 140 140 100 145 Q 70 145 60 135 Z" fill="#ffffff"/>
+  
+  <!-- FinLitGo Text -->
+  <text x="100" y="175" font-family="'Orbitron', sans-serif" font-weight="bold" font-size="32" fill="#ffffff" text-anchor="middle">FinLitGo</text>
+</svg>

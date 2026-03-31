@@ -8,6 +8,14 @@
   --font-space: 'Space Grotesk', sans-serif;
   
   --font-sans: 'Inter', sans-serif;
+
+  --color-primary-dark: #121212;
+  --color-panel-dark: #1E1E1E;
+  --color-panel-light: #2A2A2A;
+  --color-accent-green: #CAFF33;
+  --color-text-primary: #FFFFFF;
+  --color-text-muted: #888888;
+  --color-danger: #FF4D4D;
 }
 
 @keyframes sweep {
