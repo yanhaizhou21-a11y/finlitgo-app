@@ -1,30 +1,30 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
+import AdminSidebar from './AdminSidebar';
 import TopHeader from './TopHeader';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../../store/AuthContext';
 
 export default function DashboardLayout() {
   const location = useLocation();
+  const { isAdmin } = useAuth();
 
   const getHeaderTitle = () => {
-    if (location.pathname.startsWith('/class/')) return 'Literature Class';
-    if (location.pathname.startsWith('/blog/')) return 'Blog Post';
+    if (location.pathname.startsWith('/dashboard/manage-classes')) return 'Manage Classes';
+    if (location.pathname.startsWith('/dashboard/manage-blog')) return 'Manage Blog';
     switch(location.pathname) {
-      case '/dashboard': return 'Dashboard Overview';
+      case '/dashboard': return isAdmin ? 'Admin Dashboard' : 'Dashboard Overview';
       case '/dashboard/finance': return 'Financial Dashboard';
       case '/dashboard/history': return 'History Transaction & Study';
       case '/dashboard/settings': return 'Pengaturan';
-      case '/class': return 'Learning Modules';
-      case '/blog': return 'Resources Blog';
-      case '/ai-assist': return 'AI Assistant';
       default: return 'FinLitGo';
     }
   };
 
   return (
     <div className="flex h-screen bg-[#121212] text-white overflow-hidden font-inter">
-      <Sidebar />
+      {isAdmin ? <AdminSidebar /> : <Sidebar />}
       <div className="flex-1 flex flex-col min-w-0">
         <TopHeader title={getHeaderTitle()} />
         <main className="flex-1 overflow-y-auto p-6 md:p-8 relative">

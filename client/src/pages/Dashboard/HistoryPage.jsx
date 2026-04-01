@@ -17,7 +17,7 @@ export default function HistoryPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h2 className="text-2xl font-bold font-orbitron uppercase tracking-widest text-[var(--color-accent-green)]">History Transaction and Study</h2>
+        <h2 className="text-2xl font-bold font-orbitron uppercase tracking-widest text-violet-400">History Transaction and Study</h2>
         <p className="text-sm text-zinc-500 mt-2">Track your cashflow and learning milestones.</p>
       </div>
 
@@ -30,7 +30,7 @@ export default function HistoryPage() {
         >
           <div className="flex justify-between items-center mb-6 border-b border-zinc-800 pb-4">
             <h3 className="text-lg font-medium text-white flex items-center gap-2">
-              <IconArrowUpRight className="text-[var(--color-accent-green)]" />
+              <IconArrowUpRight className="text-violet-400" />
               Recent Transactions
             </h3>
             <button className="text-xs text-zinc-400 hover:text-white transition-colors">View All</button>
@@ -50,7 +50,7 @@ export default function HistoryPage() {
                     {tx.icon}
                   </div>
                   <div>
-                    <h4 className="font-medium text-white group-hover:text-[var(--color-accent-green)] transition-colors">{tx.title}</h4>
+                    <h4 className="font-medium text-white group-hover:text-violet-300 transition-colors">{tx.title}</h4>
                     <span className="text-xs text-zinc-500 font-mono">{tx.date}</span>
                   </div>
                 </div>
@@ -71,7 +71,7 @@ export default function HistoryPage() {
         >
           <div className="flex justify-between items-center mb-6 border-b border-zinc-800 pb-4">
             <h3 className="text-lg font-medium text-white flex items-center gap-2">
-              <IconBook2 className="text-[var(--color-accent-green)]" />
+              <IconBook2 className="text-violet-400" />
               Study Progress
             </h3>
             <button className="text-xs text-zinc-400 hover:text-white transition-colors">View All</button>
@@ -87,7 +87,7 @@ export default function HistoryPage() {
                 className="flex items-center justify-between p-4 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-colors group cursor-pointer"
               >
                 <div className="flex items-center gap-4 w-full">
-                  <div className="w-12 h-12 bg-[var(--color-accent-green)]/10 text-[var(--color-accent-green)] border border-[var(--color-accent-green)]/30 rounded-full flex items-center justify-center font-bold text-sm">
+                  <div className="w-12 h-12 bg-violet-500/10 text-violet-400 border border-violet-500/30 rounded-full flex items-center justify-center font-bold text-sm">
                     {study.progress}
                   </div>
                   <div className="flex-1">

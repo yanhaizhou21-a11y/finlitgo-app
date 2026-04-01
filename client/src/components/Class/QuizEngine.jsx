@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconX, IconCheck, IconTarget } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
+import { recordStudyActivity } from '../../utils/streak';
 
 export default function QuizEngine({ questions, onComplete }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -22,6 +23,7 @@ export default function QuizEngine({ questions, onComplete }) {
     
     if (selectedOption === currentQ.correctAnswer) {
       setStatus('correct');
+      recordStudyActivity(); // Track streak — 1 per day
     } else {
       setStatus('incorrect');
     }
@@ -50,7 +52,7 @@ export default function QuizEngine({ questions, onComplete }) {
         </button>
         <div className="flex-1 h-4 bg-zinc-800 rounded-full overflow-hidden">
           <motion.div 
-            className="h-full bg-[var(--color-accent-green)] rounded-full"
+            className="h-full bg-gradient-to-r from-violet-600 to-purple-400 rounded-full"
             initial={{ width: `${((currentIndex) / questions.length) * 100}%` }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -82,7 +84,7 @@ export default function QuizEngine({ questions, onComplete }) {
                 let cardStyle = "bg-[#1A1A1A] border-zinc-700 hover:bg-zinc-800";
                 
                 if (isSelected && status === 'idle') {
-                  cardStyle = "bg-[var(--color-accent-green)]/10 border-[var(--color-accent-green)] text-[var(--color-accent-green)]";
+                  cardStyle = "bg-violet-500/10 border-violet-500 text-violet-400";
                 } else if (isCorrect || showCorrect) {
                   cardStyle = "bg-green-500/20 border-green-500 text-green-400";
                 } else if (isWrong) {
@@ -133,8 +135,7 @@ export default function QuizEngine({ questions, onComplete }) {
             className={`w-40 h-14 rounded-2xl font-bold uppercase tracking-widest text-lg transition-all ${
               selectedOption === null 
                 ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed' 
-                : status === 'idle' 
-                  ? 'bg-[var(--color-accent-green)] text-black hover:bg-lime-400 hover:shadow-[0_0_20px_rgba(202,255,51,0.3)]'
+                : status === 'idle'                   ? 'bg-gradient-to-r from-violet-600 to-purple-400 text-white hover:shadow-[0_0_20px_rgba(124,58,237,0.3)]'
                   : status === 'correct'
                     ? 'bg-green-500 text-black shadow-[0_0_20px_rgba(34,197,94,0.3)]'
                     : 'bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.3)]'

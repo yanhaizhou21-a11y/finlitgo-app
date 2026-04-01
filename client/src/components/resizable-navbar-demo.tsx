@@ -17,22 +17,10 @@ import { auth, db } from "../services/firebase";
 
 export default function NavbarDemo() {
   const navItems = [
-    {
-      name: "Home",
-      link: "/",
-    },
-    {
-      name: "Class",
-      link: "/class",
-    },
-    {
-      name: "Blog",
-      link: "/blog",
-    },
-    {
-      name: "Ai assist",
-      link: "/ai-assist",
-    },
+    { name: "Home", link: "/" },
+    { name: "Class", link: "/class" },
+    { name: "Blog", link: "/blog" },
+    { name: "AI Assist", link: "/ai-assist" },
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -72,6 +60,10 @@ export default function NavbarDemo() {
     }
   };
 
+  const displayName = profileData?.username || profileData?.fullName || user?.displayName || "User";
+  const photoURL = profileData?.photoUrl || user?.photoURL;
+  const initial = displayName.charAt(0).toUpperCase();
+
   return (
     <div className="relative w-full z-50">
       <Navbar className="bg-transparent border-none">
@@ -80,26 +72,30 @@ export default function NavbarDemo() {
           <NavbarLogo />
           <NavItems items={navItems} />
           
-          <div className="flex items-center gap-4 relative z-20">
+          <div className="flex items-center gap-3 relative z-20">
             {user ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                {/* Profile Avatar */}
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center border border-gray-300">
-                    {profileData?.photoUrl || user.photoURL ? (
-                      <img src={profileData?.photoUrl || user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-purple-400 overflow-hidden flex items-center justify-center border-2 border-violet-400/30 shadow-[0_0_10px_rgba(124,58,237,0.2)]">
+                    {photoURL ? (
+                      <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-gray-500 font-bold text-sm">
-                        {(profileData?.username || user.displayName || "?").charAt(0).toUpperCase()}
-                      </span>
+                      <span className="text-white font-bold text-xs">{initial}</span>
                     )}
                   </div>
-                  <span className="text-sm font-medium hidden md:block">
-                    {profileData?.username || user.displayName || "User"}
-                  </span>
+                  <span className="text-sm font-medium hidden md:block text-white">{displayName}</span>
                 </div>
+                
+                {/* Dashboard Button */}
+                <NavbarButton variant="primary" href="/dashboard">
+                  Dashboard
+                </NavbarButton>
+                
+                {/* Logout */}
                 <button 
                   onClick={handleLogout}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-black transition-colors"
+                  className="px-3 py-2 text-sm font-medium text-gray-400 hover:text-red-400 transition-colors"
                 >
                   Logout
                 </button>
@@ -138,26 +134,32 @@ export default function NavbarDemo() {
               </a>
             ))}
             
-            <div className="mt-4 pt-4 border-t border-gray-100 flex w-full flex-col gap-4">
+            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800 flex w-full flex-col gap-4">
               {user ? (
                 <>
                   <div className="flex items-center gap-3 px-2 mb-2">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-                      {profileData?.photoUrl || user.photoURL ? (
-                        <img src={profileData?.photoUrl || user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-purple-400 overflow-hidden flex items-center justify-center">
+                      {photoURL ? (
+                        <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
                       ) : (
-                        <span className="text-gray-500 font-bold text-lg">
-                          {(profileData?.username || user.displayName || "?").charAt(0).toUpperCase()}
-                        </span>
+                        <span className="text-white font-bold text-lg">{initial}</span>
                       )}
                     </div>
-                    <span className="font-medium">
-                      {profileData?.username || user.displayName || "User"}
-                    </span>
+                    <span className="font-medium dark:text-white">{displayName}</span>
                   </div>
+                  
+                  <NavbarButton
+                    href="/dashboard"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    variant="primary"
+                    className="w-full text-center"
+                  >
+                    Dashboard
+                  </NavbarButton>
+                  
                   <button
                     onClick={handleLogout}
-                    className="w-full text-center py-2 px-4 bg-red-50 text-red-600 rounded-lg font-medium hover:bg-red-100 transition-colors"
+                    className="w-full text-center py-2 px-4 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg font-medium hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"
                   >
                     Logout
                   </button>

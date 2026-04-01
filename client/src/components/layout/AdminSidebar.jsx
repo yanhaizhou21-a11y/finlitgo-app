@@ -4,9 +4,12 @@ import { motion } from 'framer-motion';
 import { 
   IconLayoutDashboard, 
   IconChartBar, 
-  IconHistory, 
   IconSettings, 
-  IconLogout
+  IconBook2,
+  IconArticle,
+  IconLogout,
+  IconSchool,
+  IconWriting
 } from '@tabler/icons-react';
 import logoUrl from '../../assets/logo.svg';
 import { useAuth } from '../../store/AuthContext';
@@ -16,7 +19,7 @@ import { auth } from '../../services/firebase';
 const AnimatedNavItem = ({ to, icon: Icon, label }) => {
   return (
     <NavLink 
-      to={to}
+      to={to} 
       end
       className={({ isActive }) => 
         `relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl mb-4 transition-all duration-300 group ${
@@ -36,7 +39,7 @@ const AnimatedNavItem = ({ to, icon: Icon, label }) => {
   );
 };
 
-export default function Sidebar() {
+export default function AdminSidebar() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -63,9 +66,15 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 flex flex-col items-center gap-2 w-full">
-        <AnimatedNavItem to="/dashboard" icon={IconLayoutDashboard} label="Dashboard" />
+        <AnimatedNavItem to="/dashboard" icon={IconLayoutDashboard} label="Admin Overview" />
+        <div className="w-8 h-px bg-zinc-800 my-2" />
+        
+        {/* Admin CRUD Section */}
+        <AnimatedNavItem to="/dashboard/manage-classes" icon={IconSchool} label="Manage Classes" />
+        <AnimatedNavItem to="/dashboard/manage-blog" icon={IconWriting} label="Manage Blog" />
+        
+        <div className="w-8 h-px bg-zinc-800 my-2" />
         <AnimatedNavItem to="/dashboard/finance" icon={IconChartBar} label="Financial" />
-        <AnimatedNavItem to="/dashboard/history" icon={IconHistory} label="History" />
       </nav>
 
       <div className="mt-auto w-full flex flex-col items-center gap-2">
@@ -84,8 +93,11 @@ export default function Sidebar() {
         </button>
 
         {/* Avatar */}
-        <div className="relative w-10 h-10 rounded-full border-2 border-zinc-700 overflow-hidden hover:border-violet-400 transition-colors mt-1 group cursor-pointer" onClick={() => navigate('/dashboard/settings')}>
+        <div className="relative w-10 h-10 rounded-full border-2 border-violet-500/30 overflow-hidden hover:border-violet-400 transition-colors mt-1 group cursor-pointer" onClick={() => navigate('/dashboard/settings')}>
           <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-violet-500 to-purple-400 rounded-full border-2 border-[var(--color-primary-dark)] flex items-center justify-center" title="Admin">
+            <span className="text-[6px] font-black text-white">A</span>
+          </div>
         </div>
       </div>
     </motion.aside>
