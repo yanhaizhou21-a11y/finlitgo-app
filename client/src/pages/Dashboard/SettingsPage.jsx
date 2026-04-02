@@ -4,6 +4,7 @@ import { IconUser, IconShieldLock, IconMail, IconArrowRight, IconCheck } from '@
 import { useAuth } from '../../store/AuthContext';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
+import { updateProfile } from 'firebase/auth';
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -15,6 +16,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [photoURL, setPhotoURL] = useState('');
+  const [photoError, setPhotoError] = useState('');
 
   // Load profile from Firestore
   useEffect(() => {
@@ -51,6 +53,34 @@ export default function SettingsPage() {
     setSaved(false);
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setPhotoError('File harus berupa gambar.');
+      return;
+    }
+
+    // Keep profile photo payload lightweight for Firestore doc size limits.
+    if (file.size > 2 * 1024 * 1024) {
+      setPhotoError('Ukuran gambar maksimal 2MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : '';
+      setPhotoURL(result);
+      setPhotoError('');
+      setSaved(false);
+    };
+    reader.onerror = () => {
+      setPhotoError('Gagal membaca file gambar. Coba lagi.');
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSave = async () => {
     if (!user) return;
     setSaving(true);
@@ -62,6 +92,12 @@ export default function SettingsPage() {
         photoUrl: photoURL,
         updatedAt: new Date().toISOString(),
       }, { merge: true });
+
+      await updateProfile(user, {
+        displayName: formData.fullName || formData.username || user.displayName || '',
+        photoURL: photoURL || null,
+      });
+
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
@@ -88,10 +124,17 @@ export default function SettingsPage() {
              animate={{ opacity: 1, x: 0 }}
              className="bg-[#1A1A1A] border border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-4"
            >
+             <input
+               id="profile-photo-input"
+               type="file"
+               accept="image/*"
+               className="hidden"
+               onChange={handlePhotoChange}
+             />
              <div className="w-24 h-24 rounded-full border-2 border-violet-500/50 overflow-hidden relative group shadow-[0_0_20px_rgba(124,58,237,0.2)]">
-               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+               <label htmlFor="profile-photo-input" className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                  <span className="text-xs uppercase tracking-wider font-bold">Edit</span>
-               </div>
+               </label>
                {photoURL ? (
                  <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
                ) : (
@@ -100,10 +143,12 @@ export default function SettingsPage() {
                  </div>
                )}
              </div>
-             
+
              <div>
                <h3 className="font-bold text-lg text-white">{displayName}</h3>
                <p className="text-sm text-zinc-500">{user?.email}</p>
+               <p className="text-xs text-zinc-600 mt-1">Klik avatar untuk ganti foto.</p>
+               {photoError && <p className="text-xs text-red-400 mt-2">{photoError}</p>}
              </div>
            </motion.div>
 
