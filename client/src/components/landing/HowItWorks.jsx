@@ -25,7 +25,7 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section className="w-full bg-[#111111] py-24 px-6 md:px-12 flex flex-col items-center">
+    <section className="w-full bg-transparent py-24 px-6 md:px-12 flex flex-col items-center">
       <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-2">
         How FinLitGo Works
       </h2>

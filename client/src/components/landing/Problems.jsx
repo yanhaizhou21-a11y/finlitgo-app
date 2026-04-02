@@ -2,14 +2,14 @@ import React from 'react';
 
 const Problems = () => {
   return (
-    <section className="w-full bg-[#18181A] py-24 px-6 md:px-12 flex flex-col items-center">
+    <section className="w-full bg-transparent py-24 px-6 md:px-12 flex flex-col items-center">
       <h2 className="text-3xl md:text-4xl font-semibold text-center text-white mb-16 max-w-lg">
         Masalah finansial yang kita hadapi bersama
       </h2>
       
       <div className="flex flex-col md:flex-row gap-8 justify-center items-center max-w-6xl w-full">
         {/* Card 1 */}
-        <div className="bg-[#2A2A2E] rounded-3xl p-3 w-72 h-80 flex flex-col relative shadow-xl border border-white/5">
+        <div className="bg-[#1a1b29]/85 rounded-3xl p-3 w-72 h-80 flex flex-col relative shadow-xl border border-white/10 backdrop-blur-sm">
           <div className="h-1/2 w-full rounded-2xl bg-gradient-to-br from-orange-400 to-purple-600 overflow-hidden relative">
             {/* Placeholder for image */}
             <div className="absolute inset-0 bg-black/20"></div>
@@ -20,7 +20,7 @@ const Problems = () => {
         </div>
 
         {/* Card 2 */}
-        <div className="bg-[#2A2A2E] rounded-3xl p-3 w-72 h-80 flex flex-col relative shadow-xl border border-white/5">
+        <div className="bg-[#1a1b29]/85 rounded-3xl p-3 w-72 h-80 flex flex-col relative shadow-xl border border-white/10 backdrop-blur-sm">
           <div className="h-1/2 w-full rounded-2xl bg-gradient-to-br from-orange-400 to-purple-600 overflow-hidden relative">
             <div className="absolute inset-0 bg-black/20"></div>
           </div>
@@ -30,7 +30,7 @@ const Problems = () => {
         </div>
 
         {/* Card 3 */}
-        <div className="bg-[#2A2A2E] rounded-3xl p-3 w-72 h-80 flex flex-col relative shadow-xl border border-white/5">
+        <div className="bg-[#1a1b29]/85 rounded-3xl p-3 w-72 h-80 flex flex-col relative shadow-xl border border-white/10 backdrop-blur-sm">
           <div className="h-1/2 w-full rounded-2xl bg-gradient-to-br from-orange-400 to-purple-600 overflow-hidden relative">
             <div className="absolute inset-0 bg-black/20"></div>
           </div>
