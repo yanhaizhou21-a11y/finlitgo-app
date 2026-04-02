@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../store/AuthContext';
 import { IconFlame, IconBook2, IconLock, IconCheck, IconSearch, IconFilter } from '@tabler/icons-react';
 
 const STORAGE_KEY = 'finlitgo_classes';
@@ -17,9 +18,21 @@ function getClasses() {
 
 export default function ClassPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState('All');
   const [search, setSearch] = useState('');
   const classes = getClasses();
+
+  // IDs of classes that require login
+  const loginRequiredIds = [1, 2, 3];
+
+  const handleClassClick = (course) => {
+    if (loginRequiredIds.includes(course.id) && !user) {
+      navigate('/register');
+      return;
+    }
+    navigate(`/class/${course.id}`);
+  };
 
   const filters = ['All', 'Foundation', 'Growth', 'Advanced'];
   const filteredClasses = classes.filter(cls => {
@@ -119,7 +132,7 @@ export default function ClassPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              onClick={() => navigate(`/class/${course.id}`)}
+              onClick={() => handleClassClick(course)}
               className="bg-[#1A1A1A] border border-zinc-800 hover:border-violet-500/40 rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer group hover:-translate-y-1 shadow-lg hover:shadow-2xl hover:shadow-violet-500/10 flex flex-col"
             >
               {/* Image */}
@@ -135,6 +148,16 @@ export default function ClassPage() {
                 <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-mono font-bold text-violet-300 border border-violet-500/30">
                   {course.category}
                 </div>
+
+                {/* Lock overlay for login-required classes */}
+                {loginRequiredIds.includes(course.id) && !user && (
+                  <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center z-10">
+                    <div className="flex flex-col items-center gap-2">
+                      <IconLock size={32} className="text-violet-300" />
+                      <span className="text-xs font-medium text-violet-300">Login Required</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Content */}

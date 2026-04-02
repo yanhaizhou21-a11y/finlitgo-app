@@ -68,8 +68,8 @@ export default function ClassListPage() {
                whileInView={{ opacity: 1, y: 0 }}
                viewport={{ once: true }}
                transition={{ delay: i * 0.1 }}
-               onClick={() => !course.locked && navigate(`/class/${course.id}`)}
-               className={`bg-[#1A1A1A] border ${course.locked ? 'border-zinc-800/50 opacity-70' : 'border-zinc-800 hover:border-[var(--color-accent-green)] cursor-pointer group hover:-translate-y-1 shadow-lg hover:shadow-2xl hover:shadow-[var(--color-accent-green)]/10'} rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-[380px]`}
+               onClick={() => course.locked ? navigate('/register') : navigate(`/class/${course.id}`)}
+               className={`bg-[#1A1A1A] border ${course.locked ? 'border-zinc-800/50 opacity-70 cursor-pointer' : 'border-zinc-800 hover:border-[var(--color-accent-green)] cursor-pointer group hover:-translate-y-1 shadow-lg hover:shadow-2xl hover:shadow-[var(--color-accent-green)]/10'} rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-[380px]`}
              >
                 <div className="h-40 w-full relative overflow-hidden bg-zinc-900 border-b border-zinc-800">
                   <img src={course.image} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-60" />
