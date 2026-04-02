@@ -1,0 +1,93 @@
+[33m8d1a8ec[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mauth-backend[m[33m, [m[1;31morigin/auth-backend[m[33m)[m HEAD@{0}: checkout: moving from develop to auth-backend
+[33m477fe01[m[33m ([m[1;31morigin/develop[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{1}: pull origin develop: Fast-forward
+[33m4bfa74a[m HEAD@{2}: checkout: moving from feature/class-page to develop
+[33mee60341[m[33m ([m[1;32mfeature/class-page[m[33m)[m HEAD@{3}: checkout: moving from blog to feature/class-page
+[33m0c81727[m[33m ([m[1;31morigin/blog[m[33m, [m[1;32mblog[m[33m)[m HEAD@{4}: checkout: moving from develop to blog
+[33m4bfa74a[m HEAD@{5}: checkout: moving from auth-backend to develop
+[33m8d1a8ec[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mauth-backend[m[33m, [m[1;31morigin/auth-backend[m[33m)[m HEAD@{6}: checkout: moving from main to auth-backend
+[33m9608c9a[m[33m ([m[1;32mmain[m[33m)[m HEAD@{7}: checkout: moving from auth-backend to main
+[33m35f65fb[m HEAD@{8}: commit: instal dep
+[33m8d1a8ec[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mauth-backend[m[33m, [m[1;31morigin/auth-backend[m[33m)[m HEAD@{9}: pull origin auth-backend: Fast-forward
+[33m5a926a2[m HEAD@{10}: checkout: moving from feature/ai-assist-page to auth-backend
+[33m8cfb427[m[33m ([m[1;32mfeature/ai-assist-page[m[33m)[m HEAD@{11}: commit: idk
+[33m41f6055[m[33m ([m[1;31morigin/feature/class-page[m[33m, [m[1;31morigin/feature/ai-assist-page[m[33m)[m HEAD@{12}: checkout: moving from feature/class-page to feature/ai-assist-page
+[33mee60341[m[33m ([m[1;32mfeature/class-page[m[33m)[m HEAD@{13}: commit: Class Page 3 file
+[33m41f6055[m[33m ([m[1;31morigin/feature/class-page[m[33m, [m[1;31morigin/feature/ai-assist-page[m[33m)[m HEAD@{14}: checkout: moving from feature/ai-assist-page to feature/class-page
+[33m41f6055[m[33m ([m[1;31morigin/feature/class-page[m[33m, [m[1;31morigin/feature/ai-assist-page[m[33m)[m HEAD@{15}: checkout: moving from feature/class-page to feature/ai-assist-page
+[33m41f6055[m[33m ([m[1;31morigin/feature/class-page[m[33m, [m[1;31morigin/feature/ai-assist-page[m[33m)[m HEAD@{16}: checkout: moving from develop to feature/class-page
+[33m4bfa74a[m HEAD@{17}: commit: humburger mobile
+[33m461675c[m HEAD@{18}: checkout: moving from feature/class-page to develop
+[33m41f6055[m[33m ([m[1;31morigin/feature/class-page[m[33m, [m[1;31morigin/feature/ai-assist-page[m[33m)[m HEAD@{19}: checkout: moving from develop to feature/class-page
+[33m461675c[m HEAD@{20}: pull origin develop: Fast-forward
+[33mfe84f03[m HEAD@{21}: checkout: moving from feature/class-page to develop
+[33m41f6055[m[33m ([m[1;31morigin/feature/class-page[m[33m, [m[1;31morigin/feature/ai-assist-page[m[33m)[m HEAD@{22}: commit: Page transision
+[33mfe84f03[m HEAD@{23}: checkout: moving from auth-backend to feature/class-page
+[33m5a926a2[m HEAD@{24}: checkout: moving from feature/class-page to auth-backend
+[33mfe84f03[m HEAD@{25}: checkout: moving from develop to feature/class-page
+[33mfe84f03[m HEAD@{26}: checkout: moving from auth-backend to develop
+[33m5a926a2[m HEAD@{27}: checkout: moving from develop to auth-backend
+[33mfe84f03[m HEAD@{28}: checkout: moving from auth-backend to develop
+[33m5a926a2[m HEAD@{29}: checkout: moving from develop to auth-backend
+[33mfe84f03[m HEAD@{30}: commit: dependen
+[33m84f4dc6[m HEAD@{31}: commit: tailwind dev
+[33m539f68f[m HEAD@{32}: pull origin develop: Merge made by the 'ort' strategy.
+[33m5110719[m HEAD@{33}: checkout: moving from auth-backend to develop
+[33m5a926a2[m HEAD@{34}: commit: add smooth scroll
+[33m3f0beb6[m HEAD@{35}: checkout: moving from develop to auth-backend
+[33m5110719[m HEAD@{36}: commit: fix horizontal scroll
+[33m71437a2[m HEAD@{37}: commit: fix horizontal scroll
+[33m03610f3[m HEAD@{38}: commit: smooth scrolling
+[33mb550df4[m HEAD@{39}: checkout: moving from auth-backend to develop
+[33m3f0beb6[m HEAD@{40}: pull origin auth-backend: Merge made by the 'ort' strategy.
+[33mc74a1f4[m HEAD@{41}: checkout: moving from develop to auth-backend
+[33mb550df4[m HEAD@{42}: commit: delet humburger
+[33md36ac8e[m HEAD@{43}: checkout: moving from auth-backend to develop
+[33mc74a1f4[m HEAD@{44}: checkout: moving from develop to auth-backend
+[33md36ac8e[m HEAD@{45}: checkout: moving from auth-backend to develop
+[33mc74a1f4[m HEAD@{46}: pull origin auth-backend: Merge made by the 'ort' strategy.
+[33m395e93b[m HEAD@{47}: checkout: moving from develop to auth-backend
+[33md36ac8e[m HEAD@{48}: commit: login button di humburger
+[33m9929c84[m HEAD@{49}: checkout: moving from auth-backend to develop
+[33m395e93b[m HEAD@{50}: commit: frammer instal
+[33m4c12b94[m HEAD@{51}: checkout: moving from develop to auth-backend
+[33m9929c84[m HEAD@{52}: checkout: moving from develop to develop
+[33m9929c84[m HEAD@{53}: commit: StarggedMenu untuk tampilan humburger di mobile
+[33md43c2bd[m HEAD@{54}: checkout: moving from auth-backend to develop
+[33m4c12b94[m HEAD@{55}: checkout: moving from develop to auth-backend
+[33md43c2bd[m HEAD@{56}: checkout: moving from auth-backend to develop
+[33m4c12b94[m HEAD@{57}: commit: chore: add framer-motion to package-lock
+[33me7caee2[m HEAD@{58}: checkout: moving from develop to auth-backend
+[33md43c2bd[m HEAD@{59}: reset: moving to HEAD
+[33md43c2bd[m HEAD@{60}: reset: moving to HEAD
+[33md43c2bd[m HEAD@{61}: checkout: moving from remotes/origin/auth-backend to develop
+[33md43c2bd[m HEAD@{62}: checkout: moving from develop to remotes/origin/auth-backend
+[33md43c2bd[m HEAD@{63}: pull origin develop: Fast-forward
+[33md5e3e62[m HEAD@{64}: checkout: moving from dashboard to develop
+[33md43c2bd[m HEAD@{65}: pull origin develop: Fast-forward
+[33m73bc526[m[33m ([m[1;31morigin/dashboard[m[33m)[m HEAD@{66}: commit: test doang
+[33m9cb7561[m[33m ([m[1;32mlandingpage[m[33m)[m HEAD@{67}: checkout: moving from landingpage to dashboard
+[33m9cb7561[m[33m ([m[1;32mlandingpage[m[33m)[m HEAD@{68}: checkout: moving from develop to landingpage
+[33md5e3e62[m HEAD@{69}: pull origin develop: Fast-forward
+[33m811da56[m HEAD@{70}: checkout: moving from landingpage to develop
+[33m9cb7561[m[33m ([m[1;32mlandingpage[m[33m)[m HEAD@{71}: commit: hero
+[33md8bc7ad[m[33m ([m[1;31morigin/landingpage[m[33m)[m HEAD@{72}: commit: buat kotak hero
+[33m811da56[m HEAD@{73}: pull origin develop: Fast-forward
+[33m3a8ad06[m HEAD@{74}: checkout: moving from develop to landingpage
+[33m811da56[m HEAD@{75}: checkout: moving from feature/blog-ai-assist-page to develop
+[33m811da56[m HEAD@{76}: checkout: moving from feature/blog-page to feature/blog-ai-assist-page
+[33m811da56[m HEAD@{77}: checkout: moving from feature/class-page to feature/blog-page
+[33m811da56[m HEAD@{78}: checkout: moving from develop to feature/class-page
+[33m811da56[m HEAD@{79}: commit: feat: setup react router and dummy pages for class, blog, ai
+[33m222a136[m HEAD@{80}: checkout: moving from landingpage to develop
+[33m3a8ad06[m HEAD@{81}: checkout: moving from develop to landingpage
+[33m222a136[m HEAD@{82}: pull origin develop: Fast-forward
+[33m9608c9a[m[33m ([m[1;32mmain[m[33m)[m HEAD@{83}: checkout: moving from landingpage to develop
+[33m3a8ad06[m HEAD@{84}: checkout: moving from develop to landingpage
+[33m9608c9a[m[33m ([m[1;32mmain[m[33m)[m HEAD@{85}: reset: moving to HEAD
+[33m9608c9a[m[33m ([m[1;32mmain[m[33m)[m HEAD@{86}: checkout: moving from landingpage to develop
+[33m3a8ad06[m HEAD@{87}: commit: set up folder dan file landing page dari mulai navbar sampai footer
+[33m9608c9a[m[33m ([m[1;32mmain[m[33m)[m HEAD@{88}: checkout: moving from develop to landingpage
+[33m9608c9a[m[33m ([m[1;32mmain[m[33m)[m HEAD@{89}: checkout: moving from main to develop
+[33m9608c9a[m[33m ([m[1;32mmain[m[33m)[m HEAD@{90}: checkout: moving from Authentication to main
+[33m1238c2a[m HEAD@{91}: checkout: moving from feature-login to Authentication
+[33ma97ea28[m[33m ([m[1;31morigin/feature-login[m[33m, [m[1;32mfeatur
