@@ -10,6 +10,8 @@ import CompleteProfile from './CompleteProfile';
 const AuthContainer = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
+  const redirectTo = searchParams.get('redirect') || '/dashboard';
   // views: 'signin', 'signup', 'completeProfile'
   const [view, setView] = useState(location.pathname === '/register' ? 'signup' : 'signin');
 
@@ -26,8 +28,8 @@ const AuthContainer = () => {
       const userRef = doc(db, 'users', user.uid);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists() && userSnap.data().username && userSnap.data().dateOfBirth) {
-        // User profile is already complete
-        navigate('/dashboard');
+        // User profile is already complete — go to redirect URL or dashboard
+        navigate(redirectTo);
       } else {
         // Needs profile completion
         setView('completeProfile');
@@ -40,7 +42,7 @@ const AuthContainer = () => {
   };
 
   const handleProfileComplete = () => {
-    navigate('/dashboard');
+    navigate(redirectTo);
   };
 
   return (

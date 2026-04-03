@@ -28,7 +28,7 @@ export default function ClassPage() {
 
   const handleClassClick = (course) => {
     if (loginRequiredIds.includes(course.id) && !user) {
-      navigate('/register');
+      navigate(`/register?redirect=/class/${course.id}`);
       return;
     }
     navigate(`/class/${course.id}`);
