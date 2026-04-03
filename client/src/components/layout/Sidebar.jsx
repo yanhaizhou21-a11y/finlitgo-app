@@ -37,7 +37,7 @@ const AnimatedNavItem = ({ to, icon: Icon, label }) => {
 };
 
 export default function Sidebar() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -45,7 +45,7 @@ export default function Sidebar() {
     navigate('/login');
   };
 
-  const photoURL = user?.photoURL || `https://i.pravatar.cc/150?u=${user?.email}`;
+  const photoURL = profile?.photoUrl || user?.photoURL || `https://i.pravatar.cc/150?u=${user?.email}`;
 
   return (
     <motion.aside 

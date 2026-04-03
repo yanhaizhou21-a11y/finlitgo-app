@@ -26,14 +26,10 @@ export default function BlogPage() {
   const restPosts = filteredBlogs.slice(1);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Hero Section — Medium-inspired with matching home gradient */}
-      <section className="relative w-full py-20 px-6 overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#141414] via-[#6D28D9] to-[#A78BFA] opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
-        
-        <div className="absolute top-1/2 right-[20%] -translate-y-1/2 w-[400px] h-[400px] bg-violet-600/15 rounded-full blur-[100px] pointer-events-none" />
+    <div className="relative min-h-screen text-white">
+
+      {/* Hero Section — synchronized with class */}
+      <section className="relative z-10 w-full overflow-hidden bg-[#0a0a0a] px-6 py-20">
 
         <div className="relative z-10 max-w-5xl mx-auto">
           <motion.div
@@ -70,9 +66,11 @@ export default function BlogPage() {
         </div>
       </section>
 
+      <div className="pointer-events-none relative z-10 -mt-14 h-20 bg-[linear-gradient(to_bottom,rgba(10,10,10,0)_0%,rgba(62,38,140,0.34)_52%,rgba(10,10,10,0)_100%)]" />
+
       {/* Featured Post — Medium-style full-width */}
       {featured && (
-        <section className="max-w-5xl mx-auto px-6 py-8">
+        <section className="relative z-10 max-w-5xl mx-auto px-6 pb-8 pt-8">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -112,7 +110,7 @@ export default function BlogPage() {
       )}
 
       {/* Recent Articles Grid — Medium-inspired */}
-      <section className="max-w-5xl mx-auto px-6 py-8 pb-20">
+      <section className="relative z-10 max-w-5xl mx-auto px-6 py-8 pb-20">
         <h3 className="text-2xl font-bold font-orbitron mb-8 border-b border-zinc-800 pb-4 flex items-center gap-2">
           <span className="w-1 h-6 bg-gradient-to-b from-violet-500 to-purple-400 rounded-full" />
           Recent Articles

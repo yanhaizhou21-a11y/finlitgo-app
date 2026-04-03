@@ -14,8 +14,11 @@ import { useState, useEffect } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../services/firebase";
+import logoUrl from "../assets/logo.svg";
 
-export default function NavbarDemo() {
+type NavbarVariant = "default" | "learning";
+
+export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVariant }) {
   const navItems = [
     { name: "Home", link: "/" },
     { name: "Class", link: "/class" },
@@ -64,6 +67,70 @@ export default function NavbarDemo() {
   const photoURL = profileData?.photoUrl || user?.photoURL;
   const initial = displayName.charAt(0).toUpperCase();
 
+  if (variant === "learning") {
+    return (
+      <div className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#0a0a0a]/85 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+          <a href="/" className="flex items-center gap-2 shrink-0">
+            <img src={logoUrl} alt="FinLitGo Logo" className="h-8 w-8 object-contain" />
+            <span className="font-bold text-white" style={{ fontFamily: "'Orbitron', sans-serif" }}>FinLitGo</span>
+          </a>
+
+          <nav className="hidden items-center gap-6 text-sm font-medium text-zinc-300 md:flex">
+            {navItems.map((item) => (
+              <a key={item.name} href={item.link} className="transition-colors hover:text-white">
+                {item.name}
+              </a>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-3 shrink-0">
+            {user ? (
+              <>
+                <div className="hidden items-center gap-2 sm:flex">
+                  <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-violet-400/30 bg-gradient-to-br from-violet-600 to-purple-400 shadow-[0_0_10px_rgba(124,58,237,0.2)]">
+                    {photoURL ? (
+                      <img src={photoURL} alt="Profile" className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-xs font-bold text-white">{initial}</span>
+                    )}
+                  </div>
+                  <span className="max-w-[120px] truncate text-sm font-medium text-white">{displayName}</span>
+                </div>
+
+                <a
+                  href="/dashboard"
+                  className="rounded-full bg-white px-4 py-2 text-sm font-bold text-black transition hover:-translate-y-0.5"
+                >
+                  Dashboard
+                </a>
+
+                <button
+                  onClick={handleLogout}
+                  className="px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:text-red-400"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <a href="/login" className="text-sm font-medium text-zinc-300 transition-colors hover:text-white">
+                  Login
+                </a>
+                <a
+                  href="/register"
+                  className="rounded-full bg-white px-4 py-2 text-sm font-bold text-black transition hover:-translate-y-0.5"
+                >
+                  Sign Up
+                </a>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full z-50">
       <Navbar className="bg-transparent border-none">
@@ -72,7 +139,7 @@ export default function NavbarDemo() {
           <NavbarLogo />
           <NavItems items={navItems} />
           
-          <div className="flex items-center gap-3 relative z-20">
+          <div className="relative z-20 flex shrink-0 items-center gap-3">
             {user ? (
               <div className="flex items-center gap-3">
                 {/* Profile Avatar */}
@@ -84,7 +151,7 @@ export default function NavbarDemo() {
                       <span className="text-white font-bold text-xs">{initial}</span>
                     )}
                   </div>
-                  <span className="text-sm font-medium hidden md:block text-white">{displayName}</span>
+                  <span className="hidden max-w-[120px] truncate text-sm font-medium text-white xl:block">{displayName}</span>
                 </div>
                 
                 {/* Dashboard Button */}

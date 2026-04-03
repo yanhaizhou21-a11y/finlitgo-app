@@ -42,15 +42,10 @@ export default function ClassPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Hero Section — matching home page gradient */}
-      <section className="relative w-full py-24 px-6 overflow-hidden">
-        {/* Background gradient like home hero */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#141414] via-[#6D28D9] to-[#A78BFA] opacity-60" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
-        
-        {/* Glow orb */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-600/20 rounded-full blur-[120px] pointer-events-none" />
+    <div className="relative min-h-screen text-white">
+
+      {/* Hero Section — synchronized with blog */}
+      <section className="relative z-10 w-full overflow-hidden bg-[#0a0a0a] px-6 py-24">
 
         <div className="relative z-10 max-w-6xl mx-auto text-center">
           <motion.div
@@ -100,8 +95,10 @@ export default function ClassPage() {
         </div>
       </section>
 
+      <div className="pointer-events-none relative z-10 -mt-14 h-20 bg-[linear-gradient(to_bottom,rgba(10,10,10,0)_0%,rgba(62,38,140,0.34)_52%,rgba(10,10,10,0)_100%)]" />
+
       {/* Category Filters */}
-      <section className="max-w-6xl mx-auto px-6 py-8">
+      <section className="relative z-10 max-w-6xl mx-auto px-6 pb-8 pt-8">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold font-orbitron text-white flex items-center gap-3">
             <IconBook2 className="text-violet-400" /> Learning Paths
@@ -187,7 +184,7 @@ export default function ClassPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
+      <section className="relative z-10 max-w-6xl mx-auto px-6 py-16">
         <div className="bg-gradient-to-br from-[#1A1A2E] via-[#2D1B69] to-[#1A1A2E] border border-violet-500/20 rounded-3xl p-12 text-center relative overflow-hidden">
           <div className="absolute -top-20 -right-20 w-60 h-60 bg-violet-600/20 rounded-full blur-[80px] pointer-events-none" />
           <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-purple-600/20 rounded-full blur-[80px] pointer-events-none" />
