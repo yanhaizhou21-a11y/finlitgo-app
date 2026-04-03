@@ -19,18 +19,22 @@ function getBlogs() {
 export default function BlogPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const [visibleCount, setVisibleCount] = useState(3); // ✅ dari Doc 2
+
   const blogs = getBlogs();
 
-  const filteredBlogs = blogs.filter(b => b.title.toLowerCase().includes(search.toLowerCase()));
+  const filteredBlogs = blogs.filter(b =>
+    b.title.toLowerCase().includes(search.toLowerCase())
+  );
+
   const featured = filteredBlogs[0];
-  const restPosts = filteredBlogs.slice(1);
+  const restPosts = filteredBlogs.slice(1, 1 + visibleCount); // ✅ dari Doc 2
 
   return (
     <div className="relative min-h-screen text-white">
 
-      {/* Hero Section — synchronized with class */}
+      {/* Hero Section */}
       <section className="relative z-10 w-full overflow-hidden bg-[#0a0a0a] px-6 py-20">
-
         <div className="relative z-10 max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -48,17 +52,20 @@ export default function BlogPage() {
           </motion.div>
 
           {/* Search */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="max-w-xl mx-auto relative"
           >
             <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={20} />
-            <input 
+            <input
               type="text"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={e => {
+                setSearch(e.target.value);
+                setVisibleCount(3); // ✅ reset saat search berubah
+              }}
               placeholder="Search articles..."
               className="w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl py-4 px-12 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-400 focus:shadow-[0_0_30px_rgba(124,58,237,0.2)] transition-all text-lg"
             />
@@ -68,10 +75,10 @@ export default function BlogPage() {
 
       <div className="pointer-events-none relative z-10 -mt-14 h-20 bg-[linear-gradient(to_bottom,rgba(10,10,10,0)_0%,rgba(62,38,140,0.34)_52%,rgba(10,10,10,0)_100%)]" />
 
-      {/* Featured Post — Medium-style full-width */}
+      {/* Featured Post */}
       {featured && (
         <section className="relative z-10 max-w-5xl mx-auto px-6 pb-8 pt-8">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             onClick={() => navigate(`/blog/${featured.id}`)}
@@ -87,7 +94,7 @@ export default function BlogPage() {
               <span className="text-violet-400 font-mono text-sm uppercase mb-3">{featured.category}</span>
               <h2 className="text-3xl font-bold text-white mb-4 leading-tight group-hover:text-violet-300 transition-colors">{featured.title}</h2>
               <p className="text-zinc-400 mb-8 line-clamp-3 text-lg">{featured.excerpt}</p>
-              
+
               <div className="flex items-center justify-between mt-auto">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-zinc-800 border-2 border-zinc-700 overflow-hidden">
@@ -109,16 +116,16 @@ export default function BlogPage() {
         </section>
       )}
 
-      {/* Recent Articles Grid — Medium-inspired */}
+      {/* Recent Articles Grid */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 py-8 pb-20">
         <h3 className="text-2xl font-bold font-orbitron mb-8 border-b border-zinc-800 pb-4 flex items-center gap-2">
           <span className="w-1 h-6 bg-gradient-to-b from-violet-500 to-purple-400 rounded-full" />
           Recent Articles
         </h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {restPosts.map((post, i) => (
-            <motion.div 
+            <motion.div
               key={post.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -137,7 +144,7 @@ export default function BlogPage() {
                 <span className="text-violet-400 font-mono tracking-widest text-[10px] uppercase mb-2 block">{post.category}</span>
                 <h4 className="text-xl font-bold text-white mb-3 group-hover:text-violet-300 transition-colors leading-tight">{post.title}</h4>
                 <p className="text-zinc-500 text-sm line-clamp-2 mb-6">{post.excerpt}</p>
-                
+
                 <div className="mt-auto flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-zinc-800 overflow-hidden">
                     <img src={`https://i.pravatar.cc/150?u=${post.author}`} className="w-full h-full object-cover" alt="Author" />
@@ -152,6 +159,30 @@ export default function BlogPage() {
               </div>
             </motion.div>
           ))}
+        </div>
+
+        <div className="text-center mt-10 flex justify-center gap-4">
+
+          {/* LOAD MORE */}
+          {visibleCount + 1 < filteredBlogs.length && (
+            <button
+              onClick={() => setVisibleCount(prev => prev + 3)}
+              className="px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-400 text-white rounded-xl font-bold hover:shadow-lg transition-all"
+            >
+              Load More
+            </button>
+          )}
+
+          {/* SHOW LESS */}
+          {visibleCount > 3 && (
+            <button
+              onClick={() => setVisibleCount(3)}
+              className="px-6 py-3 bg-zinc-800 border border-zinc-700 text-white rounded-xl font-bold hover:bg-zinc-700 transition-all"
+            >
+              Show Less
+            </button>
+          )}
+
         </div>
 
         {filteredBlogs.length === 0 && (
