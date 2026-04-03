@@ -51,25 +51,43 @@ interface MobileNavMenuProps {
 
 export const Navbar = ({ children, className }: NavbarProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
+  const { scrollY } = useScroll();
   const [visible, setVisible] = useState<boolean>(false);
+  const [isNavbarVisible, setIsNavbarVisible] = useState<boolean>(true);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest > 100) {
-      setVisible(true);
-    } else {
+    const previous = scrollY.getPrevious() ?? 0;
+    const scrollingDown = latest > previous;
+    const scrollingUp = latest < previous;
+
+    if (latest <= 0) {
       setVisible(false);
+      setIsNavbarVisible(true);
+      return;
+    }
+
+    setVisible(latest > 100);
+
+    if (scrollingDown && latest > 80) {
+      setIsNavbarVisible(false);
+      return;
+    }
+
+    if (scrollingUp) {
+      setIsNavbarVisible(true);
     }
   });
 
   return (
     <motion.div
       ref={ref}
-      // IMPORTANT: Change this to class of `fixed` if you want the navbar to be fixed
-      className={cn("sticky inset-x-0 top-20 z-40 w-full", className)}
+      animate={{
+        y: isNavbarVisible ? 0 : -120,
+        opacity: isNavbarVisible ? 1 : 0,
+      }}
+      transition={{ duration: 0.25, ease: "easeInOut" }}
+      style={{ pointerEvents: isNavbarVisible ? "auto" : "none" }}
+      className={cn("fixed inset-x-0 top-0 z-40 w-full", className)}
     >
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
