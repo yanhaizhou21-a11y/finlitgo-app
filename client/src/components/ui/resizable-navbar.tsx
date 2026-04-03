@@ -9,6 +9,7 @@ import {
 } from "motion/react";
 
 import React, { useRef, useState } from "react";
+import logoUrl from "../../assets/logo.svg";
 
 
 interface NavbarProps {
@@ -138,7 +139,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
+        "hidden min-w-0 flex-1 flex-row items-center justify-center space-x-1 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
         className,
       )}
     >
@@ -254,9 +255,7 @@ export const NavbarLogo = () => {
       href="/"
       className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black"
     >
-      <div className="w-8 h-8 rounded-full bg-[#252525] flex items-center justify-center overflow-hidden border border-violet-500/30">
-        <span className="text-white font-bold text-xs" style={{ fontFamily: "'Orbitron', sans-serif" }}>F</span>
-      </div>
+      <img src={logoUrl} alt="FinLitGo Logo" className="h-8 w-8 object-contain" />
       <span className="font-bold text-black dark:text-white" style={{ fontFamily: "'Orbitron', sans-serif" }}>FinLitGo</span>
     </a>
   );

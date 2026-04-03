@@ -21,6 +21,7 @@ const HomePage = () => {
 
         <div className="relative z-10 flex flex-col w-full">
           <Hero />
+          <div className="pointer-events-none -mt-14 h-24 bg-[linear-gradient(to_bottom,rgba(10,10,10,0)_0%,rgba(62,38,140,0.34)_50%,rgba(10,10,10,0)_100%)]" />
           <Description />
           <Problems />
           <HowItWorks />
