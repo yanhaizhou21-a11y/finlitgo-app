@@ -2,27 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconWallet, IconTrendingUp, IconTrendingDown, IconPlus, IconTarget, IconTrash, IconX, IconCash } from '@tabler/icons-react';
 
+import { useAuth } from '../../store/AuthContext';
+
 const TX_KEY = 'finlitgo_transactions';
 const GOALS_KEY = 'finlitgo_goals';
-
-function getInitialTransactions() {
-  const saved = localStorage.getItem(TX_KEY);
-  if (saved) return JSON.parse(saved);
-  return [
-    { id: 1, title: 'Salary Drop', type: 'income', amount: 2000000, category: 'Gaji', date: '2026-03-31', icon: 'bank' },
-    { id: 2, title: 'Investment Advance', type: 'expense', amount: 500000, category: 'Investasi', date: '2026-03-30', icon: 'invest' },
-    { id: 3, title: 'Makan Siang', type: 'expense', amount: 50000, category: 'Makan', date: '2026-03-30', icon: 'food' },
-  ];
-}
-
-function getInitialGoals() {
-  const saved = localStorage.getItem(GOALS_KEY);
-  if (saved) return JSON.parse(saved);
-  return [
-    { id: 1, name: 'Emergency Fund', current: 5200000, target: 10000000 },
-    { id: 2, name: 'New Laptop', current: 12000000, target: 20000000 },
-  ];
-}
+const POCKETS_KEY = 'finlitgo_pockets';
 
 function formatRupiah(num) {
   return 'Rp ' + num.toLocaleString('id-ID');
@@ -31,16 +15,52 @@ function formatRupiah(num) {
 const CATEGORIES = ['Gaji', 'Freelance', 'Investasi', 'Makan', 'Transport', 'Belanja', 'Hiburan', 'Utilitas', 'Lainnya'];
 
 export default function FinancialPage() {
-  const [transactions, setTransactions] = useState(getInitialTransactions);
-  const [goals, setGoals] = useState(getInitialGoals);
+  const { user } = useAuth();
+  const userId = user?.uid || 'guest';
+  const txKey = `${TX_KEY}_${userId}`;
+  const goalsKey = `${GOALS_KEY}_${userId}`;
+  const pocketsKey = `${POCKETS_KEY}_${userId}`;
+
+  const [transactions, setTransactions] = useState(() => {
+    const saved = localStorage.getItem(txKey);
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [goals, setGoals] = useState(() => {
+    const saved = localStorage.getItem(goalsKey);
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [pockets, setPockets] = useState(() => {
+    const saved = localStorage.getItem(pocketsKey);
+    return saved ? JSON.parse(saved) : [];
+  });
+  
   const [showCashflowModal, setShowCashflowModal] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
+  const [showPocketModal, setShowPocketModal] = useState(false);
+  const [showFundGoalModal, setShowFundGoalModal] = useState(false);
+  
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [txForm, setTxForm] = useState({ title: '', type: 'expense', amount: '', category: 'Lainnya', date: new Date().toISOString().split('T')[0] });
   const [goalForm, setGoalForm] = useState({ name: '', target: '' });
+  const [pocketForm, setPocketForm] = useState({ name: '', amount: '' });
+  const [fundGoalTargetId, setFundGoalTargetId] = useState(null);
+  const [fundGoalForm, setFundGoalForm] = useState({ pocketId: '', amount: '' });
 
-  useEffect(() => { localStorage.setItem(TX_KEY, JSON.stringify(transactions)); }, [transactions]);
-  useEffect(() => { localStorage.setItem(GOALS_KEY, JSON.stringify(goals)); }, [goals]);
+  // Re-sync if user changes
+  useEffect(() => {
+    const savedTxs = localStorage.getItem(txKey);
+    setTransactions(savedTxs ? JSON.parse(savedTxs) : []);
+    
+    const savedGoals = localStorage.getItem(goalsKey);
+    setGoals(savedGoals ? JSON.parse(savedGoals) : []);
+    
+    const savedPockets = localStorage.getItem(pocketsKey);
+    setPockets(savedPockets ? JSON.parse(savedPockets) : []);
+  }, [userId, txKey, goalsKey, pocketsKey]);
+
+  useEffect(() => { localStorage.setItem(txKey, JSON.stringify(transactions)); }, [transactions, txKey]);
+  useEffect(() => { localStorage.setItem(goalsKey, JSON.stringify(goals)); }, [goals, goalsKey]);
+  useEffect(() => { localStorage.setItem(pocketsKey, JSON.stringify(pockets)); }, [pockets, pocketsKey]);
 
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
@@ -74,6 +94,44 @@ export default function FinancialPage() {
 
   const deleteGoal = (id) => {
     setGoals(prev => prev.filter(g => g.id !== id));
+  };
+
+  const addPocket = () => {
+    if (!pocketForm.name.trim() || !pocketForm.amount) return;
+    const amount = parseInt(pocketForm.amount);
+    if (amount > balance) {
+      alert("Insufficient Main Balance to create this pocket!");
+      return;
+    }
+    // Deduct from main balance
+    setTransactions(prev => [{ id: Date.now() + 1, title: `Transfer to ${pocketForm.name}`, type: 'expense', amount, category: 'Lainnya', date: new Date().toISOString().split('T')[0] }, ...prev]);
+    setPockets(prev => [...prev, { id: Date.now(), name: pocketForm.name, balance: amount }]);
+    setShowPocketModal(false);
+    setPocketForm({ name: '', amount: '' });
+  };
+
+  const deletePocket = (id, balance) => {
+    // Return money to main balance
+    setTransactions(prev => [{ id: Date.now() + 1, title: `Return from closed pocket`, type: 'income', amount: balance, category: 'Lainnya', date: new Date().toISOString().split('T')[0] }, ...prev]);
+    setPockets(prev => prev.filter(p => p.id !== id));
+  };
+
+  const fundGoal = () => {
+    if (!fundGoalForm.pocketId || !fundGoalForm.amount) return;
+    const amount = parseInt(fundGoalForm.amount);
+    const selectedPocket = pockets.find(p => p.id.toString() === fundGoalForm.pocketId);
+    
+    if (!selectedPocket || selectedPocket.balance < amount) {
+      alert("Insufficient funds in the selected pocket!");
+      return;
+    }
+
+    setPockets(prev => prev.map(p => p.id.toString() === fundGoalForm.pocketId ? { ...p, balance: p.balance - amount } : p));
+    setGoals(prev => prev.map(g => g.id === fundGoalTargetId ? { ...g, current: g.current + amount } : g));
+
+    setShowFundGoalModal(false);
+    setFundGoalForm({ pocketId: '', amount: '' });
+    setFundGoalTargetId(null);
   };
 
   return (
@@ -166,34 +224,81 @@ export default function FinancialPage() {
           </div>
         </motion.div>
 
-        {/* Goals */}
-        <motion.div 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="bg-[#1A1A1A] border border-zinc-800 rounded-2xl p-6"
-        >
-          <h3 className="text-lg font-medium text-zinc-300 mb-6">Active Targets</h3>
-          <div className="flex flex-col gap-4">
-            {goals.map((goal) => (
-              <div key={goal.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl group">
-                <div className="flex justify-between mb-2">
-                  <span className="font-medium text-sm text-white">{goal.name}</span>
-                  <button onClick={() => deleteGoal(goal.id)} className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-red-400 transition-all">
-                    <IconTrash size={14} />
-                  </button>
+        {/* Right Column: Pockets & Goals */}
+        <div className="flex flex-col gap-6">
+          {/* Pockets */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-[#1A1A1A] border border-zinc-800 rounded-2xl p-6"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-medium text-zinc-300">My Pockets</h3>
+              <button onClick={() => setShowPocketModal(true)} className="p-1 px-2 text-xs bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition-colors flex items-center gap-1 font-mono">
+                <IconPlus size={14} /> New
+              </button>
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              {pockets.map((pocket) => (
+                <div key={pocket.id} className="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-3 rounded-xl group">
+                   <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-violet-500/10 text-violet-400 flex items-center justify-center">
+                        <IconWallet size={16} />
+                      </div>
+                      <span className="font-medium text-sm text-white">{pocket.name}</span>
+                   </div>
+                   <div className="flex items-center gap-3">
+                      <span className="text-sm font-bold font-mono text-violet-300">{formatRupiah(pocket.balance)}</span>
+                      <button onClick={() => deletePocket(pocket.id, pocket.balance)} className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-red-400 transition-all" title="Delete Pocket & Return Funds">
+                        <IconTrash size={14} />
+                      </button>
+                   </div>
                 </div>
-                <span className="text-violet-400 text-sm font-mono">{formatRupiah(goal.current)} / {formatRupiah(goal.target)}</span>
-                <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden mt-2">
-                  <div className="h-full bg-gradient-to-r from-violet-600 to-purple-400 rounded-full" style={{ width: `${Math.min((goal.current / goal.target) * 100, 100)}%` }} />
+              ))}
+              {pockets.length === 0 && (
+                <p className="text-sm text-zinc-500 text-center py-4">No separated pockets. Main balance rules all.</p>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Goals */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-[#1A1A1A] border border-zinc-800 rounded-2xl p-6 flex-1"
+          >
+            <h3 className="text-lg font-medium text-zinc-300 mb-6">Active Targets</h3>
+            <div className="flex flex-col gap-4">
+              {goals.map((goal) => (
+                <div key={goal.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl group relative">
+                  <div className="flex justify-between mb-2">
+                    <span className="font-medium text-sm text-white">{goal.name}</span>
+                    <button onClick={() => deleteGoal(goal.id)} className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-red-400 transition-all">
+                      <IconTrash size={14} />
+                    </button>
+                  </div>
+                  <span className="text-violet-400 text-sm font-mono">{formatRupiah(goal.current)} / {formatRupiah(goal.target)}</span>
+                  <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden mt-2">
+                    <div className="h-full bg-gradient-to-r from-violet-600 to-purple-400 rounded-full transition-all duration-500" style={{ width: `${Math.min((goal.current / goal.target) * 100, 100)}%` }} />
+                  </div>
+                  <div className="flex justify-between items-center mt-3">
+                    <span className="text-xs text-zinc-500">{Math.round((goal.current / goal.target) * 100)}% achieved</span>
+                    {goal.current < goal.target && pockets.length > 0 && (
+                      <button onClick={() => { setFundGoalTargetId(goal.id); setShowFundGoalModal(true); }} className="text-xs font-bold text-violet-400 hover:text-white transition-colors bg-violet-500/10 hover:bg-violet-500/30 px-2 py-1 rounded">
+                        + Fund
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <span className="text-xs text-zinc-500 mt-1 block">{Math.round((goal.current / goal.target) * 100)}% achieved</span>
-              </div>
-            ))}
-            {goals.length === 0 && (
-              <p className="text-sm text-zinc-500 text-center py-4">No goals set. Add one to start tracking.</p>
-            )}
-          </div>
-        </motion.div>
+              ))}
+              {goals.length === 0 && (
+                <p className="text-sm text-zinc-500 text-center py-4">No goals set. Add one to start tracking.</p>
+              )}
+            </div>
+          </motion.div>
+        </div>
       </div>
 
       {/* Delete Transaction Confirmation */}
@@ -286,6 +391,69 @@ export default function FinancialPage() {
                 </div>
                 <button onClick={addGoal} className="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-400 text-white font-bold uppercase tracking-wider text-sm rounded-xl hover:shadow-[0_4px_20px_rgba(124,58,237,0.4)] transition-all mt-2">
                   Add Goal
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Add Pocket Modal */}
+      <AnimatePresence>
+        {showPocketModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowPocketModal(false)}>
+            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} onClick={e => e.stopPropagation()} className="bg-[#1A1A1A] border border-zinc-800 rounded-2xl p-6 max-w-md w-full">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-bold text-white">Create New Pocket</h3>
+                <button onClick={() => setShowPocketModal(false)} className="text-zinc-400 hover:text-white"><IconX size={20} /></button>
+              </div>
+              <p className="text-sm text-zinc-400 mb-4">Transfer money from your Main Balance into a dedicated pocket.</p>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className="text-xs text-zinc-400 uppercase tracking-wider mb-1 block">Pocket Name *</label>
+                  <input value={pocketForm.name} onChange={e => setPocketForm(f => ({...f, name: e.target.value}))} className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-violet-500 transition-colors" placeholder="e.g. Tabungan Dana Darurat" />
+                 </div>
+                 <div>
+                  <label className="text-xs text-zinc-400 uppercase tracking-wider mb-1 block">Initial Transfer Amount (Rp) *</label>
+                  <input type="number" value={pocketForm.amount} onChange={e => setPocketForm(f => ({...f, amount: e.target.value}))} className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-violet-500 transition-colors font-mono" placeholder="100000" />
+                 </div>
+                 <button onClick={addPocket} className="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-400 text-white font-bold uppercase tracking-wider text-sm rounded-xl hover:shadow-[0_4px_20px_rgba(124,58,237,0.4)] transition-all mt-2">
+                  Create & Transfer
+                 </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Fund Goal Modal */}
+      <AnimatePresence>
+        {showFundGoalModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowFundGoalModal(false)}>
+            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} onClick={e => e.stopPropagation()} className="bg-[#1A1A1A] border border-zinc-800 rounded-2xl p-6 max-w-sm w-full">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-bold text-white">Fund Goal</h3>
+                <button onClick={() => setShowFundGoalModal(false)} className="text-zinc-400 hover:text-white"><IconX size={20} /></button>
+              </div>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className="text-xs text-zinc-400 uppercase tracking-wider mb-1 block">Select Pocket</label>
+                  <div className="relative">
+                    <select value={fundGoalForm.pocketId} onChange={e => setFundGoalForm(f => ({...f, pocketId: e.target.value}))} className="w-full appearance-none bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-violet-500 transition-colors cursor-pointer">
+                      <option value="" disabled>-- Choose a pocket --</option>
+                      {pockets.map(p => (
+                        <option key={p.id} value={p.id}>{p.name} (Available: Rp{p.balance})</option>
+                      ))}
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500">▼</div>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-zinc-400 uppercase tracking-wider mb-1 block">Amount to Fund (Rp)</label>
+                  <input type="number" value={fundGoalForm.amount} onChange={e => setFundGoalForm(f => ({...f, amount: e.target.value}))} className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-violet-500 transition-colors font-mono" placeholder="50000" />
+                </div>
+                <button onClick={fundGoal} className="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-400 text-white font-bold uppercase tracking-wider text-sm rounded-xl hover:shadow-[0_4px_20px_rgba(124,58,237,0.4)] transition-all mt-2">
+                  Confirm Funding
                 </button>
               </div>
             </motion.div>

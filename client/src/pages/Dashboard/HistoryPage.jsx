@@ -1,13 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { IconArrowUpRight, IconArrowDownLeft, IconBook2, IconBuildingBank, IconTrendingUp, IconCurrencyBitcoin } from '@tabler/icons-react';
+import { IconArrowUpRight, IconBook2, IconTrendingUp, IconTrendingDown, IconCash } from '@tabler/icons-react';
+import { useAuth } from '../../store/AuthContext';
+
+const TX_KEY = 'finlitgo_transactions';
+
+function formatRupiah(num) {
+  return 'Rp ' + num.toLocaleString('id-ID');
+}
 
 export default function HistoryPage() {
-  const transactions = [
-    { id: 1, title: 'Salary Drop', type: 'income', amount: '+ Rp 2.000.000', icon: <IconBuildingBank />, date: 'Today, 09:00 AM' },
-    { id: 2, title: 'Investment Advance', type: 'expense', amount: '- Rp 500.000', icon: <IconTrendingUp />, date: 'Yesterday, 14:30 PM' },
-    { id: 3, title: 'Investment Crypto', type: 'expense', amount: '- Rp 200.000', icon: <IconCurrencyBitcoin />, date: 'Yesterday, 16:00 PM' },
-  ];
+  const { user } = useAuth();
+  const userId = user?.uid || 'guest';
+  const txKey = `${TX_KEY}_${userId}`;
+
+  const [transactions, setTransactions] = useState(() => {
+    const saved = localStorage.getItem(txKey);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    const saved = localStorage.getItem(txKey);
+    setTransactions(saved ? JSON.parse(saved) : []);
+  }, [txKey]);
 
   const studyHistory = [
     { id: 1, module: 'Money Management Basics', progress: '100%', date: 'Today, 10:00 AM', status: 'Completed' },
@@ -36,29 +51,39 @@ export default function HistoryPage() {
             <button className="text-xs text-zinc-400 hover:text-white transition-colors">View All</button>
           </div>
           
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-2">
             {transactions.map((tx, i) => (
               <motion.div 
                 key={tx.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.05 }}
                 className="flex items-center justify-between p-4 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-colors group cursor-pointer"
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center ${tx.type === 'income' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                    {tx.icon}
+                    {tx.type === 'income' ? <IconTrendingUp size={20} /> : <IconTrendingDown size={20} />}
                   </div>
                   <div>
                     <h4 className="font-medium text-white group-hover:text-violet-300 transition-colors">{tx.title}</h4>
-                    <span className="text-xs text-zinc-500 font-mono">{tx.date}</span>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-xs text-zinc-500 font-mono">{tx.date}</span>
+                      <span className="text-xs text-zinc-600">•</span>
+                      <span className="text-xs text-violet-400/60">{tx.category || 'Category'}</span>
+                    </div>
                   </div>
                 </div>
                 <div className={`font-mono font-bold ${tx.type === 'income' ? 'text-green-500' : 'text-red-500'}`}>
-                  {tx.amount}
+                  {tx.type === 'income' ? '+' : '-'} {formatRupiah(tx.amount)}
                 </div>
               </motion.div>
             ))}
+            {transactions.length === 0 && (
+              <div className="text-center py-8 text-zinc-500">
+                <IconCash size={32} className="mx-auto mb-3 text-zinc-600" />
+                <p className="text-sm">No transactions yet.</p>
+              </div>
+            )}
           </div>
         </motion.div>
 
