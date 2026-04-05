@@ -6,8 +6,7 @@ import {
   IconChartBar, 
   IconHistory, 
   IconSettings, 
-  IconLogout,
-  IconSchool
+  IconLogout
 } from '@tabler/icons-react';
 import logoUrl from '../../assets/logo.svg';
 import { useAuth } from '../../store/AuthContext';
@@ -67,7 +66,6 @@ export default function Sidebar() {
         <AnimatedNavItem to="/dashboard" icon={IconLayoutDashboard} label="Dashboard" />
         <AnimatedNavItem to="/dashboard/finance" icon={IconChartBar} label="Financial" />
         <AnimatedNavItem to="/dashboard/history" icon={IconHistory} label="History" />
-        <AnimatedNavItem to="/dashboard/classes" icon={IconSchool} label="My Classes" />
       </nav>
 
       <div className="mt-auto w-full flex flex-col items-center gap-2">
