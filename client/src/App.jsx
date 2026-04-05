@@ -14,6 +14,7 @@ import AdminOverview from './pages/Dashboard/AdminOverview';
 import FinancialPage from './pages/Dashboard/FinancialPage';
 import HistoryPage from './pages/Dashboard/HistoryPage';
 import SettingsPage from './pages/Dashboard/SettingsPage';
+import ClassProgressPage from './pages/Dashboard/ClassProgressPage';
 
 // Admin CRUD pages
 import AdminClassCRUD from './pages/Dashboard/AdminClassCRUD';
@@ -88,6 +89,7 @@ function App() {
           <Route path="dashboard" element={<DashboardSwitch />} />
           <Route path="dashboard/finance" element={<FinancialPage />} />
           <Route path="dashboard/history" element={<HistoryPage />} />
+          <Route path="dashboard/classes" element={<ClassProgressPage />} />
           <Route path="dashboard/settings" element={<SettingsPage />} />
           
           {/* Admin-only CRUD routes */}
