@@ -17,6 +17,7 @@ export default function DashboardLayout() {
       case '/dashboard': return isAdmin ? 'Admin Dashboard' : 'Dashboard Overview';
       case '/dashboard/finance': return 'Financial Dashboard';
       case '/dashboard/history': return 'History Transaction & Study';
+      case '/dashboard/classes': return 'My Classes Progress';
       case '/dashboard/settings': return 'Pengaturan';
       default: return 'FinLitGo';
     }
