@@ -1,48 +1,94 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconRobot, IconSend, IconSparkles, IconWorld, IconStethoscope, IconBooks, IconUser, IconTrash } from '@tabler/icons-react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useAuth } from '../../store/AuthContext';
 
-// FinLitGo SDK Config
+// FinLitGo SDK Config — model instance dibuat sekali di luar komponen
 const GEMINI_API_KEY = "AIzaSyCsdlQ_tIjcepfmuHiB30kkRC1b2Nt4QWQ";
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const geminiModel = genAI.getGenerativeModel({
+  model: "gemini-1.5-flash",
+  generationConfig: {
+    temperature: 0.7,
+    maxOutputTokens: 1024,
+  },
+});
 const MAX_DAILY_LIMIT = 10;
 
 export default function AIAssistPage() {
   const { user } = useAuth();
   const [prompt, setPrompt] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const savedMsg = localStorage.getItem('finlitgo_ai_chat_history');
+    if (savedMsg) {
+      try {
+        const parsed = JSON.parse(savedMsg);
+        if (parsed.date === today) return parsed.data;
+      } catch (_) {}
+    }
+    return [];
+  });
   const [usageCount, setUsageCount] = useState(0);
-  const scrollRef = useRef(null);
 
-  const categories = [
-    { title: 'Global Justice', icon: <IconWorld size={20} />, color: 'bg-blue-500/10 text-blue-500', prompt: 'Tell me about Global Justice' },
-    { title: 'Medicine & Health', icon: <IconStethoscope size={20} />, color: 'bg-red-500/10 text-red-500', prompt: 'Tell me about Medicine in personal finance' },
-    { title: 'Science & Tech', icon: <IconSparkles size={20} />, color: 'bg-violet-500/10 text-violet-400', prompt: 'How does tech affect the economy?' },
-    { title: 'Finance & Econ', icon: <IconBooks size={20} />, color: 'bg-purple-500/10 text-purple-500', prompt: 'What are the best investment strategies?' }
-  ];
+  // Refs
+  const chatContainerRef = useRef(null);   // ref ke div scrollable
+  const chatSessionRef = useRef(null);      // persistent Gemini chat session
+  const isAtBottomRef = useRef(true);       // track apakah user scroll manual
 
-  // Check Daily Limit
+  // ───────────────────────────────────────────
+  // Inisialisasi/reset chat session Gemini sekali
+  // ───────────────────────────────────────────
+  const buildSystemInstruction = useCallback(() => {
+    const userId = user?.uid || 'guest';
+    const txs = JSON.parse(localStorage.getItem(`finlitgo_transactions_${userId}`) || '[]');
+    const goals = JSON.parse(localStorage.getItem(`finlitgo_goals_${userId}`) || '[]');
+    const pockets = JSON.parse(localStorage.getItem(`finlitgo_pockets_${userId}`) || '[]');
+
+    const totalIncome = txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+    const totalExpense = txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+    const mainBalance = totalIncome - totalExpense;
+    const goalsText = goals.length > 0 ? goals.map(g => `${g.name} (Rp${g.current}/${g.target})`).join(', ') : 'none';
+    const pocketsText = pockets.length > 0 ? pockets.map(p => `${p.name} Rp${p.balance}`).join(', ') : 'none';
+
+    return `You are FinLitGo AI, a smart financial literacy assistant for Gen Z. Be concise and friendly.\nUser balance: Rp${mainBalance}, expenses: Rp${totalExpense}, pockets: ${pocketsText}, goals: ${goalsText}.`;
+  }, [user]);
+
+  const startNewChatSession = useCallback(() => {
+    chatSessionRef.current = geminiModel.startChat({
+      history: [],
+      systemInstruction: buildSystemInstruction(),
+    });
+  }, [buildSystemInstruction]);
+
+  // Mulai session baru saat komponen mount atau user berubah
+  useEffect(() => {
+    startNewChatSession();
+  }, [startNewChatSession]);
+
+  // ───────────────────────────────────────────
+  // Daily limit check
+  // ───────────────────────────────────────────
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
     const savedData = localStorage.getItem('finlitgo_ai_usage');
     if (savedData) {
-      const parsed = JSON.parse(savedData);
-      if (parsed.date === today) {
-        setUsageCount(parsed.count);
-      } else {
-        // Reset for new day
-        localStorage.setItem('finlitgo_ai_usage', JSON.stringify({ date: today, count: 0 }));
-        setUsageCount(0);
-      }
+      try {
+        const parsed = JSON.parse(savedData);
+        if (parsed.date === today) {
+          setUsageCount(parsed.count);
+        } else {
+          localStorage.setItem('finlitgo_ai_usage', JSON.stringify({ date: today, count: 0 }));
+          setUsageCount(0);
+        }
+      } catch (_) {}
     } else {
       localStorage.setItem('finlitgo_ai_usage', JSON.stringify({ date: today, count: 0 }));
     }
   }, []);
 
-  // Sync usage
   const incrementUsage = () => {
     const today = new Date().toISOString().split('T')[0];
     const newCount = usageCount + 1;
@@ -50,13 +96,40 @@ export default function AIAssistPage() {
     localStorage.setItem('finlitgo_ai_usage', JSON.stringify({ date: today, count: newCount }));
   };
 
-  // Auto scroll
+  // Sync messages ke localStorage
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages, isTyping]);
+    const today = new Date().toISOString().split('T')[0];
+    localStorage.setItem('finlitgo_ai_chat_history', JSON.stringify({ date: today, data: messages }));
+  }, [messages]);
 
+  // ───────────────────────────────────────────
+  // Smooth scroll — hanya auto-scroll jika user di bawah
+  // ───────────────────────────────────────────
+  const scrollToBottom = useCallback((force = false) => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+    if (force || isAtBottomRef.current) {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    }
+  }, []);
+
+  // Deteksi apakah user scroll ke atas secara manual
+  const handleScroll = useCallback(() => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+    const threshold = 80; // px dari bawah
+    isAtBottomRef.current =
+      container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+  }, []);
+
+  // Scroll ke bawah saat pesan baru masuk
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages.length, scrollToBottom]); // hanya saat jumlah pesan bertambah, bukan setiap streaming chunk
+
+  // ───────────────────────────────────────────
+  // Handler kirim pesan
+  // ───────────────────────────────────────────
   const handleSend = async (overridePrompt = null) => {
     const textToSend = overridePrompt || prompt;
     if (!textToSend.trim() || isTyping) return;
@@ -67,36 +140,71 @@ export default function AIAssistPage() {
 
     setPrompt('');
     setIsTyping(true);
+    isAtBottomRef.current = true; // force scroll saat kirim
 
-    const newMsgs = [...messages, { role: 'user', content: textToSend }];
-    setMessages(newMsgs);
+    setMessages(prev => [...prev, { role: 'user', content: textToSend }]);
+
+    // Pastikan session aktif
+    if (!chatSessionRef.current) startNewChatSession();
 
     try {
-      // Connect to Gemini
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      
-      // Build simple prompt history context to give conversational feeling
-      const historyContext = newMsgs.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n');
-      const finalPrompt = `You are FinLitGo AI, a friendly financial literacy assistant for Gen Z. Keep responses concise, formatted nicely.\n\n${historyContext}\nAssistant:`;
+      // Pre-add pesan assistant kosong untuk streaming
+      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+      setIsTyping(false);
 
-      const result = await model.generateContent(finalPrompt);
-      const response = await result.response;
-      const text = response.text();
+      // Scroll paksa ke bawah setelah pesan user muncul
+      requestAnimationFrame(() => scrollToBottom(true));
 
-      setMessages(prev => [...prev, { role: 'assistant', content: text }]);
+      const result = await chatSessionRef.current.sendMessageStream(textToSend);
+
+      let fullText = '';
+      let lastScrollTime = 0;
+
+      for await (const chunk of result.stream) {
+        fullText += chunk.text();
+        setMessages(prev => {
+          const updated = [...prev];
+          updated[updated.length - 1] = { ...updated[updated.length - 1], content: fullText };
+          return updated;
+        });
+
+        // Throttle scroll saat streaming — setiap 120ms agar tidak thrashing
+        const now = Date.now();
+        if (now - lastScrollTime > 120) {
+          lastScrollTime = now;
+          requestAnimationFrame(() => scrollToBottom());
+        }
+      }
+
+      // Final scroll setelah selesai
+      requestAnimationFrame(() => scrollToBottom(true));
       incrementUsage();
     } catch (error) {
       console.error("AI Error:", error);
-      setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting right now." }]);
+      // Jika session error, buat ulang session
+      startNewChatSession();
+      setMessages(prev => {
+        const updated = [...prev];
+        if (updated.length > 0 && updated[updated.length - 1].content === '') {
+          updated.pop();
+        }
+        return [...updated, { role: 'assistant', content: "Sorry, I'm having trouble connecting. Please try again." }];
+      });
     } finally {
       setIsTyping(false);
     }
   };
 
-  // Markdown parser helper for basic bold and new lines
+  const handleClearChat = () => {
+    setMessages([]);
+    startNewChatSession(); // reset session juga
+  };
+
+  // ───────────────────────────────────────────
+  // Markdown formatter
+  // ───────────────────────────────────────────
   const formatText = (text) => {
     return text.split('\n').map((line, i) => {
-      // Bold text handling **text**
       const parts = line.split(/(\*\*.*?\*\*)/g);
       return (
         <span key={i} className="block mb-2">
@@ -110,6 +218,13 @@ export default function AIAssistPage() {
       );
     });
   };
+
+  const categories = [
+    { title: 'Global Justice', icon: <IconWorld size={20} />, color: 'bg-blue-500/10 text-blue-500', prompt: 'Tell me about Global Justice' },
+    { title: 'Medicine & Health', icon: <IconStethoscope size={20} />, color: 'bg-red-500/10 text-red-500', prompt: 'Tell me about Medicine in personal finance' },
+    { title: 'Science & Tech', icon: <IconSparkles size={20} />, color: 'bg-violet-500/10 text-violet-400', prompt: 'How does tech affect the economy?' },
+    { title: 'Finance & Econ', icon: <IconBooks size={20} />, color: 'bg-purple-500/10 text-purple-500', prompt: 'What are the best investment strategies?' }
+  ];
 
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] max-w-5xl mx-auto py-8 px-4">
@@ -125,8 +240,8 @@ export default function AIAssistPage() {
               {usageCount} / {MAX_DAILY_LIMIT}
             </span>
           </div>
-          <button 
-            onClick={() => setMessages([])}
+          <button
+            onClick={handleClearChat}
             className="p-2 text-zinc-500 hover:text-red-400 hover:bg-zinc-900 rounded-lg transition-colors"
             title="Clear Chat"
           >
@@ -136,7 +251,7 @@ export default function AIAssistPage() {
       </div>
 
       {messages.length === 0 ? (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex-1 flex flex-col items-center justify-center mb-6"
@@ -148,10 +263,10 @@ export default function AIAssistPage() {
           <p className="text-zinc-400 text-center max-w-md mb-10">
             Ask me anything about managing money, investing, crypto, or economic trends.
           </p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4 w-full">
             {categories.map((cat, i) => (
-              <button 
+              <button
                 key={i}
                 onClick={() => handleSend(cat.prompt)}
                 className="flex flex-col items-center text-center p-6 bg-[#1A1A1A] border border-zinc-800 hover:border-violet-500/50 hover:bg-zinc-900 rounded-2xl transition-all group"
@@ -167,14 +282,21 @@ export default function AIAssistPage() {
       ) : (
         <div className="flex-1 bg-[#1A1A1A] border border-zinc-800 rounded-3xl overflow-hidden mb-6 flex flex-col relative">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-900/5 to-transparent pointer-events-none" />
-          
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6">
-            <AnimatePresence>
+
+          {/* Chat container — scroll target */}
+          <div
+            ref={chatContainerRef}
+            onScroll={handleScroll}
+            className="flex-1 overflow-y-auto p-6 space-y-6"
+            style={{ scrollBehavior: 'smooth', overscrollBehavior: 'contain' }}
+          >
+            <AnimatePresence initial={false}>
               {messages.map((msg, idx) => (
-                <motion.div 
+                <motion.div
                   key={idx}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
                   className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                 >
                   <div className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg ${
@@ -183,29 +305,31 @@ export default function AIAssistPage() {
                     {msg.role === 'user' ? <IconUser size={20} className="text-zinc-400" /> : <IconRobot size={24} className="text-white" />}
                   </div>
                   <div className={`max-w-[80%] rounded-2xl p-5 ${
-                    msg.role === 'user' 
-                      ? 'bg-zinc-800 text-white rounded-tr-none' 
+                    msg.role === 'user'
+                      ? 'bg-zinc-800 text-white rounded-tr-none'
                       : 'bg-zinc-900/80 border border-zinc-800/50 text-zinc-300 rounded-tl-none leading-relaxed'
                   }`}>
                     {msg.role === 'user' ? msg.content : formatText(msg.content)}
                   </div>
                 </motion.div>
               ))}
+
               {isTyping && (
-                 <motion.div 
-                 initial={{ opacity: 0, y: 10 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 className="flex gap-4 flex-row"
-               >
-                 <div className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-violet-600 to-purple-400">
-                   <IconRobot size={24} className="text-white" />
-                 </div>
-                 <div className="bg-zinc-900/80 border border-zinc-800/50 rounded-2xl rounded-tl-none p-5 flex items-center gap-2">
-                   <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                   <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                   <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '300ms' }} />
-                 </div>
-               </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex gap-4 flex-row"
+                >
+                  <div className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-violet-600 to-purple-400">
+                    <IconRobot size={24} className="text-white" />
+                  </div>
+                  <div className="bg-zinc-900/80 border border-zinc-800/50 rounded-2xl rounded-tl-none p-5 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </motion.div>
               )}
             </AnimatePresence>
           </div>
@@ -213,12 +337,12 @@ export default function AIAssistPage() {
       )}
 
       {/* Input Area */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full bg-[#1A1A1A] border-2 border-zinc-800 focus-within:border-violet-500/50 transition-all rounded-3xl p-2 shadow-2xl relative shrink-0"
       >
-        <textarea 
+        <textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           onKeyDown={(e) => {
@@ -236,11 +360,13 @@ export default function AIAssistPage() {
           <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Powered by Gemini</span>
         </div>
         <div className="absolute right-4 bottom-4 flex items-center gap-2">
-          <button 
+          <button
             onClick={() => handleSend()}
             disabled={!prompt.trim() || isTyping || usageCount >= MAX_DAILY_LIMIT}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-               prompt.trim() && !isTyping && usageCount < MAX_DAILY_LIMIT ? 'bg-gradient-to-r from-violet-600 to-purple-400 text-white cursor-pointer shadow-[0_0_15px_rgba(124,58,237,0.3)] hover:scale-105' : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+              prompt.trim() && !isTyping && usageCount < MAX_DAILY_LIMIT
+                ? 'bg-gradient-to-r from-violet-600 to-purple-400 text-white cursor-pointer shadow-[0_0_15px_rgba(124,58,237,0.3)] hover:scale-105'
+                : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
             }`}
           >
             <IconSend size={18} />

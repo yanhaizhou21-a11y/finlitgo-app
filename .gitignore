@@ -13,3 +13,4 @@ firebase.json
 firebase.js
 #private
 finlintgo.sdk
+test-gemini.mjs
