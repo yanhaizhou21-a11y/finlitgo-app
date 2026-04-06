@@ -1,6 +1,6 @@
 // blogpage/index.jsx
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   IconArrowRight,
   IconSearch,
@@ -151,7 +151,6 @@ function BlogDetailPage({ blogId, onBack }) {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Hero Section with Blog Image */}
       <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
         <img src={blog.image} alt={blog.title} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
@@ -257,14 +256,14 @@ function BlogDetailPage({ blogId, onBack }) {
 // Komponen utama BlogPage (daftar blog)
 export default function BlogPage() {
   const navigate = useNavigate();
-  const { id } = useParams(); // Untuk menangkap ID dari URL jika ada
+  const { id } = useParams();
   const [search, setSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(3);
   const [selectedBlogId, setSelectedBlogId] = useState(null);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const blogs = getBlogs();
 
-  // Jika ada ID di URL atau selectedBlogId, tampilkan detail blog
   const blogIdToShow = id || selectedBlogId;
   
   if (blogIdToShow) {
@@ -318,27 +317,101 @@ export default function BlogPage() {
             </p>
           </motion.div>
 
-          {/* Search */}
+          {/* Search Component dengan Animasi Placeholder ke Icon */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="max-w-xl mx-auto relative"
+            className="max-w-xl mx-auto"
           >
-            <IconSearch
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"
-              size={20}
-            />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setVisibleCount(3);
-              }}
-              placeholder="Search articles..."
-              className="w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl py-4 px-12 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-400 focus:shadow-[0_0_30px_rgba(124,58,237,0.2)] transition-all text-lg"
-            />
+            <div className="relative w-full">
+              {/* Placeholder text yang bergeser ke kanan */}
+              <AnimatePresence mode="wait">
+                {!isSearchFocused && search === "" && (
+                  <motion.div
+                    initial={{ x: 0, opacity: 1 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 50, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="absolute inset-y-0 left-12 flex items-center pointer-events-none z-10"
+                  >
+                    <span className="text-zinc-400 text-lg">Search articles...</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Icon Search yang muncul dari kanan */}
+              <AnimatePresence mode="wait">
+                {isSearchFocused && (
+                  <motion.div
+                    initial={{ x: 50, opacity: 0, scale: 0.5 }}
+                    animate={{ x: 0, opacity: 1, scale: 1 }}
+                    exit={{ x: -50, opacity: 0, scale: 0.5 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 500, 
+                      damping: 30,
+                      duration: 0.4 
+                    }}
+                    className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none z-10"
+                  >
+                    <motion.div
+                      animate={{ 
+                        rotate: [0, 360],
+                        scale: [1, 1.2, 1]
+                      }}
+                      transition={{ 
+                        rotate: { duration: 0.5, ease: "easeInOut" },
+                        scale: { duration: 0.3, ease: "easeInOut" }
+                      }}
+                    >
+                      <IconSearch 
+                        className="text-violet-400" 
+                        size={24} 
+                      />
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Icon Search statis (selalu ada) */}
+              <motion.div 
+                className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none z-10"
+                animate={{ 
+                  opacity: isSearchFocused ? 0 : 1,
+                  scale: isSearchFocused ? 0.8 : 1
+                }}
+                transition={{ duration: 0.2 }}
+              >
+                <IconSearch 
+                  className="text-zinc-400" 
+                  size={20} 
+                />
+              </motion.div>
+              
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setVisibleCount(3);
+                }}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+                className="w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-transparent focus:outline-none focus:border-violet-400 focus:shadow-[0_0_30px_rgba(124,58,237,0.2)] transition-all duration-300 text-lg"
+              />
+
+              {/* Animated Glow Effect saat focus */}
+              {isSearchFocused && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-purple-400 rounded-2xl blur-xl -z-10 opacity-30"
+                />
+              )}
+            </div>
           </motion.div>
         </div>
       </section>
