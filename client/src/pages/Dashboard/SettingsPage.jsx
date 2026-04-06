@@ -4,7 +4,7 @@ import { IconUser, IconBell, IconShieldLock, IconLock, IconCheck, IconX, IconChe
 import { useAuth } from '../../store/AuthContext';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
-import { updateProfile } from 'firebase/auth';
+import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -27,6 +27,20 @@ export default function SettingsPage() {
     classReminders: true,
   });
 
+  const [securityData, setSecurityData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+    loginAlerts: true,
+  });
+
+  const [privacyData, setPrivacyData] = useState({
+    profileVisibility: 'private',
+    showEmail: false,
+    showProgress: true,
+    allowPersonalization: true,
+  });
+
   // Load profile from Firestore
   useEffect(() => {
     if (!user) return;
@@ -46,6 +60,18 @@ export default function SettingsPage() {
           if (data.photoUrl) setPhotoURL(data.photoUrl);
           if (data.notifications) {
             setNotifications(data.notifications);
+          }
+          if (data.security) {
+            setSecurityData(prev => ({
+              ...prev,
+              loginAlerts: data.security.loginAlerts ?? prev.loginAlerts,
+            }));
+          }
+          if (data.privacy) {
+            setPrivacyData(prev => ({
+              ...prev,
+              ...data.privacy,
+            }));
           }
         } else {
           setFormData(prev => ({
@@ -73,6 +99,33 @@ export default function SettingsPage() {
 
   const handleNotificationChange = (setting) => {
     setNotifications(prev => ({ ...prev, [setting]: !prev[setting] }));
+    setSaved(false);
+    setError('');
+  };
+
+  const handleSecurityChange = (e) => {
+    const { name, value } = e.target;
+    setSecurityData(prev => ({ ...prev, [name]: value }));
+    setSaved(false);
+    setError('');
+  };
+
+  const handleSecurityToggle = (key) => {
+    setSecurityData(prev => ({ ...prev, [key]: !prev[key] }));
+    setSaved(false);
+    setError('');
+  };
+
+  const handlePrivacyToggle = (key) => {
+    setPrivacyData(prev => ({ ...prev, [key]: !prev[key] }));
+    setSaved(false);
+    setError('');
+  };
+
+  const handlePrivacyVisibilityChange = (value) => {
+    setPrivacyData(prev => ({ ...prev, profileVisibility: value }));
+    setSaved(false);
+    setError('');
   };
 
   const handlePhotoChange = (e) => {
@@ -180,12 +233,118 @@ export default function SettingsPage() {
     }
   };
 
+  const handleSaveSecurity = async (e) => {
+    e?.preventDefault();
+
+    if (!user) {
+      setError('User not authenticated');
+      return;
+    }
+
+    setSaving(true);
+    setError('');
+
+    try {
+      const usesPasswordProvider = user.providerData?.some((provider) => provider.providerId === 'password');
+      const wantsPasswordUpdate = Boolean(securityData.currentPassword || securityData.newPassword || securityData.confirmPassword);
+
+      if (wantsPasswordUpdate && !usesPasswordProvider) {
+        throw new Error('Password hanya bisa diubah untuk akun email/password. Akun Google gunakan pengaturan akun Google.');
+      }
+
+      if (wantsPasswordUpdate) {
+        if (!securityData.currentPassword || !securityData.newPassword || !securityData.confirmPassword) {
+          throw new Error('Lengkapi semua field password terlebih dahulu.');
+        }
+
+        if (securityData.newPassword.length < 8) {
+          throw new Error('Password baru minimal 8 karakter.');
+        }
+
+        if (securityData.newPassword !== securityData.confirmPassword) {
+          throw new Error('Konfirmasi password tidak cocok.');
+        }
+
+        const credential = EmailAuthProvider.credential(user.email, securityData.currentPassword);
+        await reauthenticateWithCredential(user, credential);
+        await updatePassword(user, securityData.newPassword);
+      }
+
+      await setDoc(
+        doc(db, 'users', user.uid),
+        {
+          security: {
+            loginAlerts: securityData.loginAlerts,
+            lastPasswordChangeAt: wantsPasswordUpdate ? new Date().toISOString() : null,
+          },
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+
+      setSecurityData(prev => ({
+        ...prev,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      }));
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      const errorCode = err?.code || '';
+      if (errorCode === 'auth/wrong-password' || errorCode === 'auth/invalid-credential') {
+        setError('Password saat ini salah.');
+      } else if (errorCode === 'auth/weak-password') {
+        setError('Password baru terlalu lemah. Gunakan kombinasi huruf, angka, dan simbol.');
+      } else if (errorCode === 'auth/requires-recent-login') {
+        setError('Silakan login ulang dulu sebelum mengganti password.');
+      } else {
+        setError(err.message || 'Failed to save security settings');
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSavePrivacy = async (e) => {
+    e?.preventDefault();
+
+    if (!user) {
+      setError('User not authenticated');
+      return;
+    }
+
+    setSaving(true);
+    setError('');
+
+    try {
+      await setDoc(
+        doc(db, 'users', user.uid),
+        {
+          privacy: privacyData,
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      console.error('Error saving privacy settings:', err);
+      setError(err.message || 'Failed to save privacy settings');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const displayName = formData.fullName || user?.displayName || 'User';
   const initial = displayName.charAt(0).toUpperCase();
 
   const accountOptions = [
     {
       id: 'profile-quick',
+      tab: 'profile',
       label: 'Edit Profile',
       description: 'Update name, username, and photo',
       icon: IconUser,
@@ -193,6 +352,7 @@ export default function SettingsPage() {
     },
     {
       id: 'notification-quick',
+      tab: 'notifications',
       label: 'Notification Preferences',
       description: 'Manage email and class reminders',
       icon: IconBell,
@@ -200,17 +360,19 @@ export default function SettingsPage() {
     },
     {
       id: 'security',
+      tab: 'security',
       label: 'Security',
       description: 'Password and account protection',
       icon: IconShieldLock,
-      action: null,
+      action: () => setActiveTab('security'),
     },
     {
       id: 'privacy',
+      tab: 'privacy',
       label: 'Privacy',
       description: 'Control account visibility',
       icon: IconLock,
-      action: null,
+      action: () => setActiveTab('privacy'),
     },
   ];
 
@@ -292,24 +454,23 @@ export default function SettingsPage() {
             <div className="flex flex-col gap-1 pt-1">
               {accountOptions.map((option) => {
                 const Icon = option.icon;
-                const isInactive = !option.action;
+                const isActive = activeTab === option.tab;
 
                 return (
                   <button
                     key={option.id}
                     type="button"
-                    onClick={option.action || undefined}
-                    disabled={isInactive}
+                    onClick={option.action}
                     className={`w-full flex items-center justify-between gap-3 rounded-xl px-3 py-3 text-left transition-all ${
-                      isInactive
-                        ? 'cursor-not-allowed text-zinc-500 hover:bg-zinc-800/20'
-                        : 'text-zinc-300 hover:text-white hover:bg-zinc-800/50'
+                      isActive
+                        ? 'text-white bg-zinc-800/70 border border-violet-500/30'
+                        : 'text-zinc-300 hover:text-white hover:bg-zinc-800/50 border border-transparent'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <span className={`flex h-9 w-9 items-center justify-center rounded-lg border ${
-                        isInactive
-                          ? 'border-zinc-700/60 bg-zinc-900/40 text-zinc-500'
+                        isActive
+                          ? 'border-violet-500/40 bg-violet-500/20 text-violet-300'
                           : 'border-violet-500/30 bg-violet-500/10 text-violet-400'
                       }`}>
                         <Icon size={17} />
@@ -320,7 +481,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
 
-                    <IconChevronRight size={16} className={isInactive ? 'text-zinc-700' : 'text-zinc-500'} />
+                    <IconChevronRight size={16} className={isActive ? 'text-violet-300' : 'text-zinc-500'} />
                   </button>
                 );
               })}
@@ -502,6 +663,211 @@ export default function SettingsPage() {
                 ) : (
                   <>
                     <IconCheck size={18} /> Save Preferences
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+
+          {/* Security Tab */}
+          {activeTab === 'security' && (
+            <form onSubmit={handleSaveSecurity} className="flex flex-col gap-6">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-4 mb-2">
+                <h3 className="text-lg font-semibold text-white">Security</h3>
+                {saved && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="flex items-center gap-2 text-green-400 text-sm font-medium"
+                  >
+                    <IconCheck size={18} /> Saved
+                  </motion.div>
+                )}
+              </div>
+
+              <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg">
+                <h4 className="text-sm font-medium text-white mb-1">Change Password</h4>
+                <p className="text-xs text-zinc-400">Isi field di bawah kalau kamu ingin ganti password akun.</p>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-zinc-300">Current Password</label>
+                <input
+                  type="password"
+                  name="currentPassword"
+                  value={securityData.currentPassword}
+                  onChange={handleSecurityChange}
+                  placeholder="Enter current password"
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/30 transition-all"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-zinc-300">New Password</label>
+                  <input
+                    type="password"
+                    name="newPassword"
+                    value={securityData.newPassword}
+                    onChange={handleSecurityChange}
+                    placeholder="Min. 8 characters"
+                    className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/30 transition-all"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-zinc-300">Confirm New Password</label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={securityData.confirmPassword}
+                    onChange={handleSecurityChange}
+                    placeholder="Repeat new password"
+                    className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/30 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg hover:border-zinc-700 transition-colors">
+                <div>
+                  <h4 className="text-sm font-medium text-white">Login Alerts</h4>
+                  <p className="text-xs text-zinc-400 mt-1">Terima notifikasi saat ada login dari perangkat baru.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleSecurityToggle('loginAlerts')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    securityData.loginAlerts ? 'bg-violet-600' : 'bg-zinc-700'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      securityData.loginAlerts ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <button
+                type="submit"
+                disabled={saving}
+                className="mt-4 bg-gradient-to-r from-violet-600 to-purple-400 hover:from-violet-700 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-lg transition-all flex items-center justify-center gap-2"
+              >
+                {saving ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <IconCheck size={18} /> Save Security
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+
+          {/* Privacy Tab */}
+          {activeTab === 'privacy' && (
+            <form onSubmit={handleSavePrivacy} className="flex flex-col gap-6">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-4 mb-2">
+                <h3 className="text-lg font-semibold text-white">Privacy</h3>
+                {saved && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="flex items-center gap-2 text-green-400 text-sm font-medium"
+                  >
+                    <IconCheck size={18} /> Saved
+                  </motion.div>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-zinc-300">Profile Visibility</label>
+                <select
+                  value={privacyData.profileVisibility}
+                  onChange={(e) => handlePrivacyVisibilityChange(e.target.value)}
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/30 transition-all"
+                >
+                  <option value="private">Private (only you)</option>
+                  <option value="friends">Friends only</option>
+                  <option value="public">Public</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg hover:border-zinc-700 transition-colors">
+                <div>
+                  <h4 className="text-sm font-medium text-white">Show Email on Profile</h4>
+                  <p className="text-xs text-zinc-400 mt-1">Tampilkan email ke pengguna lain sesuai visibilitas profil.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handlePrivacyToggle('showEmail')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    privacyData.showEmail ? 'bg-violet-600' : 'bg-zinc-700'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      privacyData.showEmail ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg hover:border-zinc-700 transition-colors">
+                <div>
+                  <h4 className="text-sm font-medium text-white">Show Learning Progress</h4>
+                  <p className="text-xs text-zinc-400 mt-1">Izinkan pengguna lain melihat progress kelas kamu.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handlePrivacyToggle('showProgress')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    privacyData.showProgress ? 'bg-violet-600' : 'bg-zinc-700'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      privacyData.showProgress ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg hover:border-zinc-700 transition-colors">
+                <div>
+                  <h4 className="text-sm font-medium text-white">Personalized Recommendations</h4>
+                  <p className="text-xs text-zinc-400 mt-1">Gunakan aktivitas akun untuk rekomendasi kelas dan konten yang relevan.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handlePrivacyToggle('allowPersonalization')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    privacyData.allowPersonalization ? 'bg-violet-600' : 'bg-zinc-700'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      privacyData.allowPersonalization ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <button
+                type="submit"
+                disabled={saving}
+                className="mt-4 bg-gradient-to-r from-violet-600 to-purple-400 hover:from-violet-700 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-lg transition-all flex items-center justify-center gap-2"
+              >
+                {saving ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <IconCheck size={18} /> Save Privacy
                   </>
                 )}
               </button>

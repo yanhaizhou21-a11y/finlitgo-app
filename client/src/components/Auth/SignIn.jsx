@@ -98,7 +98,7 @@ const SignIn = ({ onToggle, onSuccess }) => {
 
       <div className="text-center mt-6 text-sm text-gray-500">
         Don't have an account?{' '}
-        <button className="text-black font-semibold hover:underline bg-transparent border-none p-0" onClick={onToggle} disabled={loading}>
+        <button type="button" className="text-black font-semibold hover:underline bg-transparent border-none p-0" onClick={onToggle} disabled={loading}>
           Sign Up
         </button>
       </div>

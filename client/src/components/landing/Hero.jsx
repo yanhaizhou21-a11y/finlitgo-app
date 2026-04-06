@@ -1,7 +1,21 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import GradientBlinds from '../Background/GradientBlinds';
+import { useAuth } from '../../store/AuthContext';
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleClickNow = () => {
+    if (user) {
+      navigate('/dashboard');
+      return;
+    }
+
+    navigate('/login?redirect=/dashboard');
+  };
+
   return (
     <main className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-[#141414] via-[#6D28D9] to-[#A78BFA] pt-[120px] pb-10 px-6 relative overflow-hidden">
 
@@ -14,7 +28,7 @@ const Hero = () => {
           blindCount={12}
           blindMinWidth={50}
           spotlightRadius={0.5}
-          spotlightSoftness={1}s
+          spotlightSoftness={1}
           spotlightOpacity={1}
           mouseDampening={0.15}
           distortAmount={0}
@@ -41,7 +55,11 @@ const Hero = () => {
             target, dan quiz seru — khusus Gen Z.
           </p>
           <div className="pb-2">
-            <button className="whitespace-nowrap px-8 py-3 bg-white/10 border border-white/30 backdrop-blur-md rounded-full text-white font-medium hover:bg-white/20 hover:scale-105 active:scale-95 transition-all duration-300 shadow-xl text-[17px] flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleClickNow}
+              className="whitespace-nowrap px-8 py-3 bg-white/10 border border-white/30 backdrop-blur-md rounded-full text-white font-medium hover:bg-white/20 hover:scale-105 active:scale-95 transition-all duration-300 shadow-xl text-[17px] flex items-center gap-2"
+            >
               Click now
             </button>
           </div>

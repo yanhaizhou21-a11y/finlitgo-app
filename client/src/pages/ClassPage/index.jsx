@@ -183,24 +183,28 @@ export default function ClassPage() {
         )}
       </section>
 
-      {/* CTA Section */}
-      <section className="relative z-10 max-w-6xl mx-auto px-6 py-16">
-        <div className="bg-gradient-to-br from-[#1A1A2E] via-[#2D1B69] to-[#1A1A2E] border border-violet-500/20 rounded-3xl p-12 text-center relative overflow-hidden">
-          <div className="absolute -top-20 -right-20 w-60 h-60 bg-violet-600/20 rounded-full blur-[80px] pointer-events-none" />
-          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-purple-600/20 rounded-full blur-[80px] pointer-events-none" />
-          
-          <div className="relative z-10">
-            <h2 className="text-3xl font-bold font-orbitron text-white mb-4">Ready to Level Up?</h2>
-            <p className="text-zinc-400 max-w-lg mx-auto mb-8">Sign up now and start your financial literacy journey. Track your progress, earn streaks, and master your money.</p>
-            <button 
-              onClick={() => navigate('/register')}
-              className="px-8 py-3 bg-gradient-to-r from-violet-600 to-purple-400 text-white font-bold uppercase tracking-wider rounded-xl hover:shadow-[0_4px_20px_rgba(124,58,237,0.4)] transition-all hover:-translate-y-0.5"
-            >
-              Get Started Free
-            </button>
-          </div>
-        </div>
-      </section>
+      {!user && (
+        <>
+          {/* CTA Section */}
+          <section className="relative z-10 max-w-6xl mx-auto px-6 py-16">
+            <div className="bg-gradient-to-br from-[#1A1A2E] via-[#2D1B69] to-[#1A1A2E] border border-violet-500/20 rounded-3xl p-12 text-center relative overflow-hidden">
+              <div className="absolute -top-20 -right-20 w-60 h-60 bg-violet-600/20 rounded-full blur-[80px] pointer-events-none" />
+              <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-purple-600/20 rounded-full blur-[80px] pointer-events-none" />
+
+              <div className="relative z-10">
+                <h2 className="text-3xl font-bold font-orbitron text-white mb-4">Ready to Level Up?</h2>
+                <p className="text-zinc-400 max-w-lg mx-auto mb-8">Sign up now and start your financial literacy journey. Track your progress, earn streaks, and master your money.</p>
+                <button
+                  onClick={() => navigate('/register')}
+                  className="px-8 py-3 bg-gradient-to-r from-violet-600 to-purple-400 text-white font-bold uppercase tracking-wider rounded-xl hover:shadow-[0_4px_20px_rgba(124,58,237,0.4)] transition-all hover:-translate-y-0.5"
+                >
+                  Get Started Free
+                </button>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
     </div>
   );
 }

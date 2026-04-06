@@ -6,10 +6,12 @@ import { db } from '../../services/firebase';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import CompleteProfile from './CompleteProfile';
+import { useAuth } from '../../store/AuthContext';
 
 const AuthContainer = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const searchParams = new URLSearchParams(location.search);
   const redirectTo = searchParams.get('redirect') || '/dashboard';
   // views: 'signin', 'signup', 'completeProfile'
@@ -19,15 +21,23 @@ const AuthContainer = () => {
     if (view !== 'completeProfile') {
       setView(location.pathname === '/register' ? 'signup' : 'signin');
     }
-  }, [location.pathname, view]);
+  }, [location.pathname]);
 
-  const toggleAuth = () => setView(view === 'signin' ? 'signup' : 'signin');
+  const toggleAuth = () => {
+    const nextPath = view === 'signin' ? '/register' : '/login';
+    navigate(`${nextPath}?redirect=${encodeURIComponent(redirectTo)}`, { replace: true });
+  };
 
   const handleAuthSuccess = async (user) => {
     try {
       const userRef = doc(db, 'users', user.uid);
       const userSnap = await getDoc(userRef);
-      if (userSnap.exists() && userSnap.data().username && userSnap.data().dateOfBirth) {
+      const hasRequiredProfile =
+        userSnap.exists() &&
+        userSnap.data().username &&
+        userSnap.data().dateOfBirth;
+
+      if (hasRequiredProfile) {
         // User profile is already complete — go to redirect URL or dashboard
         navigate(redirectTo);
       } else {
