@@ -8,6 +8,7 @@ export default function QuizEngine({ questions, onComplete }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [status, setStatus] = useState('idle'); // 'idle', 'correct', 'incorrect'
+  const [score, setScore] = useState(0);
   const navigate = useNavigate();
 
   const currentQ = questions[currentIndex];
@@ -23,7 +24,8 @@ export default function QuizEngine({ questions, onComplete }) {
     
     if (selectedOption === currentQ.correctAnswer) {
       setStatus('correct');
-      recordStudyActivity(); // Track streak — 1 per day
+      setScore(prev => prev + 1);
+      recordStudyActivity();
     } else {
       setStatus('incorrect');
     }
@@ -35,17 +37,18 @@ export default function QuizEngine({ questions, onComplete }) {
       setSelectedOption(null);
       setStatus('idle');
     } else {
-      onComplete();
-      navigate('/class');
+      // Quiz complete — pass score back
+      const finalScore = score + (status === 'correct' ? 0 : 0); // score already updated
+      onComplete(finalScore, questions.length);
     }
   };
 
   return (
     <div className="fixed inset-0 bg-[#121212] z-50 flex flex-col font-inter">
-      {/* Top Bar: Close & Progress */}
+      {/* Top Bar */}
       <div className="h-20 px-6 flex items-center gap-6 max-w-4xl mx-auto w-full">
         <button 
-          onClick={() => navigate('/class')}
+          onClick={() => onComplete(score, questions.length)}
           className="text-zinc-500 hover:text-white transition-colors"
         >
           <IconX size={28} />
@@ -58,6 +61,7 @@ export default function QuizEngine({ questions, onComplete }) {
             transition={{ duration: 0.5, ease: 'easeOut' }}
           />
         </div>
+        <span className="text-sm text-zinc-500 font-mono">{currentIndex + 1}/{questions.length}</span>
       </div>
 
       {/* Main Content */}

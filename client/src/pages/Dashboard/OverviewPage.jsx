@@ -1,17 +1,31 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { IconFlame, IconBook2, IconArticle, IconChevronRight } from '@tabler/icons-react';
 import { getCurrentStreak, getWeeklyStreak } from '../../utils/streak';
+import { useAuth } from '../../store/AuthContext';
+import { CLASS_META, CLASS_LEVELS } from '../../data/classContent';
+
+function getClassProgressData(userId) {
+  return [1, 2, 3].map((id) => {
+    const meta = CLASS_META[id];
+    const levels = CLASS_LEVELS[id];
+    const totalItems = levels.reduce((sum, l) => sum + l.items.length, 0);
+    let completedCount = 0;
+    try {
+      const raw = localStorage.getItem(`finlitgo_progress_${userId}_class_${id}`);
+      if (raw) completedCount = JSON.parse(raw).length;
+    } catch {}
+    const progress = Math.round((completedCount / totalItems) * 100);
+    return { id, title: meta.title, category: meta.category, totalItems, completedCount, progress };
+  });
+}
 
 export default function OverviewPage() {
+  const { user } = useAuth();
+  const userId = user?.uid || 'guest';
   const streakCount = getCurrentStreak();
   const weeklyStreak = getWeeklyStreak();
-  // Mock study progress data (would come from localStorage/backend)
-  const myClasses = [
-    { id: 1, title: 'Money Management Basics', category: 'Foundation', chapters: 12, completedChapters: 12, progress: 100 },
-    { id: 2, title: 'Investing for Beginners', category: 'Growth', chapters: 8, completedChapters: 4, progress: 45 },
-    { id: 3, title: 'Crypto & Digital Assets', category: 'Advanced', chapters: 10, completedChapters: 1, progress: 10 },
-  ];
+  const myClasses = useMemo(() => getClassProgressData(userId), [userId]);
 
   const blogHistory = [
     { id: 1, title: 'How to Build an Emergency Fund in 6 Months', readDate: '2026-03-30', timeToRead: '4 min', category: 'Foundation' },
@@ -73,7 +87,7 @@ export default function OverviewPage() {
                   <div className="flex items-center gap-3 mt-1">
                     <span className="text-xs text-zinc-500 font-mono">{cls.category}</span>
                     <span className="text-xs text-zinc-600">•</span>
-                    <span className="text-xs text-zinc-500">{cls.completedChapters}/{cls.chapters} chapters</span>
+                    <span className="text-xs text-zinc-500">{cls.completedCount}/{cls.totalItems} materi</span>
                   </div>
                 </div>
               </div>
