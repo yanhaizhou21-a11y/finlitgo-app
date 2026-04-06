@@ -1,21 +1,13 @@
-// pages/Blog/BlogPostPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import {
-  IconArrowLeft,
-  IconClock,
-  IconBookmark,
-  IconShare,
-  IconHeart,
-} from "@tabler/icons-react";
+import { IconArrowLeft, IconClock, IconBookmark, IconShare, IconHeart } from "@tabler/icons-react";
 
 const STORAGE_KEY = "finlitgo_blogs";
 
 function getBlogs() {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) return JSON.parse(saved);
-
   return [
     {
       id: 1,
@@ -23,12 +15,24 @@ function getBlogs() {
       excerpt: "An emergency fund is a financial safety net designed to cover unexpected expenses...",
       content: `
         <p>An emergency fund is a financial safety net designed to cover unexpected expenses such as medical bills, car repairs, or job loss. Building one might seem daunting, but with a solid plan, you can achieve it in just 6 months.</p>
+        
         <h2>Why You Need an Emergency Fund</h2>
-        <p>Life is unpredictable. Without savings, unexpected costs can derail your finances and push you into debt.</p>
+        <p>Life is unpredictable. Without savings, unexpected costs can derail your finances and push you into debt. An emergency fund gives you peace of mind and financial stability.</p>
+        
         <h2>Step-by-Step Plan</h2>
-        <p><strong>Month 1-2:</strong> Save $1,000 as a starter fund.</p>
-        <p><strong>Month 3-4:</strong> Build up to 3 months of expenses.</p>
-        <p><strong>Month 5-6:</strong> Reach your goal of 6 months of expenses.</p>
+        <p><strong>Month 1-2:</strong> Save $1,000 as a starter fund. Cut unnecessary expenses like dining out and subscriptions.</p>
+        <p><strong>Month 3-4:</strong> Build up to 3 months of expenses. Consider a side hustle or overtime work.</p>
+        <p><strong>Month 5-6:</strong> Reach your goal of 6 months of expenses. Automate your savings to stay consistent.</p>
+        
+        <h2>Where to Keep Your Fund</h2>
+        <p>Keep your emergency fund in a high-yield savings account that's separate from your daily checking account. This makes it accessible but not too easy to spend.</p>
+        
+        <h2>Final Tips</h2>
+        <ul>
+          <li>Start small - even $20 per week adds up</li>
+          <li>Celebrate milestones to stay motivated</li>
+          <li>Replenish the fund if you ever need to use it</li>
+        </ul>
       `,
       author: "Admin FinlitGo",
       date: "Oct 12",
@@ -40,7 +44,7 @@ function getBlogs() {
       id: 2,
       title: "Understanding Crypto: A Beginner's Guide",
       excerpt: "Cryptocurrency has taken the financial world by storm...",
-      content: "<p>Detailed content about cryptocurrency...</p>",
+      content: "<p>Detailed content about cryptocurrency for beginners...</p>",
       author: "Doctor Solking",
       date: "Oct 10",
       timeToRead: "8 min read",
@@ -51,7 +55,7 @@ function getBlogs() {
       id: 3,
       title: "The 50/30/20 Rule Explained",
       excerpt: "Budgeting doesn't have to be complicated...",
-      content: "<p>Detailed explanation of the 50/30/20 rule...</p>",
+      content: "<p>Detailed explanation of the 50/30/20 budgeting rule...</p>",
       author: "Admin FinlitGo",
       date: "Oct 05",
       timeToRead: "5 min read",
@@ -61,8 +65,8 @@ function getBlogs() {
     {
       id: 4,
       title: "Why You Need to Start Investing Early",
-      excerpt: "Compound interest is powerful...",
-      content: "<p>Why starting early matters...</p>",
+      excerpt: "Compound interest is the eighth wonder of the world...",
+      content: "<p>Why starting early matters for building wealth...</p>",
       author: "Snickers",
       date: "Sep 28",
       timeToRead: "6 min read",
@@ -72,8 +76,8 @@ function getBlogs() {
     {
       id: 5,
       title: "10 Side Hustles That Actually Make Money",
-      excerpt: "Looking to boost your income?...",
-      content: "<p>10 side hustles to earn extra cash...</p>",
+      excerpt: "Looking to boost your income? Here are 10 proven side hustles...",
+      content: "<p>List of 10 side hustles with actionable steps...</p>",
       author: "Admin FinlitGo",
       date: "Sep 20",
       timeToRead: "7 min read",
@@ -83,8 +87,8 @@ function getBlogs() {
     {
       id: 6,
       title: "How to Improve Your Credit Score Fast",
-      excerpt: "A good credit score opens doors...",
-      content: "<p>Tips to boost your credit score...</p>",
+      excerpt: "A good credit score opens doors to better loans...",
+      content: "<p>Actionable tips to boost your credit score quickly...</p>",
       author: "Doctor Solking",
       date: "Sep 15",
       timeToRead: "5 min read",
@@ -94,8 +98,8 @@ function getBlogs() {
   ];
 }
 
-export default function BlogPostPage() {
-  const { postId } = useParams(); // Ambil ID dari URL
+export default function BlogDetailPage() {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [blog, setBlog] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
@@ -103,10 +107,12 @@ export default function BlogPostPage() {
 
   useEffect(() => {
     const blogs = getBlogs();
-    const foundBlog = blogs.find((b) => b.id === parseInt(postId));
+    const foundBlog = blogs.find((b) => b.id === parseInt(id));
     setBlog(foundBlog);
+    
+    // Scroll to top when page loads
     window.scrollTo(0, 0);
-  }, [postId]);
+  }, [id]);
 
   if (!blog) {
     return (
@@ -126,7 +132,7 @@ export default function BlogPostPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Hero Section */}
+      {/* Hero Section with Blog Image */}
       <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
         <img
           src={blog.image}
@@ -134,7 +140,7 @@ export default function BlogPostPage() {
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
-
+        
         {/* Back Button */}
         <button
           onClick={() => navigate("/blog")}
@@ -149,9 +155,7 @@ export default function BlogPostPage() {
           <button
             onClick={() => setIsSaved(!isSaved)}
             className={`p-2 rounded-full backdrop-blur-sm transition-all ${
-              isSaved
-                ? "bg-violet-600 text-white"
-                : "bg-black/50 text-white hover:bg-violet-600"
+              isSaved ? "bg-violet-600 text-white" : "bg-black/50 text-white hover:bg-violet-600"
             }`}
           >
             <IconBookmark size={20} />
@@ -159,20 +163,14 @@ export default function BlogPostPage() {
           <button
             onClick={() => setIsLiked(!isLiked)}
             className={`p-2 rounded-full backdrop-blur-sm transition-all ${
-              isLiked
-                ? "bg-red-500 text-white"
-                : "bg-black/50 text-white hover:bg-red-500"
+              isLiked ? "bg-red-500 text-white" : "bg-black/50 text-white hover:bg-red-500"
             }`}
           >
             <IconHeart size={20} />
           </button>
           <button
             onClick={() => {
-              if (navigator.share) {
-                navigator.share({ title: blog.title, url: window.location.href });
-              } else {
-                alert("Share this article!");
-              }
+              navigator.share ? navigator.share({ title: blog.title, url: window.location.href }) : alert("Share this article!");
             }}
             className="p-2 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-violet-600 transition-all"
           >
@@ -181,7 +179,7 @@ export default function BlogPostPage() {
         </div>
       </div>
 
-      {/* Content */}
+      {/* Blog Content */}
       <article className="max-w-4xl mx-auto px-6 py-12 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -220,8 +218,8 @@ export default function BlogPostPage() {
             </div>
           </div>
 
-          {/* Blog Content */}
-          <div
+          {/* Blog Content with HTML */}
+          <div 
             className="prose prose-invert prose-lg max-w-none
               prose-headings:text-white prose-headings:font-bold prose-headings:font-orbitron
               prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl
@@ -233,13 +231,15 @@ export default function BlogPostPage() {
             dangerouslySetInnerHTML={{ __html: blog.content }}
           />
 
-          {/* Tags */}
+          {/* Tags / Related Content */}
           <div className="mt-12 pt-8 border-t border-zinc-800">
             <h3 className="text-xl font-bold mb-4">Tags</h3>
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-zinc-800 rounded-full text-sm text-zinc-300">
-                {blog.category}
-              </span>
+              {blog.category && (
+                <span className="px-3 py-1 bg-zinc-800 rounded-full text-sm text-zinc-300">
+                  {blog.category}
+                </span>
+              )}
               <span className="px-3 py-1 bg-zinc-800 rounded-full text-sm text-zinc-300">
                 Personal Finance
               </span>
@@ -249,7 +249,7 @@ export default function BlogPostPage() {
             </div>
           </div>
 
-          {/* Navigation */}
+          {/* Navigation Buttons */}
           <div className="mt-12 flex justify-between">
             <button
               onClick={() => navigate("/blog")}
