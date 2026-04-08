@@ -1,138 +1,174 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { IconArrowLeft, IconBrandTwitter, IconBrandLinkedin, IconLink } from '@tabler/icons-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+function getBlogData(postId) {
+  const STORAGE_KEY = 'finlitgo_blogs';
+  const saved = localStorage.getItem(STORAGE_KEY);
+  const blogs = saved ? JSON.parse(saved) : [];
+  return blogs.find(b => String(b.id) === String(postId));
+}
+
 export default function BlogPostPage() {
-  const { postId } = useParams();
+  const { postId } = useParams(); // Ambil ID dari URL
   const navigate = useNavigate();
-  const [post, setPost] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchBlogPost();
-  }, [postId]);
+  const blogData = getBlogData(postId);
 
-  const fetchBlogPost = () => {
-    setLoading(true);
-    const saved = localStorage.getItem('finlitgo_blogs');
-    let dataList = [];
-    if (saved) {
-      dataList = JSON.parse(saved);
-    } else {
-      // Fake fallback matching BlogPage index
-      dataList = [
-        { id: 1, title: 'How to Build an Emergency Fund in 6 Months', excerpt: 'An emergency fund is a financial safety net designed to cover unexpected expenses...', author: 'Admin FinlitGo', date: 'Oct 12', timeToRead: '4 min read', category: 'Foundation', image: 'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=800&q=80', content: 'An emergency fund is a financial safety net...' },
-        { id: 2, title: 'Understanding Crypto: A Beginner\'s Guide', excerpt: 'Cryptocurrency has taken the financial world by storm, but what exactly is it?', author: 'Doctor Solking', date: 'Oct 10', timeToRead: '8 min read', category: 'Advanced', image: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=800&q=80', content: 'Cryptocurrency has taken the financial world by storm...' }
-      ];
-    }
-    
-    const found = dataList.find(b => b.id.toString() === postId?.toString());
-    if (found) {
-      setPost({
-        ...found,
-        image: found.thumbnail_url || found.image,
-        date: found.created_at ? new Date(found.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : found.date,
-        timeToRead: found.time_to_read || found.timeToRead || '5 min read'
-      });
-    }
-    setLoading(false);
+  // Fallback
+  const post = blogData || {
+    title: 'How to Build an Emergency Fund in 6 Months',
+    author: 'Admin FinlitGo',
+    date: 'Oct 12, 2026',
+    timeToRead: '4 min read',
+    image: 'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=1600&q=80',
+    content: `An emergency fund is a financial safety net designed to cover unexpected expenses such as medical bills, urgent car repairs, or sudden job loss.\n\n### Why is an Emergency Fund Critical?\nLife is unpredictable. Having liquid cash readily available gives you peace of mind.\n\n### Step 1: Set a Realistic Goal\nStart small. Aim for one month of essential expenses.\n\n### Step 2: Automate Your Savings\nSet up an automatic transfer from your checking to a dedicated high-yield savings account.\n\n### Step 3: Trim the Fat\nReview your last three months of bank statements.`
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
-        <div className="w-8 h-8 rounded-full border-t-2 border-violet-500 animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (!post) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0a] text-white">
-        <h1 className="text-2xl font-bold mb-4">Artikel tidak ditemukan</h1>
-        <button onClick={() => navigate('/blog')} className="px-6 py-2 bg-violet-600 rounded-xl">Kembali ke Blog</button>
-      </div>
-    );
-  }
-
-
   return (
-    <div className="max-w-4xl mx-auto py-8 px-6 font-inter relative">
-      {/* Navigation */}
-      <button 
-        onClick={() => navigate('/blog')}
-        className="flex items-center gap-2 text-zinc-400 hover:text-violet-400 transition-colors mb-8 font-mono text-xs uppercase tracking-widest"
-      >
-        <div className="p-3 bg-zinc-900 rounded-full hover:bg-zinc-800 transition-colors">
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
+      {/* Hero Section */}
+      <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
+        <img
+          src={blog.image}
+          alt={blog.title}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
+
+        {/* Back Button */}
+        <button
+          onClick={() => navigate("/blog")}
+          className="absolute top-6 left-6 z-20 flex items-center gap-2 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full text-white hover:bg-violet-600 transition-all"
+        >
           <IconArrowLeft size={20} />
-        </div>
-        <span className="hidden md:inline">Back to Blog</span>
-      </button>
+          Back to Blog
+        </button>
 
-      {/* Header Info */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10 text-center px-4">
-        <h1 className="text-4xl md:text-5xl font-bold font-orbitron text-white leading-tight mb-8">{post.title}</h1>
-        
-        <div className="flex items-center justify-center gap-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-zinc-800">
-              <img src={`https://i.pravatar.cc/150?u=${post.author}`} className="w-full h-full object-cover" alt="Author" />
-            </div>
-            <div className="text-left font-sans">
-              <div className="text-white font-medium">{post.author}</div>
-              <div className="text-zinc-500 text-sm">{post.date} · {post.timeToRead}</div>
-            </div>
-          </div>
-          
-          <div className="h-8 w-px bg-zinc-800 hidden md:block"></div>
-          
-          <div className="hidden md:flex items-center gap-4 text-zinc-500">
-            <IconBrandTwitter className="hover:text-blue-400 cursor-pointer transition-colors" />
-            <IconBrandLinkedin className="hover:text-blue-600 cursor-pointer transition-colors" />
-            <IconLink className="hover:text-white cursor-pointer transition-colors" />
-          </div>
+        {/* Action Buttons */}
+        <div className="absolute top-6 right-6 z-20 flex gap-3">
+          <button
+            onClick={() => setIsSaved(!isSaved)}
+            className={`p-2 rounded-full backdrop-blur-sm transition-all ${
+              isSaved
+                ? "bg-violet-600 text-white"
+                : "bg-black/50 text-white hover:bg-violet-600"
+            }`}
+          >
+            <IconBookmark size={20} />
+          </button>
+          <button
+            onClick={() => setIsLiked(!isLiked)}
+            className={`p-2 rounded-full backdrop-blur-sm transition-all ${
+              isLiked
+                ? "bg-red-500 text-white"
+                : "bg-black/50 text-white hover:bg-red-500"
+            }`}
+          >
+            <IconHeart size={20} />
+          </button>
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({ title: blog.title, url: window.location.href });
+              } else {
+                alert("Share this article!");
+              }
+            }}
+            className="p-2 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-violet-600 transition-all"
+          >
+            <IconShare size={20} />
+          </button>
         </div>
-      </motion.div>
-
-      {/* Cover Image */}
-      {post.image && (
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full h-64 md:h-[400px] bg-zinc-900 rounded-3xl overflow-hidden mb-12 shadow-2xl border border-zinc-800">
-          <img src={post.image} alt={post.title} className="w-full h-full object-cover opacity-80" />
-        </motion.div>
-      )}
+      </div>
 
       {/* Content */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="px-4 md:px-12">
-        <div className="prose prose-invert prose-lg max-w-none text-zinc-300 font-sans leading-relaxed">
-          {(post.content || '').split('\n').map((paragraph, idx) => {
-            const cleaned = paragraph.trim();
-            if (!cleaned) return null;
-            
-            if (cleaned.startsWith('### ')) {
-              return <h3 key={idx} className="text-2xl font-bold font-orbitron text-white mt-10 mb-4">{cleaned.replace('### ', '')}</h3>;
-            }
-            
-            return <p key={idx} className="mb-6 selection:bg-violet-500 selection:text-white">{cleaned}</p>;
-          })}
-        </div>
-      </motion.div>
-
-      {/* Divider */}
-      <div className="w-full h-px bg-zinc-800 my-16"></div>
-
-      {/* Bottom CTA */}
-      <div className="bg-gradient-to-br from-[#1A1A2E] via-[#2D1B69] to-[#1A1A2E] rounded-3xl p-8 border border-violet-500/20 text-center relative overflow-hidden">
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-violet-600/20 rounded-full blur-[60px] pointer-events-none" />
-        <h3 className="text-2xl font-bold text-white mb-4 relative z-10">Ready to start building?</h3>
-        <p className="text-zinc-400 mb-6 relative z-10">Head over to your Financial Dashboard to set up your goals now.</p>
-        <button 
-          onClick={() => navigate('/dashboard/finance')}
-          className="px-8 py-3 bg-gradient-to-r from-violet-600 to-purple-400 text-white font-bold uppercase tracking-wider text-sm rounded-xl hover:shadow-[0_4px_20px_rgba(124,58,237,0.4)] transition-all relative z-10"
+      <article className="max-w-4xl mx-auto px-6 py-12 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          Go to Dashboard
-        </button>
-      </div>
+          {/* Category */}
+          <div className="mb-4">
+            <span className="text-violet-400 font-mono text-sm uppercase tracking-wider">
+              {blog.category}
+            </span>
+          </div>
+
+          {/* Title */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-orbitron mb-6 leading-tight">
+            {blog.title}
+          </h1>
+
+          {/* Author Info */}
+          <div className="flex items-center gap-4 mb-8 pb-8 border-b border-zinc-800">
+            <div className="w-12 h-12 rounded-full bg-zinc-800 overflow-hidden">
+              <img
+                src={`https://i.pravatar.cc/150?u=${blog.author}`}
+                className="w-full h-full object-cover"
+                alt={blog.author}
+              />
+            </div>
+            <div>
+              <div className="font-semibold text-white">{blog.author}</div>
+              <div className="flex items-center gap-2 text-sm text-zinc-400">
+                <span>{blog.date}</span>
+                <span>•</span>
+                <IconClock size={14} />
+                <span>{blog.timeToRead}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Blog Content */}
+          <div
+            className="prose prose-invert prose-lg max-w-none
+              prose-headings:text-white prose-headings:font-bold prose-headings:font-orbitron
+              prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl
+              prose-p:text-zinc-300 prose-p:leading-relaxed
+              prose-a:text-violet-400 prose-a:no-underline hover:prose-a:underline
+              prose-strong:text-white prose-strong:font-bold
+              prose-ul:text-zinc-300 prose-li:text-zinc-300
+              prose-blockquote:border-l-violet-500 prose-blockquote:text-zinc-400"
+            dangerouslySetInnerHTML={{ __html: blog.content }}
+          />
+
+          {/* Tags */}
+          <div className="mt-12 pt-8 border-t border-zinc-800">
+            <h3 className="text-xl font-bold mb-4">Tags</h3>
+            <div className="flex flex-wrap gap-2">
+              <span className="px-3 py-1 bg-zinc-800 rounded-full text-sm text-zinc-300">
+                {blog.category}
+              </span>
+              <span className="px-3 py-1 bg-zinc-800 rounded-full text-sm text-zinc-300">
+                Personal Finance
+              </span>
+              <span className="px-3 py-1 bg-zinc-800 rounded-full text-sm text-zinc-300">
+                Tips & Tricks
+              </span>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="mt-12 flex justify-between">
+            <button
+              onClick={() => navigate("/blog")}
+              className="flex items-center gap-2 text-zinc-400 hover:text-violet-400 transition-colors"
+            >
+              <IconArrowLeft size={20} />
+              All Articles
+            </button>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="text-zinc-400 hover:text-violet-400 transition-colors"
+            >
+              Back to Top ↑
+            </button>
+          </div>
+        </motion.div>
+      </article>
     </div>
   );
 }
