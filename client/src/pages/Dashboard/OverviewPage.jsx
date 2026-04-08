@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { IconFlame, IconBook2, IconArticle, IconChevronRight } from '@tabler/icons-react';
 import { getCurrentStreak, getWeeklyStreak } from '../../utils/streak';
@@ -21,17 +21,44 @@ function getClassProgressData(userId) {
 }
 
 export default function OverviewPage() {
-  const { user } = useAuth();
-  const userId = user?.uid || 'guest';
-  const streakCount = getCurrentStreak();
-  const weeklyStreak = getWeeklyStreak();
-  const myClasses = useMemo(() => getClassProgressData(userId), [userId]);
+  const { user, profile } = useAuth();
+  const [myClasses, setMyClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const streakCount = profile?.streak_count || 0;
+  const points = profile?.points || 0;
+
+  useEffect(() => {
+    fetchProgress();
+  }, []);
+
+  const fetchProgress = async () => {
+    try {
+      // For now, fetch all classes and shows them
+      // In a real app, we'd fetch "enrolled" or "in-progress" specifically
+      const res = await fetch('http://localhost:5000/api/classes');
+      const result = await res.json();
+      if (result.success) {
+        setMyClasses(result.data.classes.slice(0, 3).map(c => ({
+            id: c.id,
+            title: c.title,
+            category: c.category,
+            totalItems: c.chapters_count || 5, // fallback
+            completedCount: 0, // In next step, fetch actual progress
+            progress: 0
+        })));
+      }
+    } catch (error) {
+      console.error("Error fetching progress:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const blogHistory = [
-    { id: 1, title: 'How to Build an Emergency Fund in 6 Months', readDate: '2026-03-30', timeToRead: '4 min', category: 'Foundation' },
-    { id: 2, title: 'Understanding Crypto: A Beginner\'s Guide', readDate: '2026-03-28', timeToRead: '8 min', category: 'Advanced' },
-    { id: 3, title: 'The 50/30/20 Rule Explained', readDate: '2026-03-25', timeToRead: '5 min', category: 'Foundation' },
+    { id: 1, title: 'How to Build an Emergency Fund in 6 Months', readDate: '2026-04-06', timeToRead: '4 min', category: 'Foundation' },
   ];
+
 
   return (
     <div className="flex flex-col gap-6">

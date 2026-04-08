@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
@@ -18,37 +18,39 @@ import {
 
 const STORAGE_KEY = 'finlitgo_classes';
 
-function getClasses() {
+function getInitialClasses() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) return JSON.parse(saved);
   return [
-    { id: 1, title: 'Financial Foundation & Mindset', category: 'Foundation', description: 'Bangun pondasi keuangan yang kuat, pahami psikologi uang, dan kuasai strategi budgeting yang cocok untuk Gen Z.', levels: 1, image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500&q=80' },
-    { id: 2, title: 'Navigasi Hutang & Kredit Digital', category: 'Intermediate', description: 'Bongkar cara kerja Paylater & fintech, bedakan hutang produktif vs konsumtif, dan jaga skor kreditmu untuk masa depan.', levels: 1, image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=500&q=80' },
-    { id: 3, title: 'Dasar Investasi & Wealth Building', category: 'Advanced', description: 'Kenali profil risikomu, mulai investasi dari instrumen aman, dan bangun kekayaan jangka panjang dengan strategi yang terbukti.', levels: 1, image: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=500&q=80' },
+    { id: 1, title: 'Money Management Basics', category: 'Foundation', description: 'Learn the fundamentals of managing your money wisely.', chapters: 12, youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500&q=80', quizzes: [
+      { question: 'What percentage of income should go to Needs in the 50/30/20 rule?', options: ['20%', '30%', '50%', '10%'], correctAnswer: 2 },
+      { question: 'Which is considered a "Want"?', options: ['Rent', 'Groceries', 'Dining Out', 'Electricity'], correctAnswer: 2 }
+    ]},
+    { id: 2, title: 'Investing for Beginners', category: 'Growth', description: 'Start your investment journey with confidence.', chapters: 8, youtubeUrl: 'https://www.youtube.com/watch?v=PHe0bXAIuk0', image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=500&q=80', quizzes: [] },
+    { id: 3, title: 'Crypto & Digital Assets', category: 'Advanced', description: 'Understand the world of cryptocurrency and blockchain.', chapters: 10, youtubeUrl: '', image: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=500&q=80', quizzes: [] },
   ];
-}
-
-// Read real progress from localStorage (per-user)
-function getClassProgress(userId, moduleId) {
-  try {
-    const raw = localStorage.getItem(`finlitgo_progress_${userId}_class_${moduleId}`);
-    if (!raw) return 0;
-    const completed = JSON.parse(raw);
-    const levels = CLASS_LEVELS[moduleId];
-    if (!levels) return 0;
-    const totalItems = levels.reduce((sum, l) => sum + l.items.length, 0);
-    return Math.round((completed.length / totalItems) * 100);
-  } catch {
-    return 0;
-  }
 }
 
 export default function ClassPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const userId = user?.uid || 'guest';
+  const { user, profile } = useAuth();
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('All');
   const [search, setSearch] = useState('');
-  const classes = getClasses();
-  const streak = getCurrentStreak();
+  
+  const streak = profile?.streak_count || 0;
+
+  useEffect(() => {
+    fetchClasses();
+  }, []);
+
+  const fetchClasses = () => {
+    const data = getInitialClasses();
+    setClasses(data);
+    setLoading(false);
+  };
+
 
   // IDs of classes that require login
   const loginRequiredIds = [1, 2, 3];
@@ -163,10 +165,12 @@ export default function ClassPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <AnimatePresence mode="popLayout">
             {filteredClasses.map((course, i) => {
-              const progress = getClassProgress(userId, course.id);
-              const meta = CLASS_META[course.id];
+              const progress = course.progress || 0;
               const isCompleted = progress >= 100;
-              const isLocked = loginRequiredIds.includes(course.id) && !user;
+              const isLocked = false; // Disable strict lock for now to allow viewing
+              const image = course.thumbnail_url || course.image;
+              const chaptersCount = course.chapters_count || 1;
+              const meta = CLASS_META?.[course.id] || null;
 
               return (
                 <motion.div

@@ -13,6 +13,7 @@
     "dev": "npm run dev --workspaces --if-present"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.101.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",

@@ -1,32 +1,37 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IconRobot, IconSend, IconSparkles, IconWorld, IconStethoscope, IconBooks, IconUser, IconTrash } from '@tabler/icons-react';
+import { IconRobot, IconSend, IconSparkles, IconWallet, IconChartBar, IconPigMoney, IconUser, IconTrash, IconTarget } from '@tabler/icons-react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useAuth } from '../../store/AuthContext';
 
-// FinLitGo SDK Config — model instance dibuat sekali di luar komponen
+// FinLitGo SDK Config — model instance created once outside component
 const GEMINI_API_KEY = "AIzaSyCsdlQ_tIjcepfmuHiB30kkRC1b2Nt4QWQ";
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const geminiModel = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+  model: "gemini-2.0-flash",
   generationConfig: {
     temperature: 0.7,
-    maxOutputTokens: 1024,
+    maxOutputTokens: 2048,
   },
 });
 const MAX_DAILY_LIMIT = 10;
 
 export default function AIAssistPage() {
   const { user } = useAuth();
+  const userId = user?.id || 'guest';
+
+  // Per-user keys
+  const chatKey = `finlitgo_ai_chat_${userId}`;
+  const usageKey = `finlitgo_ai_usage_${userId}`;
+
   const [prompt, setPrompt] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const savedMsg = localStorage.getItem('finlitgo_ai_chat_history');
+    const savedMsg = localStorage.getItem(chatKey);
     if (savedMsg) {
       try {
         const parsed = JSON.parse(savedMsg);
-        if (parsed.date === today) return parsed.data;
+        return Array.isArray(parsed) ? parsed : (parsed.data || []);
       } catch (_) {}
     }
     return [];
@@ -34,27 +39,76 @@ export default function AIAssistPage() {
   const [usageCount, setUsageCount] = useState(0);
 
   // Refs
-  const chatContainerRef = useRef(null);   // ref ke div scrollable
-  const chatSessionRef = useRef(null);      // persistent Gemini chat session
-  const isAtBottomRef = useRef(true);       // track apakah user scroll manual
+  const chatContainerRef = useRef(null);
+  const chatSessionRef = useRef(null);
+  const isAtBottomRef = useRef(true);
 
   // ───────────────────────────────────────────
-  // Inisialisasi/reset chat session Gemini sekali
+  // Build rich system instruction with user's cashflow data
   // ───────────────────────────────────────────
   const buildSystemInstruction = useCallback(() => {
-    const userId = user?.uid || 'guest';
     const txs = JSON.parse(localStorage.getItem(`finlitgo_transactions_${userId}`) || '[]');
     const goals = JSON.parse(localStorage.getItem(`finlitgo_goals_${userId}`) || '[]');
     const pockets = JSON.parse(localStorage.getItem(`finlitgo_pockets_${userId}`) || '[]');
 
-    const totalIncome = txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-    const totalExpense = txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+    const incomes = txs.filter(t => t.type === 'income');
+    const expenses = txs.filter(t => t.type === 'expense');
+    const totalIncome = incomes.reduce((s, t) => s + t.amount, 0);
+    const totalExpense = expenses.reduce((s, t) => s + t.amount, 0);
     const mainBalance = totalIncome - totalExpense;
-    const goalsText = goals.length > 0 ? goals.map(g => `${g.name} (Rp${g.current}/${g.target})`).join(', ') : 'none';
-    const pocketsText = pockets.length > 0 ? pockets.map(p => `${p.name} Rp${p.balance}`).join(', ') : 'none';
 
-    return `You are FinLitGo AI, a smart financial literacy assistant for Gen Z. Be concise and friendly.\nUser balance: Rp${mainBalance}, expenses: Rp${totalExpense}, pockets: ${pocketsText}, goals: ${goalsText}.`;
-  }, [user]);
+    // Category breakdown
+    const expenseByCategory = {};
+    expenses.forEach(t => {
+      const cat = t.category || 'Lainnya';
+      expenseByCategory[cat] = (expenseByCategory[cat] || 0) + t.amount;
+    });
+    const categoryBreakdown = Object.entries(expenseByCategory)
+      .sort((a, b) => b[1] - a[1])
+      .map(([cat, amt]) => `${cat}: Rp${amt.toLocaleString('id-ID')}`)
+      .join(', ') || 'none';
+
+    const incomeByCategory = {};
+    incomes.forEach(t => {
+      const cat = t.category || 'Lainnya';
+      incomeByCategory[cat] = (incomeByCategory[cat] || 0) + t.amount;
+    });
+    const incomeBreakdown = Object.entries(incomeByCategory)
+      .sort((a, b) => b[1] - a[1])
+      .map(([cat, amt]) => `${cat}: Rp${amt.toLocaleString('id-ID')}`)
+      .join(', ') || 'none';
+
+    const goalsText = goals.length > 0
+      ? goals.map(g => `${g.name} (Rp${g.current.toLocaleString('id-ID')}/${g.target.toLocaleString('id-ID')} — ${Math.round((g.current / g.target) * 100)}%)`).join('; ')
+      : 'belum ada goals';
+    const pocketsText = pockets.length > 0
+      ? pockets.map(p => `${p.name}: Rp${p.balance.toLocaleString('id-ID')}`).join('; ')
+      : 'belum ada pockets';
+
+    const savingsRate = totalIncome > 0 ? Math.round(((totalIncome - totalExpense) / totalIncome) * 100) : 0;
+
+    return `You are FinLitGo AI, a smart and friendly Indonesian financial literacy assistant for Gen Z users. You give concise, actionable, and encouraging financial advice in a casual tone.
+
+CRITICAL: Always respond in the SAME LANGUAGE the user uses. If they write in Indonesian, respond in Indonesian. If English, respond in English.
+
+USER'S FINANCIAL DATA:
+- Main Balance: Rp${mainBalance.toLocaleString('id-ID')}
+- Total Income: Rp${totalIncome.toLocaleString('id-ID')} (${incomeBreakdown})
+- Total Expenses: Rp${totalExpense.toLocaleString('id-ID')} (${categoryBreakdown})
+- Savings Rate: ${savingsRate}%
+- Pockets: ${pocketsText}
+- Financial Goals: ${goalsText}
+- Total Transactions: ${txs.length}
+
+GUIDELINES:
+- When analyzing cashflow, point out spending patterns, suggest improvements
+- For budgeting advice, reference the 50/30/20 rule adapted to their situation
+- If savings rate < 20%, gently encourage more saving
+- If they have goals, suggest strategies to reach them faster
+- Be concise — keep responses under 300 words unless they ask for detail
+- Use **bold** for key numbers and important tips
+- Use emojis sparingly to keep it friendly 💰`;
+  }, [userId]);
 
   const startNewChatSession = useCallback(() => {
     chatSessionRef.current = geminiModel.startChat({
@@ -63,47 +117,61 @@ export default function AIAssistPage() {
     });
   }, [buildSystemInstruction]);
 
-  // Mulai session baru saat komponen mount atau user berubah
+  // Start new session on mount or user change
   useEffect(() => {
     startNewChatSession();
   }, [startNewChatSession]);
 
   // ───────────────────────────────────────────
-  // Daily limit check
+  // Daily limit check (per-user)
   // ───────────────────────────────────────────
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
-    const savedData = localStorage.getItem('finlitgo_ai_usage');
+    const savedData = localStorage.getItem(usageKey);
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
         if (parsed.date === today) {
           setUsageCount(parsed.count);
         } else {
-          localStorage.setItem('finlitgo_ai_usage', JSON.stringify({ date: today, count: 0 }));
+          localStorage.setItem(usageKey, JSON.stringify({ date: today, count: 0 }));
           setUsageCount(0);
         }
       } catch (_) {}
     } else {
-      localStorage.setItem('finlitgo_ai_usage', JSON.stringify({ date: today, count: 0 }));
+      localStorage.setItem(usageKey, JSON.stringify({ date: today, count: 0 }));
     }
-  }, []);
+  }, [usageKey]);
 
   const incrementUsage = () => {
     const today = new Date().toISOString().split('T')[0];
     const newCount = usageCount + 1;
     setUsageCount(newCount);
-    localStorage.setItem('finlitgo_ai_usage', JSON.stringify({ date: today, count: newCount }));
+    localStorage.setItem(usageKey, JSON.stringify({ date: today, count: newCount }));
   };
 
-  // Sync messages ke localStorage
+  // Sync messages to per-user localStorage
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    localStorage.setItem('finlitgo_ai_chat_history', JSON.stringify({ date: today, data: messages }));
-  }, [messages]);
+    localStorage.setItem(chatKey, JSON.stringify(messages));
+  }, [messages, chatKey]);
+
+  // Reload messages when user changes
+  useEffect(() => {
+    const savedMsg = localStorage.getItem(chatKey);
+    if (savedMsg) {
+      try {
+        const parsed = JSON.parse(savedMsg);
+        setMessages(Array.isArray(parsed) ? parsed : []);
+      } catch (_) {
+        setMessages([]);
+      }
+    } else {
+      setMessages([]);
+    }
+  }, [chatKey]);
 
   // ───────────────────────────────────────────
-  // Smooth scroll — hanya auto-scroll jika user di bawah
+  // Smooth scroll
   // ───────────────────────────────────────────
   const scrollToBottom = useCallback((force = false) => {
     const container = chatContainerRef.current;
@@ -113,22 +181,20 @@ export default function AIAssistPage() {
     }
   }, []);
 
-  // Deteksi apakah user scroll ke atas secara manual
   const handleScroll = useCallback(() => {
     const container = chatContainerRef.current;
     if (!container) return;
-    const threshold = 80; // px dari bawah
+    const threshold = 80;
     isAtBottomRef.current =
       container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
   }, []);
 
-  // Scroll ke bawah saat pesan baru masuk
   useEffect(() => {
     scrollToBottom();
-  }, [messages.length, scrollToBottom]); // hanya saat jumlah pesan bertambah, bukan setiap streaming chunk
+  }, [messages.length, scrollToBottom]);
 
   // ───────────────────────────────────────────
-  // Handler kirim pesan
+  // Send message handler
   // ───────────────────────────────────────────
   const handleSend = async (overridePrompt = null) => {
     const textToSend = overridePrompt || prompt;
@@ -140,19 +206,18 @@ export default function AIAssistPage() {
 
     setPrompt('');
     setIsTyping(true);
-    isAtBottomRef.current = true; // force scroll saat kirim
+    isAtBottomRef.current = true;
 
     setMessages(prev => [...prev, { role: 'user', content: textToSend }]);
 
-    // Pastikan session aktif
+    // Ensure session is active
     if (!chatSessionRef.current) startNewChatSession();
 
     try {
-      // Pre-add pesan assistant kosong untuk streaming
+      // Pre-add empty assistant message for streaming
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
       setIsTyping(false);
 
-      // Scroll paksa ke bawah setelah pesan user muncul
       requestAnimationFrame(() => scrollToBottom(true));
 
       const result = await chatSessionRef.current.sendMessageStream(textToSend);
@@ -168,7 +233,6 @@ export default function AIAssistPage() {
           return updated;
         });
 
-        // Throttle scroll saat streaming — setiap 120ms agar tidak thrashing
         const now = Date.now();
         if (now - lastScrollTime > 120) {
           lastScrollTime = now;
@@ -176,12 +240,10 @@ export default function AIAssistPage() {
         }
       }
 
-      // Final scroll setelah selesai
       requestAnimationFrame(() => scrollToBottom(true));
       incrementUsage();
     } catch (error) {
       console.error("AI Error:", error);
-      // Jika session error, buat ulang session
       startNewChatSession();
       setMessages(prev => {
         const updated = [...prev];
@@ -197,7 +259,8 @@ export default function AIAssistPage() {
 
   const handleClearChat = () => {
     setMessages([]);
-    startNewChatSession(); // reset session juga
+    localStorage.removeItem(chatKey);
+    startNewChatSession();
   };
 
   // ───────────────────────────────────────────
@@ -219,11 +282,12 @@ export default function AIAssistPage() {
     });
   };
 
+  // Finance-relevant quick action categories
   const categories = [
-    { title: 'Global Justice', icon: <IconWorld size={20} />, color: 'bg-blue-500/10 text-blue-500', prompt: 'Tell me about Global Justice' },
-    { title: 'Medicine & Health', icon: <IconStethoscope size={20} />, color: 'bg-red-500/10 text-red-500', prompt: 'Tell me about Medicine in personal finance' },
-    { title: 'Science & Tech', icon: <IconSparkles size={20} />, color: 'bg-violet-500/10 text-violet-400', prompt: 'How does tech affect the economy?' },
-    { title: 'Finance & Econ', icon: <IconBooks size={20} />, color: 'bg-purple-500/10 text-purple-500', prompt: 'What are the best investment strategies?' }
+    { title: 'Analyze Cashflow', icon: <IconChartBar size={20} />, color: 'bg-green-500/10 text-green-500', prompt: 'Analyze my current cashflow. Look at my income vs spending breakdown, identify my biggest expense categories, and give me actionable tips to improve my financial health.' },
+    { title: 'Budgeting Tips', icon: <IconWallet size={20} />, color: 'bg-blue-500/10 text-blue-500', prompt: 'Based on my current financial data, help me create a practical monthly budget using the 50/30/20 rule. Give me specific suggestions for my situation.' },
+    { title: 'Saving Strategy', icon: <IconPigMoney size={20} />, color: 'bg-violet-500/10 text-violet-400', prompt: 'Suggest the best saving and investing strategies for my current financial situation. Consider my income, expenses, goals, and pockets.' },
+    { title: 'Goal Planning', icon: <IconTarget size={20} />, color: 'bg-purple-500/10 text-purple-500', prompt: 'Help me plan how to reach my financial goals faster. Calculate how long it will take at my current savings rate and suggest ways to accelerate.' }
   ];
 
   return (
@@ -259,9 +323,9 @@ export default function AIAssistPage() {
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-violet-600 to-purple-400 flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(124,58,237,0.3)]">
             <IconRobot size={48} className="text-white" />
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2">Hello, {user?.displayName || 'Learner'}</h3>
+          <h3 className="text-2xl font-bold text-white mb-2">Hello, {user?.user_metadata?.full_name || 'Learner'}</h3>
           <p className="text-zinc-400 text-center max-w-md mb-10">
-            Ask me anything about managing money, investing, crypto, or economic trends.
+            I can analyze your cashflow, give budgeting tips, and help you plan your financial goals. Try one of the quick actions below!
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4 w-full">
@@ -283,7 +347,6 @@ export default function AIAssistPage() {
         <div className="flex-1 bg-[#1A1A1A] border border-zinc-800 rounded-3xl overflow-hidden mb-6 flex flex-col relative">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-900/5 to-transparent pointer-events-none" />
 
-          {/* Chat container — scroll target */}
           <div
             ref={chatContainerRef}
             onScroll={handleScroll}
@@ -351,7 +414,7 @@ export default function AIAssistPage() {
               handleSend();
             }
           }}
-          placeholder={usageCount >= MAX_DAILY_LIMIT ? "Daily limit reached. Try again tomorrow." : "Ask me anything about managing money, crypto, or investments..."}
+          placeholder={usageCount >= MAX_DAILY_LIMIT ? "Daily limit reached. Try again tomorrow." : "Ask me anything about your finances, budgeting, or investments..."}
           disabled={usageCount >= MAX_DAILY_LIMIT}
           className="w-full h-20 bg-transparent text-white placeholder-zinc-500 p-4 pt-4 focus:outline-none resize-none font-sans"
         />

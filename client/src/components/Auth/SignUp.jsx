@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from 'firebase/auth';
-import { auth } from '../../services/firebase';
+import { supabase } from '../../services/supabase';
 import InputField from './InputField';
 import GoogleButton from './GoogleButton';
+
+const ADMIN_EMAIL = 'amrpendragon@gmail.com';
 
 const SignUp = ({ onToggle, onSuccess }) => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
@@ -19,10 +20,35 @@ const SignUp = ({ onToggle, onSuccess }) => {
     setLoading(true);
     setError(null);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      // optionally update immediately the display name
-      await updateProfile(userCredential.user, { displayName: formData.name });
-      onSuccess(userCredential.user);
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+            data: {
+                full_name: formData.name,
+            }
+        }
+      });
+      if (error) throw error;
+
+      // Auto-assign admin role if email matches
+      if (formData.email.toLowerCase() === ADMIN_EMAIL && data.user) {
+        // Wait for trigger to create the profile row first
+        await new Promise(r => setTimeout(r, 800));
+        
+        const { error: roleError } = await supabase
+          .from('users')
+          .update({ role: 'admin', full_name: formData.name })
+          .eq('id', data.user.id);
+        
+        if (roleError) {
+          console.warn('Could not auto-set admin role:', roleError.message);
+        } else {
+          console.log('Admin role assigned successfully for', ADMIN_EMAIL);
+        }
+      }
+
+      onSuccess(data.user);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -34,9 +60,11 @@ const SignUp = ({ onToggle, onSuccess }) => {
     setLoading(true);
     setError(null);
     try {
-      const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      onSuccess(userCredential.user);
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      });
+      if (error) throw error;
+      // Note: signInWithOAuth redirects, so this won't synchronously call onSuccess.
     } catch (err) {
       setError(err.message);
     } finally {

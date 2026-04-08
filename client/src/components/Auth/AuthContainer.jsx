@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../services/firebase';
+import { supabase } from '../../services/supabase';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import CompleteProfile from './CompleteProfile';
@@ -11,11 +10,32 @@ import { useAuth } from '../../store/AuthContext';
 const AuthContainer = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, profileComplete, loading: authLoading, refreshProfile } = useAuth();
   const searchParams = new URLSearchParams(location.search);
   const redirectTo = searchParams.get('redirect') || '/dashboard';
+  const forceView = searchParams.get('view'); // e.g. ?view=complete
+  
   // views: 'signin', 'signup', 'completeProfile'
-  const [view, setView] = useState(location.pathname === '/register' ? 'signup' : 'signin');
+  const [view, setView] = useState(() => {
+    if (forceView === 'complete') return 'completeProfile';
+    return location.pathname === '/register' ? 'signup' : 'signin';
+  });
+
+  // Handle returning users who are already logged in
+  useEffect(() => {
+    if (authLoading) return;
+    
+    // If user is logged in and lands on auth page
+    if (user) {
+      if (forceView === 'complete' || !profileComplete) {
+        // Need to complete profile
+        setView('completeProfile');
+      } else {
+        // Profile already complete, redirect to dashboard
+        navigate(redirectTo, { replace: true });
+      }
+    }
+  }, [user, profileComplete, authLoading, forceView, redirectTo, navigate]);
 
   useEffect(() => {
     if (view !== 'completeProfile') {
@@ -28,30 +48,39 @@ const AuthContainer = () => {
     navigate(`${nextPath}?redirect=${encodeURIComponent(redirectTo)}`, { replace: true });
   };
 
-  const handleAuthSuccess = async (user) => {
+  const handleAuthSuccess = async (authUser) => {
     try {
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
-      const hasRequiredProfile =
-        userSnap.exists() &&
-        userSnap.data().username &&
-        userSnap.data().dateOfBirth;
+      // Wait a moment for Supabase trigger to create profile row
+      await new Promise(r => setTimeout(r, 500));
+      
+      const { data: userProfile, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', authUser.id)
+        .maybeSingle();
+        
+      if (error && error.code !== 'PGRST116') {
+          console.error("Error fetching user data:", error);
+          alert("Database Error: " + error.message);
+      }
+
+      // Check if profile has enough data (we require full_name)
+      const hasRequiredProfile = userProfile && userProfile.full_name;
 
       if (hasRequiredProfile) {
-        // User profile is already complete — go to redirect URL or dashboard
         navigate(redirectTo);
       } else {
-        // Needs profile completion
         setView('completeProfile');
       }
     } catch (error) {
-       console.error("Error fetching user data:", error);
-       alert("Firestore Error: Be sure you created a Firestore DB in your Firebase Console! Error: " + error.message);
+       console.error("Auth success logic error:", error);
        setView('completeProfile');
     }
   };
 
-  const handleProfileComplete = () => {
+  const handleProfileComplete = async () => {
+    // Refresh the profile in AuthContext so profileComplete flag updates
+    await refreshProfile();
     navigate(redirectTo);
   };
 

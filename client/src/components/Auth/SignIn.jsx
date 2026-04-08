@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { auth } from '../../services/firebase';
+import { supabase } from '../../services/supabase';
 import InputField from './InputField';
 import GoogleButton from './GoogleButton';
 
@@ -19,8 +18,21 @@ const SignIn = ({ onToggle, onSuccess }) => {
     setLoading(true);
     setError(null);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      onSuccess(userCredential.user);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+      if (error) throw error;
+
+      // Auto-ensure admin role on login for admin email
+      if (formData.email.toLowerCase() === 'amrpendragon@gmail.com' && data.user) {
+        await supabase
+          .from('users')
+          .update({ role: 'admin' })
+          .eq('id', data.user.id);
+      }
+
+      onSuccess(data.user);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -32,9 +44,14 @@ const SignIn = ({ onToggle, onSuccess }) => {
     setLoading(true);
     setError(null);
     try {
-      const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      onSuccess(userCredential.user);
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        // Uncomment and specify this if we want to redirect to a specific URL after OAuth:
+        // options: { redirectTo: window.location.origin + '/dashboard' }
+      });
+      if (error) throw error;
+      // Note: signInWithOAuth redirects the user, so onSuccess might not be called immediately here.
+      // The logic in AuthContainer needs to handle session restoration.
     } catch (err) {
       setError(err.message);
     } finally {

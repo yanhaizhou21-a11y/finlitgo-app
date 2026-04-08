@@ -16,15 +16,22 @@ function getInitialBlogs() {
 }
 
 export default function AdminBlogCRUD() {
-  const [blogs, setBlogs] = useState(getInitialBlogs);
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingBlog, setEditingBlog] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [form, setForm] = useState({ title: '', excerpt: '', author: 'Admin FinlitGo', category: 'Foundation', image: '', content: '', timeToRead: '5 min read' });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(blogs));
-  }, [blogs]);
+    fetchBlogs();
+  }, []);
+
+  const fetchBlogs = () => {
+    const data = getInitialBlogs();
+    setBlogs(data);
+    setLoading(false);
+  };
 
   const openAdd = () => {
     setEditingBlog(null);
@@ -34,28 +41,44 @@ export default function AdminBlogCRUD() {
 
   const openEdit = (blog) => {
     setEditingBlog(blog);
-    setForm({ title: blog.title, excerpt: blog.excerpt, author: blog.author, category: blog.category, image: blog.image || '', content: blog.content || '', timeToRead: blog.timeToRead || '5 min read' });
+    setForm({ 
+      title: blog.title, 
+      excerpt: blog.excerpt, 
+      author: blog.author, 
+      category: blog.category, 
+      image: blog.thumbnail_url || blog.image || '', 
+      content: blog.content || '', 
+      timeToRead: blog.time_to_read || blog.timeToRead || '5 min read' 
+    });
     setShowModal(true);
   };
 
   const handleSave = () => {
     if (!form.title.trim()) return;
-    const today = new Date();
-    const dateStr = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     
+    let updatedBlogs;
     if (editingBlog) {
-      setBlogs(prev => prev.map(b => b.id === editingBlog.id ? { ...b, ...form } : b));
+      updatedBlogs = blogs.map(b => b.id === editingBlog.id ? { ...b, ...form } : b);
     } else {
-      const newBlog = { ...form, id: Date.now(), date: dateStr };
-      setBlogs(prev => [...prev, newBlog]);
+      updatedBlogs = [{ 
+        id: Date.now(), 
+        ...form, 
+        date: new Date().toLocaleDateString('en-US', {month: 'short', day: '2-digit'}) 
+      }, ...blogs];
     }
+    
+    setBlogs(updatedBlogs);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedBlogs));
     setShowModal(false);
   };
 
   const handleDelete = (id) => {
-    setBlogs(prev => prev.filter(b => b.id !== id));
+    const updatedBlogs = blogs.filter(b => b.id !== id);
+    setBlogs(updatedBlogs);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedBlogs));
     setDeleteConfirm(null);
   };
+
 
   return (
     <div className="flex flex-col gap-6">

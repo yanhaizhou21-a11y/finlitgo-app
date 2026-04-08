@@ -1,30 +1,61 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { IconArrowLeft, IconBrandTwitter, IconBrandLinkedin, IconLink } from '@tabler/icons-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-function getBlogData(postId) {
-  const STORAGE_KEY = 'finlitgo_blogs';
-  const saved = localStorage.getItem(STORAGE_KEY);
-  const blogs = saved ? JSON.parse(saved) : [];
-  return blogs.find(b => String(b.id) === String(postId));
-}
-
 export default function BlogPostPage() {
   const { postId } = useParams();
   const navigate = useNavigate();
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const blogData = getBlogData(postId);
+  useEffect(() => {
+    fetchBlogPost();
+  }, [postId]);
 
-  // Fallback
-  const post = blogData || {
-    title: 'How to Build an Emergency Fund in 6 Months',
-    author: 'Admin FinlitGo',
-    date: 'Oct 12, 2026',
-    timeToRead: '4 min read',
-    image: 'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=1600&q=80',
-    content: `An emergency fund is a financial safety net designed to cover unexpected expenses such as medical bills, urgent car repairs, or sudden job loss.\n\n### Why is an Emergency Fund Critical?\nLife is unpredictable. Having liquid cash readily available gives you peace of mind.\n\n### Step 1: Set a Realistic Goal\nStart small. Aim for one month of essential expenses.\n\n### Step 2: Automate Your Savings\nSet up an automatic transfer from your checking to a dedicated high-yield savings account.\n\n### Step 3: Trim the Fat\nReview your last three months of bank statements.`
+  const fetchBlogPost = () => {
+    setLoading(true);
+    const saved = localStorage.getItem('finlitgo_blogs');
+    let dataList = [];
+    if (saved) {
+      dataList = JSON.parse(saved);
+    } else {
+      // Fake fallback matching BlogPage index
+      dataList = [
+        { id: 1, title: 'How to Build an Emergency Fund in 6 Months', excerpt: 'An emergency fund is a financial safety net designed to cover unexpected expenses...', author: 'Admin FinlitGo', date: 'Oct 12', timeToRead: '4 min read', category: 'Foundation', image: 'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=800&q=80', content: 'An emergency fund is a financial safety net...' },
+        { id: 2, title: 'Understanding Crypto: A Beginner\'s Guide', excerpt: 'Cryptocurrency has taken the financial world by storm, but what exactly is it?', author: 'Doctor Solking', date: 'Oct 10', timeToRead: '8 min read', category: 'Advanced', image: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=800&q=80', content: 'Cryptocurrency has taken the financial world by storm...' }
+      ];
+    }
+    
+    const found = dataList.find(b => b.id.toString() === postId?.toString());
+    if (found) {
+      setPost({
+        ...found,
+        image: found.thumbnail_url || found.image,
+        date: found.created_at ? new Date(found.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : found.date,
+        timeToRead: found.time_to_read || found.timeToRead || '5 min read'
+      });
+    }
+    setLoading(false);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+        <div className="w-8 h-8 rounded-full border-t-2 border-violet-500 animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0a] text-white">
+        <h1 className="text-2xl font-bold mb-4">Artikel tidak ditemukan</h1>
+        <button onClick={() => navigate('/blog')} className="px-6 py-2 bg-violet-600 rounded-xl">Kembali ke Blog</button>
+      </div>
+    );
+  }
+
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-6 font-inter relative">

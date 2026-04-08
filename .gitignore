@@ -14,3 +14,4 @@ firebase.js
 #private
 finlintgo.sdk
 test-gemini.mjs
+supabase_setup.sql

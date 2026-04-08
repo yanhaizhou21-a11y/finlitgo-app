@@ -10,8 +10,7 @@ import {
 } from '@tabler/icons-react';
 import logoUrl from '../../assets/logo.svg';
 import { useAuth } from '../../store/AuthContext';
-import { signOut } from 'firebase/auth';
-import { auth } from '../../services/firebase';
+import { supabase } from '../../services/supabase';
 
 const AnimatedNavItem = ({ to, icon: Icon, label }) => {
   return (
@@ -41,11 +40,11 @@ export default function Sidebar() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await signOut(auth);
+    await supabase.auth.signOut();
     navigate('/login');
   };
 
-  const photoURL = profile?.photoUrl || user?.photoURL || `https://i.pravatar.cc/150?u=${user?.email}`;
+  const photoURL = profile?.avatar_url || profile?.photoUrl || user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || user?.email || 'User')}&background=random`;
 
   return (
     <motion.aside 

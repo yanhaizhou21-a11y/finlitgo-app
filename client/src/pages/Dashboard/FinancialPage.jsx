@@ -16,7 +16,7 @@ const CATEGORIES = ['Gaji', 'Freelance', 'Investasi', 'Makan', 'Transport', 'Bel
 
 export default function FinancialPage() {
   const { user } = useAuth();
-  const userId = user?.uid || 'guest';
+  const userId = user?.id || 'guest';
   const txKey = `${TX_KEY}_${userId}`;
   const goalsKey = `${GOALS_KEY}_${userId}`;
   const pocketsKey = `${POCKETS_KEY}_${userId}`;

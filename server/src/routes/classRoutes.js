@@ -11,4 +11,9 @@ router.get('/:id', classController.getClassById);
 // POST update streak and progress
 router.post('/progress', classController.updateProgress);
 
+// Admin Routes (CRUD)
+router.post('/', classController.createClass);
+router.put('/:id', classController.updateClass);
+router.delete('/:id', classController.deleteClass);
+
 module.exports = router;

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { doc, setDoc } from 'firebase/firestore';
-import { db, auth } from '../../services/firebase';
+import { supabase } from '../../services/supabase';
+import { useAuth } from '../../store/AuthContext';
 import InputField from './InputField';
 
 const CompleteProfile = ({ onComplete }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({ username: '', placeOfBirth: '', dateOfBirth: '', photoUrl: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -15,20 +16,40 @@ const CompleteProfile = ({ onComplete }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!auth.currentUser) return;
+    
+    if (!formData.username.trim()) {
+      setError('Full Name is required.');
+      return;
+    }
+
+    if (!user) {
+      setError('No authenticated user found. Please try logging in again.');
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     try {
-      await setDoc(doc(db, 'users', auth.currentUser.uid), {
-        username: formData.username,
-        placeOfBirth: formData.placeOfBirth,
-        dateOfBirth: formData.dateOfBirth,
-        photoUrl: formData.photoUrl || '',
-        email: auth.currentUser.email,
-        updatedAt: new Date()
-      }, { merge: true });
-      onComplete(); // proceed to dashboard
+      // Try upsert: if the row exists, update it. If not, create it
+      const { error: dbError } = await supabase
+        .from('users')
+        .upsert({
+          id: user.id,
+          full_name: formData.username,
+          avatar_url: formData.photoUrl || '',
+          email: user.email
+        }, { onConflict: 'id' });
+
+      if (dbError) throw dbError;
+        
+      // Also update auth user metadata
+      await supabase.auth.updateUser({
+        data: { full_name: formData.username }
+      });
+
+      onComplete(); // this will call refreshProfile + navigate
     } catch (err) {
+      console.error('CompleteProfile error:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -53,10 +74,10 @@ const CompleteProfile = ({ onComplete }) => {
 
       <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
         <InputField
-          label="Username"
+          label="Full Name"
           type="text"
           name="username"
-          placeholder="Choose a username"
+          placeholder="Choose a display name"
           value={formData.username}
           onChange={handleChange}
         />
@@ -90,7 +111,7 @@ const CompleteProfile = ({ onComplete }) => {
         
         <button 
           type="submit" 
-          disabled={loading}
+          disabled={loading || !user}
           className="mt-4 w-full py-3.5 px-4 bg-black hover:bg-gray-800 text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:-translate-y-0.5 border border-transparent disabled:opacity-50 disabled:hover:-translate-y-0"
         >
           {loading ? 'Saving...' : 'Complete Setup'}

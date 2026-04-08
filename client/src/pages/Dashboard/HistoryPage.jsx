@@ -11,7 +11,7 @@ function formatRupiah(num) {
 
 export default function HistoryPage() {
   const { user } = useAuth();
-  const userId = user?.uid || 'guest';
+  const userId = user?.id || 'guest';
   const txKey = `${TX_KEY}_${userId}`;
 
   const [transactions, setTransactions] = useState(() => {

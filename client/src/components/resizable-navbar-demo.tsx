@@ -11,9 +11,7 @@ import {
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
 import { useState, useEffect } from "react";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../services/firebase";
+import { supabase } from "../services/supabase";
 import logoUrl from "../assets/logo.svg";
 
 type NavbarVariant = "default" | "learning";
@@ -31,24 +29,27 @@ export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVa
   const [profileData, setProfileData] = useState<any>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        try {
-          const docRef = doc(db, "users", currentUser.uid);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            setProfileData(docSnap.data());
-          }
-        } catch (error) {
-          console.error("Error fetching user profile:", error);
-        }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        supabase.from('users').select('*').eq('id', session.user.id).single()
+          .then(({ data }) => setProfileData(data));
       } else {
         setProfileData(null);
       }
     });
 
-    return () => unsubscribe();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        supabase.from('users').select('*').eq('id', session.user.id).single()
+          .then(({ data }) => setProfileData(data));
+      } else {
+        setProfileData(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleLogout = async () => {
@@ -56,15 +57,15 @@ export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVa
     if (!isConfirmed) return;
 
     try {
-      await signOut(auth);
+      await supabase.auth.signOut();
       setIsMobileMenuOpen(false);
     } catch (error) {
       console.error("Error signing out:", error);
     }
   };
 
-  const displayName = profileData?.username || profileData?.fullName || user?.displayName || "User";
-  const photoURL = profileData?.photoUrl || user?.photoURL;
+  const displayName = profileData?.full_name || profileData?.fullName || user?.user_metadata?.full_name || "User";
+  const photoURL = profileData?.avatar_url || profileData?.photoUrl || user?.user_metadata?.avatar_url;
   const initial = displayName.charAt(0).toUpperCase();
 
   if (variant === "learning") {

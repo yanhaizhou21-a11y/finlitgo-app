@@ -13,8 +13,7 @@ import {
 } from '@tabler/icons-react';
 import logoUrl from '../../assets/logo.svg';
 import { useAuth } from '../../store/AuthContext';
-import { signOut } from 'firebase/auth';
-import { auth } from '../../services/firebase';
+import { supabase } from '../../services/supabase';
 
 const AnimatedNavItem = ({ to, icon: Icon, label }) => {
   return (
@@ -44,7 +43,7 @@ export default function AdminSidebar() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await signOut(auth);
+    await supabase.auth.signOut();
     navigate('/login');
   };
 

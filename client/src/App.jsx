@@ -68,6 +68,20 @@ function DashboardSwitch() {
   return isAdmin ? <AdminOverview /> : <OverviewPage />;
 }
 
+// Wrapper that checks profile completeness for dashboard routes
+function ProfileGuard({ children }) {
+  const { user, profileComplete, loading } = useAuth();
+
+  if (loading) return null;
+
+  // If user is logged in but profile not complete, redirect to complete profile
+  if (user && !profileComplete) {
+    return <Navigate to="/register?view=complete" replace />;
+  }
+
+  return children;
+}
+
 function App() {
   return (
     <Router>
@@ -84,8 +98,8 @@ function App() {
         <Route path="/blog/:postId" element={<PublicLayout><BlogPostPage /></PublicLayout>} />
         <Route path="/ai-assist" element={<PublicLayout><AIAssistPage /></PublicLayout>} />
 
-        {/* Dashboard routes (protected, with sidebar) */}
-        <Route path="/" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+        {/* Dashboard routes (protected, with sidebar, profile must be complete) */}
+        <Route path="/" element={<ProtectedRoute><ProfileGuard><DashboardLayout /></ProfileGuard></ProtectedRoute>}>
           <Route path="dashboard" element={<DashboardSwitch />} />
           <Route path="dashboard/finance" element={<FinancialPage />} />
           <Route path="dashboard/history" element={<HistoryPage />} />

@@ -22,6 +22,14 @@ function saveSet(key, s) { localStorage.setItem(key, JSON.stringify([...s])); }
 function loadJSON(key, fallback) { try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : fallback; } catch { return fallback; } }
 function saveJSON(key, v) { localStorage.setItem(key, JSON.stringify(v)); }
 
+// YouTube ID Extractor
+function getYouTubeId(url) {
+  if (!url) return 'dQw4w9WgXcQ'; // Default placeholder
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : 'dQw4w9WgXcQ';
+}
+
 // ── Confetti ──
 function ConfettiParticle({ delay }) {
   const colors = ['#a78bfa','#c084fc','#34d399','#fbbf24','#f472b6','#60a5fa'];
@@ -38,62 +46,67 @@ function ConfettiParticle({ delay }) {
 }
 
 // ── Main Component ──
+// ── Main Component ──
 export default function ClassDetailPage() {
   const { moduleId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const userId = user?.uid || 'guest';
-  const classMeta = CLASS_META[moduleId] || CLASS_META[1];
-  const levels = CLASS_LEVELS[moduleId] || CLASS_LEVELS[1];
-
+  const { user, profile } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [classData, setClassData] = useState(null);
+  
   // State
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [openLevels, setOpenLevels] = useState({ 'level-1': true });
+  const [openLevels, setOpenLevels] = useState({});
   const [activeItemId, setActiveItemId] = useState(null);
-  const [completed, setCompleted] = useState(() => loadSet(progressKey(userId, moduleId)));
-  const [unlockedLevels, setUnlockedLevels] = useState(() => loadSet(levelUnlockKey(userId, moduleId)));
-  const [quizHistory, setQuizHistory] = useState(() => loadJSON(quizHistKey(userId, moduleId), {}));
+  const [completed, setCompleted] = useState(new Set());
+  const [unlockedLevels, setUnlockedLevels] = useState(new Set(['level-1']));
+  const [quizHistory, setQuizHistory] = useState({});
   const [readingProgress, setReadingProgress] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
 
   // Quiz flow states
-  const [quizLandingData, setQuizLandingData] = useState(null); // { quiz, levelId, type }
-  const [activeQuiz, setActiveQuiz] = useState(null); // { questions, levelId, type, quizId }
+  const [quizLandingData, setQuizLandingData] = useState(null);
+  const [activeQuiz, setActiveQuiz] = useState(null);
 
   const contentRef = useRef(null);
 
-  // Ensure level-1 always unlocked
   useEffect(() => {
-    if (!unlockedLevels.has('level-1')) {
-      const next = new Set(unlockedLevels);
-      next.add('level-1');
-      setUnlockedLevels(next);
-      saveSet(levelUnlockKey(userId, moduleId), next);
-    }
-  }, [moduleId, userId]);
+    fetchClassDetail();
+  }, [moduleId]);
 
-  // Set initial active item
-  useEffect(() => {
-    if (!activeItemId) {
-      const firstLesson = levels[0]?.items?.find(i => i.type === 'lesson');
-      if (firstLesson) setActiveItemId(firstLesson.id);
+  const fetchClassDetail = () => {
+    setLoading(true);
+    const saved = localStorage.getItem('finlitgo_classes');
+    let dataList = [];
+    if (saved) {
+      dataList = JSON.parse(saved);
+    } else {
+      // Fake fallback matching index
+      dataList = [
+        { id: 1, title: 'Money Management Basics', category: 'Foundation', description: 'Learn the fundamentals of managing your money wisely.', chapters: 12, youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500&q=80', quizzes: [
+          { question: 'What percentage of income should go to Needs in the 50/30/20 rule?', options: ['20%', '30%', '50%', '10%'], correctAnswer: 2 },
+          { question: 'Which is considered a "Want"?', options: ['Rent', 'Groceries', 'Dining Out', 'Electricity'], correctAnswer: 2 }
+        ]},
+        { id: 2, title: 'Investing for Beginners', category: 'Growth', description: 'Start your investment journey with confidence.', chapters: 8, youtubeUrl: 'https://www.youtube.com/watch?v=PHe0bXAIuk0', image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=500&q=80', quizzes: [] },
+        { id: 3, title: 'Crypto & Digital Assets', category: 'Advanced', description: 'Understand the world of cryptocurrency and blockchain.', chapters: 10, youtubeUrl: '', image: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=500&q=80', quizzes: [] },
+      ];
     }
-  }, [levels]);
-
-  // Reload on moduleId/user change
-  useEffect(() => {
-    setCompleted(loadSet(progressKey(userId, moduleId)));
-    setUnlockedLevels(loadSet(levelUnlockKey(userId, moduleId)));
-    setQuizHistory(loadJSON(quizHistKey(userId, moduleId), {}));
-    setActiveItemId(null);
-    setOpenLevels({ 'level-1': true });
-    setQuizLandingData(null);
-    setActiveQuiz(null);
-  }, [moduleId, userId]);
+    const found = dataList.find(c => c.id.toString() === moduleId?.toString());
+    if (found) {
+      setClassData({
+        ...found,
+        chapters: [
+           { id: 1, title: 'Bab 1: Pendahuluan', quizzes: found.quizzes || [] }
+        ]
+      });
+      setOpenLevels({ [1]: true });
+    }
+    setLoading(false);
+  };
 
   useEffect(() => { recordStudyActivity(); }, []);
 
-  // Scroll progress
+  // Scroll progress logic ... (keep as is)
   useEffect(() => {
     const el = contentRef.current;
     if (!el) return;
@@ -103,11 +116,42 @@ export default function ClassDetailPage() {
     };
     el.addEventListener('scroll', h);
     return () => el.removeEventListener('scroll', h);
-  }, [activeItemId]);
+  }, [activeItemId, classData]);
 
-  // ── Derived ──
-  const isLevelUnlocked = (lvlId) => unlockedLevels.has(lvlId);
+
+
+  // Helper variables derived from classData
+  const classMeta = CLASS_META[moduleId] || {
+    title: classData?.title || 'Unknown Class',
+    category: classData?.category || 'Uncategorized',
+    difficulty: 2, // Default or fetched from DB
+  };
+  
+  // Transform DB chapters to "levels" UI structure for dynamically added classes
+  const dynamicLevels = (classData?.chapters || []).map((ch, idx) => ({
+    id: ch.id || `ch-${idx}`,
+    title: ch.title || `Chapter ${idx+1}`,
+    items: [
+        { id: `video-${ch.id || idx}`, title: 'Materi Utama', type: 'video', videoId: getYouTubeId(classData?.youtubeUrl || classData?.youtube_url), duration: '10 min', description: classData?.description || '' }
+    ],
+    finalQuiz: {
+        id: `quiz-${ch.id || idx}`,
+        title: `Quiz: ${ch.title || 'Akhir'}`,
+        questionCount: ch.quizzes?.length || 0,
+        questions: ch.quizzes || [],
+        duration: '5 menit'
+    }
+  }));
+
+  // IMPORTANT: For pre-built rich content (like Dicoding), prioritize CLASS_LEVELS!
+  const levels = CLASS_LEVELS[moduleId] || dynamicLevels;
+
+  const isLevelUnlocked = (lvlId) => {
+    // For now, always unlock. You could use levelUnlockKey logic here.
+    return true; 
+  };
   const getLevelIndex = (lvlId) => levels.findIndex(l => l.id === lvlId);
+
 
   // Flatten all lesson items for current level navigation
   const currentLevel = levels.find(l => l.items.some(it => it.id === activeItemId));
@@ -146,19 +190,34 @@ export default function ClassDetailPage() {
   const progressPercent = Math.round((completedCount / totalItems) * 100);
 
   // ── Actions ──
-  const markComplete = (itemId) => {
+  const markComplete = async (itemId) => {
     const next = new Set(completed);
     next.add(itemId);
     setCompleted(next);
-    saveSet(progressKey(userId, moduleId), next);
+    
+    // Sync with backend if logged in
+    if (user && itemId.startsWith('video-')) {
+        const chapterId = itemId.replace('video-', '');
+        try {
+            await fetch('http://localhost:5000/api/classes/progress', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    chapterId, 
+                    earnedPoints: 10 // Fixed points for now
+                })
+            });
+        } catch (error) {
+            console.error("Error syncing progress:", error);
+        }
+    }
   };
 
   const selectItem = (item, levelId) => {
     if (!isItemAccessible(levelId, item.id)) return;
     if (item.type === 'in-lesson-quiz') {
-      // Show quiz landing for in-lesson quiz
       setQuizLandingData({
-        quiz: { title: item.title, description: 'Quick check! Jawab pertanyaan ini untuk melanjutkan ke materi berikutnya.', questionCount: item.questions.length, duration: '1 menit' },
+        quiz: { title: item.title, description: 'Quick check!', questionCount: item.questions.length, duration: '1 menit' },
         questions: item.questions,
         levelId, type: 'in-lesson', quizId: item.id,
       });
@@ -171,7 +230,6 @@ export default function ClassDetailPage() {
   };
 
   const openFinalQuizLanding = (level) => {
-    // Check all items in level are completed
     const allDone = level.items.every(i => completed.has(i.id));
     if (!allDone) return;
     setQuizLandingData({
@@ -193,19 +251,18 @@ export default function ClassDetailPage() {
     setQuizLandingData(null);
   };
 
-  const handleQuizComplete = (score, total) => {
+  const handleQuizComplete = async (score, total) => {
     if (!activeQuiz) return;
     const pct = Math.round((score / total) * 100);
     const passed = pct >= 60;
     const now = new Date();
     const dateStr = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-    // Save history
+    // Save history locally for immediate feedback
     const hist = { ...quizHistory };
     if (!hist[activeQuiz.quizId]) hist[activeQuiz.quizId] = [];
     hist[activeQuiz.quizId].push({ date: dateStr, percentage: pct, status: passed ? 'Lulus' : 'Gagal' });
     setQuizHistory(hist);
-    saveJSON(quizHistKey(userId, moduleId), hist);
 
     if (passed) {
       markComplete(activeQuiz.quizId);
@@ -213,14 +270,8 @@ export default function ClassDetailPage() {
       if (activeQuiz.type === 'final') {
         const lvlIdx = getLevelIndex(activeQuiz.levelId);
         if (lvlIdx < levels.length - 1) {
-          // Unlock next level
           const nextLvl = levels[lvlIdx + 1];
-          const next = new Set(unlockedLevels);
-          next.add(nextLvl.id);
-          setUnlockedLevels(next);
-          saveSet(levelUnlockKey(userId, moduleId), next);
           setOpenLevels(prev => ({ ...prev, [nextLvl.id]: true }));
-          // Auto-navigate to first item of next level
           const firstItem = nextLvl.items[0];
           if (firstItem) {
             setActiveQuiz(null);
@@ -229,7 +280,6 @@ export default function ClassDetailPage() {
             return;
           }
         }
-        // If last level final quiz passed
         if (lvlIdx === levels.length - 1) {
           setShowCelebration(true);
         }
@@ -239,6 +289,14 @@ export default function ClassDetailPage() {
     setActiveQuiz(null);
   };
 
+  // Set initial active item if none set
+  useEffect(() => {
+    if (!activeItemId && levels.length > 0) {
+      const firstItem = levels[0]?.items?.[0];
+      if (firstItem) setActiveItemId(firstItem.id);
+    }
+  }, [levels, activeItemId]);
+
   // Navigate within level
   const goNext = () => {
     if (activeItemIndex < currentLevelItems.length - 1) {
@@ -246,7 +304,6 @@ export default function ClassDetailPage() {
       const next = currentLevelItems[activeItemIndex + 1];
       selectItem(next, currentLevel.id);
     } else {
-      // Last item in level → mark complete
       markComplete(activeItemId);
     }
   };
@@ -257,6 +314,23 @@ export default function ClassDetailPage() {
       selectItem(prev, currentLevel.id);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+        <IconLoader2 className="animate-spin text-violet-500" size={48} />
+      </div>
+    );
+  }
+
+  if (!classData) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0a] text-white">
+        <h1 className="text-2xl font-bold mb-4">Kelas tidak ditemukan</h1>
+        <button onClick={() => navigate('/class')} className="px-6 py-2 bg-violet-600 rounded-xl">Kembali ke Daftar Kelas</button>
+      </div>
+    );
+  }
 
   // ── Quiz Full-screen ──
   if (activeQuiz) {

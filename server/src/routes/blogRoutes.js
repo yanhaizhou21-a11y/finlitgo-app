@@ -11,4 +11,10 @@ router.get('/:id', blogController.getBlogById);
 // POST new blog
 router.post('/', blogController.createBlog);
 
+// PUT update blog
+router.put('/:id', blogController.updateBlog);
+
+// DELETE blog
+router.delete('/:id', blogController.deleteBlog);
+
 module.exports = router;
