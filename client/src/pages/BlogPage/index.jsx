@@ -114,157 +114,14 @@ function getBlogs() {
   ];
 }
 
-// Komponen untuk halaman detail blog
-function BlogDetailPage({ blogId, onBack }) {
-  const [blog, setBlog] = useState(null);
-  const [isSaved, setIsSaved] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
-
-  React.useEffect(() => {
-    const blogs = getBlogs();
-    const foundBlog = blogs.find((b) => b.id === parseInt(blogId));
-    setBlog(foundBlog);
-    window.scrollTo(0, 0);
-  }, [blogId]);
-
-  if (!blog) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Blog not found</h2>
-          <button onClick={onBack} className="text-violet-400 hover:text-violet-300">
-            ← Back to Blog
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
-      <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
-        <img src={blog.image} alt={blog.title} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
-        
-        <button
-          onClick={onBack}
-          className="absolute top-6 left-6 z-20 flex items-center gap-2 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full text-white hover:bg-violet-600 transition-all"
-        >
-          <IconArrowLeft size={20} />
-          Back to Blog
-        </button>
-
-        <div className="absolute top-6 right-6 z-20 flex gap-3">
-          <button
-            onClick={() => setIsSaved(!isSaved)}
-            className={`p-2 rounded-full backdrop-blur-sm transition-all ${
-              isSaved ? "bg-violet-600 text-white" : "bg-black/50 text-white hover:bg-violet-600"
-            }`}
-          >
-            <IconBookmark size={20} />
-          </button>
-          <button
-            onClick={() => setIsLiked(!isLiked)}
-            className={`p-2 rounded-full backdrop-blur-sm transition-all ${
-              isLiked ? "bg-red-500 text-white" : "bg-black/50 text-white hover:bg-red-500"
-            }`}
-          >
-            <IconHeart size={20} />
-          </button>
-          <button
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({ title: blog.title, url: window.location.href });
-              } else {
-                alert("Share this article!");
-              }
-            }}
-            className="p-2 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-violet-600 transition-all"
-          >
-            <IconShare size={20} />
-          </button>
-        </div>
-      </div>
-
-      <article className="max-w-4xl mx-auto px-6 py-12 relative z-10">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <div className="mb-4">
-            <span className="text-violet-400 font-mono text-sm uppercase tracking-wider">{blog.category}</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-orbitron mb-6 leading-tight">{blog.title}</h1>
-          
-          <div className="flex items-center gap-4 mb-8 pb-8 border-b border-zinc-800">
-            <div className="w-12 h-12 rounded-full bg-zinc-800 overflow-hidden">
-              <img src={`https://i.pravatar.cc/150?u=${blog.author}`} className="w-full h-full object-cover" alt={blog.author} />
-            </div>
-            <div>
-              <div className="font-semibold text-white">{blog.author}</div>
-              <div className="flex items-center gap-2 text-sm text-zinc-400">
-                <span>{blog.date}</span>
-                <span>•</span>
-                <IconClock size={14} />
-                <span>{blog.timeToRead}</span>
-              </div>
-            </div>
-          </div>
-
-          <div 
-            className="prose prose-invert prose-lg max-w-none
-              prose-headings:text-white prose-headings:font-bold prose-headings:font-orbitron
-              prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl
-              prose-p:text-zinc-300 prose-p:leading-relaxed
-              prose-a:text-violet-400 prose-a:no-underline hover:prose-a:underline
-              prose-strong:text-white prose-strong:font-bold
-              prose-ul:text-zinc-300 prose-li:text-zinc-300
-              prose-blockquote:border-l-violet-500 prose-blockquote:text-zinc-400"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
-          />
-
-          <div className="mt-12 pt-8 border-t border-zinc-800">
-            <h3 className="text-xl font-bold mb-4">Tags</h3>
-            <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-zinc-800 rounded-full text-sm text-zinc-300">{blog.category}</span>
-              <span className="px-3 py-1 bg-zinc-800 rounded-full text-sm text-zinc-300">Personal Finance</span>
-              <span className="px-3 py-1 bg-zinc-800 rounded-full text-sm text-zinc-300">Tips & Tricks</span>
-            </div>
-          </div>
-
-          <div className="mt-12 flex justify-between">
-            <button onClick={onBack} className="flex items-center gap-2 text-zinc-400 hover:text-violet-400 transition-colors">
-              <IconArrowLeft size={20} />
-              All Articles
-            </button>
-            <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="text-zinc-400 hover:text-violet-400 transition-colors">
-              Back to Top ↑
-            </button>
-          </div>
-        </motion.div>
-      </article>
-    </div>
-  );
-}
-
 // Komponen utama BlogPage (daftar blog)
 export default function BlogPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [visibleCount, setVisibleCount] = useState(3); // ✅ dari Doc 2
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(3);
 
   const blogs = getBlogs();
-
-  const blogIdToShow = id || selectedBlogId;
-  
-  if (blogIdToShow) {
-    return (
-      <BlogDetailPage 
-        blogId={blogIdToShow} 
-        onBack={() => {
-          setSelectedBlogId(null);
-          navigate("/blog", { replace: true });
-        }} 
-      />
-    );
-  }
 
   const filteredBlogs = blogs.filter((b) =>
     b.title.toLowerCase().includes(search.toLowerCase())
@@ -275,7 +132,8 @@ export default function BlogPage() {
   }));
 
   const featured = filteredBlogs[0];
-  const restPosts = filteredBlogs.slice(1, 1 + visibleCount); // ✅ dari Doc 2
+  const restPosts = filteredBlogs.slice(1, 1 + visibleCount);
+  const remainingPosts = Math.max(0, filteredBlogs.length - 1 - visibleCount);
 
   return (
     <div className="relative min-h-screen text-white bg-[#0a0a0a]">
@@ -333,7 +191,7 @@ export default function BlogPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            onClick={() => handleBlogClick(featured.id)}
+            onClick={() => navigate(`/blog/${featured.id}`)}
             className="group cursor-pointer bg-[#1A1A1A] border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl hover:border-violet-500/30 transition-all flex flex-col md:flex-row h-auto md:h-96 w-full"
           >
             <div className="w-full md:w-1/2 h-64 md:h-full overflow-hidden relative">
@@ -400,7 +258,7 @@ export default function BlogPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              onClick={() => handleBlogClick(post.id)}
+              onClick={() => navigate(`/blog/${post.id}`)}
               className="bg-[#1A1A1A] border border-zinc-800 hover:border-violet-500/30 rounded-2xl overflow-hidden group cursor-pointer flex flex-col h-full transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-violet-500/5"
             >
               <div className="w-full h-48 overflow-hidden relative">

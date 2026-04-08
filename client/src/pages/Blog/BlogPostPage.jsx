@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { IconArrowLeft, IconBrandTwitter, IconBrandLinkedin, IconLink } from '@tabler/icons-react';
+import { IconArrowLeft, IconBrandTwitter, IconBrandLinkedin, IconLink, IconClock, IconBookmark, IconHeart, IconShare } from '@tabler/icons-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 function getBlogData(postId) {
@@ -14,14 +14,19 @@ export default function BlogPostPage() {
   const { postId } = useParams(); // Ambil ID dari URL
   const navigate = useNavigate();
 
+  // Missing States
+  const [isSaved, setIsSaved] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+
   const blogData = getBlogData(postId);
 
   // Fallback
-  const post = blogData || {
+  const blog = blogData || {
     title: 'How to Build an Emergency Fund in 6 Months',
     author: 'Admin FinlitGo',
     date: 'Oct 12, 2026',
     timeToRead: '4 min read',
+    category: 'Foundation',
     image: 'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=1600&q=80',
     content: `An emergency fund is a financial safety net designed to cover unexpected expenses such as medical bills, urgent car repairs, or sudden job loss.\n\n### Why is an Emergency Fund Critical?\nLife is unpredictable. Having liquid cash readily available gives you peace of mind.\n\n### Step 1: Set a Realistic Goal\nStart small. Aim for one month of essential expenses.\n\n### Step 2: Automate Your Savings\nSet up an automatic transfer from your checking to a dedicated high-yield savings account.\n\n### Step 3: Trim the Fat\nReview your last three months of bank statements.`
   };
