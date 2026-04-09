@@ -30,14 +30,6 @@ const SignIn = ({ onToggle, onSuccess }) => {
       console.log('[DEBUG] Supabase response - data:', data, '| error:', error);
       if (error) throw error;
 
-      // Auto-ensure admin role on login for admin email
-      if (formData.email.toLowerCase() === 'amrpendragon@gmail.com' && data.user) {
-        await supabase
-          .from('users')
-          .update({ role: 'admin' })
-          .eq('id', data.user.id);
-      }
-
       onSuccess(data.user);
     } catch (err) {
       setError(err.message);

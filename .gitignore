@@ -15,3 +15,4 @@ firebase.js
 finlintgo.sdk
 test-gemini.mjs
 supabase_setup.sql
+database_setup.sql

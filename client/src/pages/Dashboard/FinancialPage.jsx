@@ -1,38 +1,69 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IconWallet, IconTrendingUp, IconTrendingDown, IconPlus, IconTarget, IconTrash, IconX, IconCash } from '@tabler/icons-react';
+import { IconWallet, IconTrendingUp, IconTrendingDown, IconPlus, IconTarget, IconTrash, IconX, IconCash, IconLoader2 } from '@tabler/icons-react';
 
+import { supabase } from '../../services/supabase';
 import { useAuth } from '../../store/AuthContext';
-
-const TX_KEY = 'finlitgo_transactions';
-const GOALS_KEY = 'finlitgo_goals';
-const POCKETS_KEY = 'finlitgo_pockets';
 
 function formatRupiah(num) {
   return 'Rp ' + num.toLocaleString('id-ID');
 }
 
 const CATEGORIES = ['Gaji', 'Freelance', 'Investasi', 'Makan', 'Transport', 'Belanja', 'Hiburan', 'Utilitas', 'Lainnya'];
+const MAX_INT32 = 2147483647;
+
+function readLocalArray(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalArray(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Ignore quota/storage errors and continue with in-memory state.
+  }
+}
+
+function normalizeTransaction(tx) {
+  return {
+    ...tx,
+    title: tx.title ?? tx.label ?? tx.description ?? 'Untitled',
+    type: tx.type ?? tx.transaction_type ?? 'expense',
+    amount: Number(tx.amount ?? 0),
+    category: tx.category ?? tx.tx_category ?? 'Lainnya',
+    date: tx.date ?? tx.transaction_date ?? tx.created_at?.split('T')[0] ?? '-',
+  };
+}
+
+function buildTransactionPayloads({ userId, title, type, amount, category, date }) {
+  return [
+    { user_id: userId, title, type, amount, category, date },
+    { user_id: userId, label: title, type, amount, category, date },
+    { user_id: userId, title, transaction_type: type, amount, category, date },
+    { user_id: userId, label: title, transaction_type: type, amount, category, date },
+    { user_id: userId, title, type, amount, category, transaction_date: date },
+    { user_id: userId, label: title, type, amount, category, transaction_date: date },
+  ];
+}
 
 export default function FinancialPage() {
   const { user } = useAuth();
-  const userId = user?.id || 'guest';
-  const txKey = `${TX_KEY}_${userId}`;
-  const goalsKey = `${GOALS_KEY}_${userId}`;
-  const pocketsKey = `${POCKETS_KEY}_${userId}`;
+  const userId = user?.id || null;
+  const txLocalKey = userId ? `finlitgo_transactions_${userId}` : null;
+  const goalsLocalKey = userId ? `finlitgo_goals_${userId}` : null;
+  const pocketsLocalKey = userId ? `finlitgo_pockets_${userId}` : null;
 
-  const [transactions, setTransactions] = useState(() => {
-    const saved = localStorage.getItem(txKey);
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [goals, setGoals] = useState(() => {
-    const saved = localStorage.getItem(goalsKey);
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [pockets, setPockets] = useState(() => {
-    const saved = localStorage.getItem(pocketsKey);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [transactions, setTransactions] = useState([]);
+  const [goals, setGoals] = useState([]);
+  const [pockets, setPockets] = useState([]);
+  const [loading, setLoading] = useState(true);
   
   const [showCashflowModal, setShowCashflowModal] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
@@ -46,21 +77,56 @@ export default function FinancialPage() {
   const [fundGoalTargetId, setFundGoalTargetId] = useState(null);
   const [fundGoalForm, setFundGoalForm] = useState({ pocketId: '', amount: '' });
 
-  // Re-sync if user changes
-  useEffect(() => {
-    const savedTxs = localStorage.getItem(txKey);
-    setTransactions(savedTxs ? JSON.parse(savedTxs) : []);
-    
-    const savedGoals = localStorage.getItem(goalsKey);
-    setGoals(savedGoals ? JSON.parse(savedGoals) : []);
-    
-    const savedPockets = localStorage.getItem(pocketsKey);
-    setPockets(savedPockets ? JSON.parse(savedPockets) : []);
-  }, [userId, txKey, goalsKey, pocketsKey]);
+  const fetchFinancialData = useCallback(async () => {
+    if (!userId) {
+      setTransactions([]);
+      setGoals([]);
+      setPockets([]);
+      setLoading(false);
+      return;
+    }
 
-  useEffect(() => { localStorage.setItem(txKey, JSON.stringify(transactions)); }, [transactions, txKey]);
-  useEffect(() => { localStorage.setItem(goalsKey, JSON.stringify(goals)); }, [goals, goalsKey]);
-  useEffect(() => { localStorage.setItem(pocketsKey, JSON.stringify(pockets)); }, [pockets, pocketsKey]);
+    setLoading(true);
+    try {
+      const localTx = txLocalKey ? readLocalArray(txLocalKey) : [];
+      const localGoals = goalsLocalKey ? readLocalArray(goalsLocalKey) : [];
+      const localPockets = pocketsLocalKey ? readLocalArray(pocketsLocalKey) : [];
+
+      const [txRes, goalsRes, pocketsRes] = await Promise.all([
+        supabase.from('transactions').select('*').order('created_at', { ascending: false }),
+        supabase.from('goals').select('*').order('created_at', { ascending: true }),
+        supabase.from('pockets').select('*').order('created_at', { ascending: true }),
+      ]);
+
+      if (txRes.error) console.error('Failed to fetch transactions:', txRes.error);
+      if (goalsRes.error) console.error('Failed to fetch goals:', goalsRes.error);
+      if (pocketsRes.error) console.error('Failed to fetch pockets:', pocketsRes.error);
+
+      const nextTx = txRes.error ? localTx : (txRes.data || []).map(normalizeTransaction);
+      const nextGoals = goalsRes.error ? localGoals : (goalsRes.data || []);
+      const nextPockets = pocketsRes.error ? localPockets : (pocketsRes.data || []);
+
+      setTransactions(nextTx);
+      setGoals(nextGoals);
+      setPockets(nextPockets);
+
+      if (!txRes.error && txLocalKey) writeLocalArray(txLocalKey, nextTx);
+      if (!goalsRes.error && goalsLocalKey) writeLocalArray(goalsLocalKey, nextGoals);
+      if (!pocketsRes.error && pocketsLocalKey) writeLocalArray(pocketsLocalKey, nextPockets);
+    } catch (err) {
+      console.error('Error fetching financial data:', err);
+      setTransactions(txLocalKey ? readLocalArray(txLocalKey).map(normalizeTransaction) : []);
+      setGoals(goalsLocalKey ? readLocalArray(goalsLocalKey) : []);
+      setPockets(pocketsLocalKey ? readLocalArray(pocketsLocalKey) : []);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId, txLocalKey, goalsLocalKey, pocketsLocalKey]);
+
+  // Fetch data from Supabase
+  useEffect(() => {
+    fetchFinancialData();
+  }, [fetchFinancialData]);
 
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
@@ -72,52 +138,209 @@ export default function FinancialPage() {
     { title: 'Total Expenses', amount: '-' + formatRupiah(totalExpense), icon: <IconTrendingDown />, color: 'text-red-400', gradient: 'from-red-600 to-rose-400' }
   ];
 
-  const addTransaction = () => {
-    if (!txForm.title.trim() || !txForm.amount) return;
-    const newTx = { ...txForm, id: Date.now(), amount: parseInt(txForm.amount) };
-    setTransactions(prev => [newTx, ...prev]);
+  const addTransaction = async () => {
+    if (!txForm.title.trim() || !txForm.amount || !userId) return;
+    const amount = Number.parseInt(txForm.amount, 10);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      alert('Amount harus berupa angka lebih dari 0.');
+      return;
+    }
+    if (amount > MAX_INT32) {
+      alert('Amount terlalu besar. Maksimum yang didukung saat ini: 2.147.483.647');
+      return;
+    }
+
+    const payloads = buildTransactionPayloads({
+      userId,
+      title: txForm.title,
+      type: txForm.type,
+      amount,
+      category: txForm.category,
+      date: txForm.date,
+    });
+
+    let writeError = null;
+    for (const payload of payloads) {
+      const { error } = await supabase.from('transactions').insert(payload);
+      if (!error) {
+        writeError = null;
+        break;
+      }
+      writeError = error;
+    }
+
+    if (writeError) {
+      console.error('Failed to add transaction:', writeError);
+      const fallbackTx = normalizeTransaction({
+        id: `local-tx-${Date.now()}`,
+        user_id: userId,
+        title: txForm.title,
+        type: txForm.type,
+        amount,
+        category: txForm.category,
+        date: txForm.date,
+        created_at: new Date().toISOString(),
+      });
+      setTransactions(prev => {
+        const next = [fallbackTx, ...prev];
+        if (txLocalKey) writeLocalArray(txLocalKey, next);
+        return next;
+      });
+      return;
+    }
+
+    await fetchFinancialData();
     setShowCashflowModal(false);
     setTxForm({ title: '', type: 'expense', amount: '', category: 'Lainnya', date: new Date().toISOString().split('T')[0] });
   };
 
-  const deleteTransaction = (id) => {
-    setTransactions(prev => prev.filter(t => t.id !== id));
+  const deleteTransaction = async (id) => {
+    const { error } = await supabase.from('transactions').delete().eq('id', id);
+    if (!error) {
+      await fetchFinancialData();
+    } else {
+      console.error(error);
+      setTransactions(prev => {
+        const next = prev.filter(t => t.id !== id);
+        if (txLocalKey) writeLocalArray(txLocalKey, next);
+        return next;
+      });
+    }
     setDeleteConfirm(null);
   };
 
-  const addGoal = () => {
-    if (!goalForm.name.trim() || !goalForm.target) return;
-    setGoals(prev => [...prev, { id: Date.now(), name: goalForm.name, current: 0, target: parseInt(goalForm.target) }]);
+  const addGoal = async () => {
+    if (!goalForm.name.trim() || !goalForm.target || !userId) return;
+    
+    const newGoal = { user_id: userId, name: goalForm.name, target: parseInt(goalForm.target), current: 0 };
+    const { error } = await supabase.from('goals').insert(newGoal);
+    
+    if (error) {
+      console.error('Failed to add goal:', error);
+      const fallbackGoal = { id: `local-goal-${Date.now()}`, ...newGoal };
+      setGoals(prev => {
+        const next = [...prev, fallbackGoal];
+        if (goalsLocalKey) writeLocalArray(goalsLocalKey, next);
+        return next;
+      });
+      setShowGoalModal(false);
+      setGoalForm({ name: '', target: '' });
+      return;
+    }
+    
+    await fetchFinancialData();
     setShowGoalModal(false);
     setGoalForm({ name: '', target: '' });
   };
 
-  const deleteGoal = (id) => {
-    setGoals(prev => prev.filter(g => g.id !== id));
+  const deleteGoal = async (id) => {
+    const { error } = await supabase.from('goals').delete().eq('id', id);
+    if (!error) {
+      await fetchFinancialData();
+      return;
+    }
+    setGoals(prev => {
+      const next = prev.filter(g => g.id !== id);
+      if (goalsLocalKey) writeLocalArray(goalsLocalKey, next);
+      return next;
+    });
   };
 
-  const addPocket = () => {
-    if (!pocketForm.name.trim() || !pocketForm.amount) return;
+  const addPocket = async () => {
+    if (!pocketForm.name.trim() || !pocketForm.amount || !userId) return;
     const amount = parseInt(pocketForm.amount);
     if (amount > balance) {
       alert("Insufficient Main Balance to create this pocket!");
       return;
     }
-    // Deduct from main balance
-    setTransactions(prev => [{ id: Date.now() + 1, title: `Transfer to ${pocketForm.name}`, type: 'expense', amount, category: 'Lainnya', date: new Date().toISOString().split('T')[0] }, ...prev]);
-    setPockets(prev => [...prev, { id: Date.now(), name: pocketForm.name, balance: amount }]);
+    
+    // Create pocket via Supabase
+    const newPocket = { user_id: userId, name: pocketForm.name, balance: amount };
+    const { error: pocketError } = await supabase.from('pockets').insert(newPocket);
+    if (pocketError) {
+      console.error('Failed to create pocket:', pocketError);
+      const fallbackPocket = { id: `local-pocket-${Date.now()}`, ...newPocket };
+      setPockets(prev => {
+        const next = [...prev, fallbackPocket];
+        if (pocketsLocalKey) writeLocalArray(pocketsLocalKey, next);
+        return next;
+      });
+      setShowPocketModal(false);
+      setPocketForm({ name: '', amount: '' });
+      return;
+    }
+
+    // Create deducting transaction as an expense
+    const txPayloads = buildTransactionPayloads({
+      userId,
+      title: `Transfer to ${pocketForm.name}`,
+      type: 'expense',
+      amount,
+      category: 'Lainnya',
+      date: new Date().toISOString().split('T')[0],
+    });
+    let txWriteError = null;
+    for (const payload of txPayloads) {
+      const { error } = await supabase.from('transactions').insert(payload);
+      if (!error) {
+        txWriteError = null;
+        break;
+      }
+      txWriteError = error;
+    }
+    if (txWriteError) console.warn('Failed to create transfer transaction:', txWriteError);
+
+    await fetchFinancialData();
+    
     setShowPocketModal(false);
     setPocketForm({ name: '', amount: '' });
   };
 
-  const deletePocket = (id, balance) => {
-    // Return money to main balance
-    setTransactions(prev => [{ id: Date.now() + 1, title: `Return from closed pocket`, type: 'income', amount: balance, category: 'Lainnya', date: new Date().toISOString().split('T')[0] }, ...prev]);
-    setPockets(prev => prev.filter(p => p.id !== id));
+  const deletePocket = async (id, balanceAmount) => {
+    const { error } = await supabase.from('pockets').delete().eq('id', id);
+    if (!error) {
+      // Return money to main balance
+      const txPayloads = buildTransactionPayloads({
+        userId,
+        title: 'Return from closed pocket',
+        type: 'income',
+        amount: balanceAmount,
+        category: 'Lainnya',
+        date: new Date().toISOString().split('T')[0],
+      });
+      for (const payload of txPayloads) {
+        const { error: txErr } = await supabase.from('transactions').insert(payload);
+        if (!txErr) break;
+      }
+      await fetchFinancialData();
+      return;
+    }
+
+    setPockets(prev => {
+      const next = prev.filter(p => p.id !== id);
+      if (pocketsLocalKey) writeLocalArray(pocketsLocalKey, next);
+      return next;
+    });
+
+    const fallbackTx = normalizeTransaction({
+      id: `local-tx-${Date.now()}`,
+      user_id: userId,
+      title: 'Return from closed pocket',
+      type: 'income',
+      amount: balanceAmount,
+      category: 'Lainnya',
+      date: new Date().toISOString().split('T')[0],
+      created_at: new Date().toISOString(),
+    });
+    setTransactions(prev => {
+      const next = [fallbackTx, ...prev];
+      if (txLocalKey) writeLocalArray(txLocalKey, next);
+      return next;
+    });
   };
 
-  const fundGoal = () => {
-    if (!fundGoalForm.pocketId || !fundGoalForm.amount) return;
+  const fundGoal = async () => {
+    if (!fundGoalForm.pocketId || !fundGoalForm.amount || !userId) return;
     const amount = parseInt(fundGoalForm.amount);
     const selectedPocket = pockets.find(p => p.id.toString() === fundGoalForm.pocketId);
     
@@ -126,13 +349,59 @@ export default function FinancialPage() {
       return;
     }
 
-    setPockets(prev => prev.map(p => p.id.toString() === fundGoalForm.pocketId ? { ...p, balance: p.balance - amount } : p));
-    setGoals(prev => prev.map(g => g.id === fundGoalTargetId ? { ...g, current: g.current + amount } : g));
+    // Attempt DB updates sequentially 
+    const { error: pError } = await supabase.from('pockets').update({ balance: selectedPocket.balance - amount }).eq('id', selectedPocket.id);
+    if (pError) {
+      setPockets(prev => {
+        const next = prev.map(p => p.id === selectedPocket.id ? { ...p, balance: p.balance - amount } : p);
+        if (pocketsLocalKey) writeLocalArray(pocketsLocalKey, next);
+        return next;
+      });
+      setGoals(prev => {
+        const next = prev.map(g => g.id === fundGoalTargetId ? { ...g, current: g.current + amount } : g);
+        if (goalsLocalKey) writeLocalArray(goalsLocalKey, next);
+        return next;
+      });
+      setShowFundGoalModal(false);
+      setFundGoalForm({ pocketId: '', amount: '' });
+      setFundGoalTargetId(null);
+      return;
+    }
+    
+    const targetGoal = goals.find(g => g.id === fundGoalTargetId);
+    const { error: gError } = await supabase.from('goals').update({ current: targetGoal.current + amount }).eq('id', targetGoal.id);
+    if (gError) {
+      setPockets(prev => {
+        const next = prev.map(p => p.id === selectedPocket.id ? { ...p, balance: p.balance - amount } : p);
+        if (pocketsLocalKey) writeLocalArray(pocketsLocalKey, next);
+        return next;
+      });
+      setGoals(prev => {
+        const next = prev.map(g => g.id === targetGoal.id ? { ...g, current: g.current + amount } : g);
+        if (goalsLocalKey) writeLocalArray(goalsLocalKey, next);
+        return next;
+      });
+      setShowFundGoalModal(false);
+      setFundGoalForm({ pocketId: '', amount: '' });
+      setFundGoalTargetId(null);
+      return;
+    }
+
+    await fetchFinancialData();
 
     setShowFundGoalModal(false);
     setFundGoalForm({ pocketId: '', amount: '' });
     setFundGoalTargetId(null);
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-zinc-500">
+        <IconLoader2 className="animate-spin mb-4" size={32} />
+        <p className="text-sm font-space">Syncing dashboard data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">

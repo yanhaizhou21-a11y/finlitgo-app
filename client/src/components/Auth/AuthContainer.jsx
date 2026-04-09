@@ -7,10 +7,12 @@ import SignUp from './SignUp';
 import CompleteProfile from './CompleteProfile';
 import { useAuth } from '../../store/AuthContext';
 
+const ADMIN_EMAIL = 'amrpendragon@gmail.com';
+
 const AuthContainer = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, profileComplete, loading: authLoading, refreshProfile } = useAuth();
+  const { user, profileComplete, isAdmin, loading: authLoading, refreshProfile } = useAuth();
   const searchParams = new URLSearchParams(location.search);
   const redirectTo = searchParams.get('redirect') || '/dashboard';
   const forceView = searchParams.get('view'); // e.g. ?view=complete
@@ -27,7 +29,7 @@ const AuthContainer = () => {
     
     // If user is logged in and lands on auth page
     if (user) {
-      if (forceView === 'complete' || !profileComplete) {
+      if ((forceView === 'complete' && !isAdmin) || (!profileComplete && !isAdmin)) {
         // Need to complete profile
         setView('completeProfile');
       } else {
@@ -35,7 +37,7 @@ const AuthContainer = () => {
         navigate(redirectTo, { replace: true });
       }
     }
-  }, [user, profileComplete, authLoading, forceView, redirectTo, navigate]);
+  }, [user, profileComplete, isAdmin, authLoading, forceView, redirectTo, navigate]);
 
   useEffect(() => {
     if (view !== 'completeProfile') {
@@ -50,6 +52,11 @@ const AuthContainer = () => {
 
   const handleAuthSuccess = async (authUser) => {
     try {
+      if (!authUser?.id) {
+        navigate(redirectTo);
+        return;
+      }
+
       // Wait a moment for Supabase trigger to create profile row
       await new Promise(r => setTimeout(r, 500));
       
@@ -58,16 +65,17 @@ const AuthContainer = () => {
         .select('*')
         .eq('id', authUser.id)
         .maybeSingle();
-        
+
       if (error && error.code !== 'PGRST116') {
-          console.error("Error fetching user data:", error);
-          alert("Database Error: " + error.message);
+        // Don't block login on profile read issues; fall back to role/email logic below.
+        console.warn('Profile fetch warning after auth:', error.message);
       }
 
-      // Check if profile has enough data (we require full_name)
-      const hasRequiredProfile = userProfile && userProfile.full_name;
+      // Check if user is registered in the database
+      const hasRequiredProfile = !!userProfile;
+      const isAdminByEmail = authUser?.email?.toLowerCase() === ADMIN_EMAIL;
 
-      if (hasRequiredProfile) {
+      if (hasRequiredProfile || isAdminByEmail) {
         navigate(redirectTo);
       } else {
         setView('completeProfile');
