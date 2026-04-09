@@ -50,7 +50,16 @@ const CompleteProfile = ({ onComplete }) => {
       onComplete(); // this will call refreshProfile + navigate
     } catch (err) {
       console.error('CompleteProfile error:', err);
-      setError(err.message);
+      
+      let errorMsg = err.message || 'An unknown error occurred.';
+      // Provide a clearer error if the users table doesn't exist or RLS is failing
+      if (err.code === '42P01' || errorMsg.includes('relation "public.users" does not exist')) {
+        errorMsg = 'Database not fully set up. Please run the database_setup.sql script.';
+      } else if (err.code === '42501' || errorMsg.includes('row-level security')) {
+        errorMsg = 'Permission denied. Please ensure RLS policies are deployed.';
+      }
+      
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
