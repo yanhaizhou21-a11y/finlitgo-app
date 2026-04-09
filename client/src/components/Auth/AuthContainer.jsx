@@ -52,6 +52,11 @@ const AuthContainer = () => {
 
   const handleAuthSuccess = async (authUser) => {
     try {
+      if (!authUser?.id) {
+        navigate(redirectTo);
+        return;
+      }
+
       // Wait a moment for Supabase trigger to create profile row
       await new Promise(r => setTimeout(r, 500));
       
@@ -60,10 +65,10 @@ const AuthContainer = () => {
         .select('*')
         .eq('id', authUser.id)
         .maybeSingle();
-        
+
       if (error && error.code !== 'PGRST116') {
-          console.error("Error fetching user data:", error);
-          alert("Database Error: " + error.message);
+        // Don't block login on profile read issues; fall back to role/email logic below.
+        console.warn('Profile fetch warning after auth:', error.message);
       }
 
       // Check if user is registered in the database

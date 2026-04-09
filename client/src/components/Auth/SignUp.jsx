@@ -4,8 +4,6 @@ import { supabase } from '../../services/supabase';
 import InputField from './InputField';
 import GoogleButton from './GoogleButton';
 
-const ADMIN_EMAIL = 'amrpendragon@gmail.com';
-
 const SignUp = ({ onToggle, onSuccess }) => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -35,23 +33,6 @@ const SignUp = ({ onToggle, onSuccess }) => {
       // When email confirmations are enabled, Supabase returns a user with no identities if the email already exists
       if (data?.user?.identities?.length === 0) {
         throw new Error('Email already registered. Please sign in instead.');
-      }
-
-      // Auto-assign admin role if email matches
-      if (formData.email.toLowerCase() === ADMIN_EMAIL && data.user) {
-        // Wait for trigger to create the profile row first
-        await new Promise(r => setTimeout(r, 800));
-        
-        const { error: roleError } = await supabase
-          .from('users')
-          .update({ role: 'admin', full_name: formData.name })
-          .eq('id', data.user.id);
-        
-        if (roleError) {
-          console.warn('Could not auto-set admin role:', roleError.message);
-        } else {
-          console.log('Admin role assigned successfully for', ADMIN_EMAIL);
-        }
       }
 
       // Check if email confirmation is required (session is null)
