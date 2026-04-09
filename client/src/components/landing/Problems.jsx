@@ -6,7 +6,7 @@ const Problems = () => {
       <h2 className="text-3xl md:text-4xl font-semibold text-center text-white mb-16 max-w-lg">
         Masalah finansial yang kita hadapi bersama
       </h2>
-      
+
       <div className="relative max-w-6xl w-full">
         {/* Shared glass panel behind all cards */}
         <div className="absolute inset-0 rounded-[2rem] border border-white/10 bg-[#1a1b29]/55 backdrop-blur-md shadow-[0_24px_60px_rgba(0,0,0,0.35)]" />
@@ -19,7 +19,7 @@ const Problems = () => {
               <div className="absolute inset-0 bg-black/20"></div>
             </div>
             <div className="h-1/2 w-full bg-white rounded-2xl -mt-6 relative z-10 flex items-center justify-center p-4 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_12px_30px_rgba(16,16,32,0.35)]">
-                 <div className="w-3/4 h-6 bg-purple-200 rounded-full opacity-60"></div>
+              <h3 className="text-[#1a1a24] font-bold text-center text-base leading-snug">Fondasi Keuangan & Mindset Uang</h3>
             </div>
           </div>
 
@@ -29,7 +29,7 @@ const Problems = () => {
               <div className="absolute inset-0 bg-black/20"></div>
             </div>
             <div className="h-1/2 w-full bg-white rounded-2xl -mt-6 relative z-10 flex items-center justify-center p-4 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_12px_30px_rgba(16,16,32,0.35)]">
-                 <div className="w-3/4 h-6 bg-purple-200 rounded-full opacity-60"></div>
+              <h3 className="text-[#1a1a24] font-bold text-center text-base leading-snug">Hutang Pintar vs Hutang Bodoh</h3>
             </div>
           </div>
 
@@ -39,7 +39,7 @@ const Problems = () => {
               <div className="absolute inset-0 bg-black/20"></div>
             </div>
             <div className="h-1/2 w-full bg-white rounded-2xl -mt-6 relative z-10 flex items-center justify-center p-4 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_12px_30px_rgba(16,16,32,0.35)]">
-                 <div className="w-3/4 h-6 bg-purple-200 rounded-full opacity-60"></div>
+              <h3 className="text-[#1a1a24] font-bold text-center text-base leading-snug">Grow Your Money 101</h3>
             </div>
           </div>
         </div>

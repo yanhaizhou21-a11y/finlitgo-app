@@ -7,8 +7,6 @@ import { CLASS_META, CLASS_LEVELS } from '../../data/classContent';
 import {
   IconFlame,
   IconBook2,
-  IconLock,
-  IconCheck,
   IconSearch,
   IconStar,
   IconClock,
@@ -163,13 +161,8 @@ export default function ClassPage() {
 
         {/* Class Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <AnimatePresence mode="popLayout">
-            {filteredClasses.map((course, i) => {
-              const progress = course.progress || 0;
-              const isCompleted = progress >= 100;
-              const isLocked = false; // Disable strict lock for now to allow viewing
+          <AnimatePresence mode="popLayout">            {filteredClasses.map((course, i) => {
               const image = course.thumbnail_url || course.image;
-              const chaptersCount = course.chapters_count || 1;
               const meta = CLASS_META?.[course.id] || null;
 
               return (
@@ -210,24 +203,8 @@ export default function ClassPage() {
                         ))}
                       </div>
                     )}
-
-                    {/* Lock overlay */}
-                    {isLocked && (
-                      <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center z-10">
-                        <div className="flex flex-col items-center gap-2">
-                          <IconLock size={32} className="text-violet-300" />
-                          <span className="text-xs font-medium text-violet-300">Login Required</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Completed Badge Overlay */}
-                    {isCompleted && !isLocked && (
-                      <div className="absolute bottom-3 right-3 bg-green-500/90 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full flex items-center gap-1 z-10">
-                        <IconCheck size={12} /> Completed
-                      </div>
-                    )}
                   </div>
+
 
                   {/* Content */}
                   <div className="p-6 flex flex-col flex-1">
@@ -244,33 +221,11 @@ export default function ClassPage() {
                       )}
                     </div>
 
-                    {/* Progress Bar */}
-                    <div className="mt-auto flex flex-col gap-2">
-                      <div className="flex justify-between items-end text-sm">
-                        <span className="text-zinc-400 font-medium">Progress</span>
-                        {isCompleted ? (
-                          <span className="text-green-400 flex items-center gap-1 font-medium"><IconCheck size={14}/> 100%</span>
-                        ) : progress > 0 ? (
-                          <span className="text-violet-300 font-mono font-bold">{progress}%</span>
-                        ) : (
-                          <span className="text-zinc-600 font-mono">0%</span>
-                        )}
-                      </div>
-                      <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          whileInView={{ width: `${progress}%` }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 0.8, delay: 0.2 + i * 0.1 }}
-                          className={`h-full rounded-full ${isCompleted ? 'bg-green-500' : 'bg-gradient-to-r from-violet-600 to-purple-400'}`}
-                        />
-                      </div>
-                    </div>
 
                     {/* CTA */}
-                    <div className="mt-4 flex items-center justify-end">
+                    <div className="mt-auto flex items-center justify-end">
                       <span className="flex items-center gap-1 text-xs font-medium text-violet-400 group-hover:text-violet-300 transition-colors">
-                        {isCompleted ? 'Review Materi' : progress > 0 ? 'Lanjutkan Belajar' : 'Mulai Belajar'}
+                        Mulai Belajar
                         <IconArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                       </span>
                     </div>

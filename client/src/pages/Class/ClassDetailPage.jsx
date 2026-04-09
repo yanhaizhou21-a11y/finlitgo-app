@@ -9,6 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { recordStudyActivity } from '../../utils/streak';
 import { CLASS_META, CLASS_LEVELS } from '../../data/classContent';
 import { useAuth } from '../../store/AuthContext';
+import { supabase } from '../../services/supabase';
 import QuizEngine from '../../components/Class/QuizEngine';
 import QuizLanding from '../../components/Class/QuizLanding';
 
@@ -54,13 +55,21 @@ export default function ClassDetailPage() {
   const [loading, setLoading] = useState(true);
   const [classData, setClassData] = useState(null);
   
+  // Derive userId for per-user progress isolation
+  const userId = user?.id || 'guest';
+
   // State
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [openLevels, setOpenLevels] = useState({});
   const [activeItemId, setActiveItemId] = useState(null);
-  const [completed, setCompleted] = useState(new Set());
-  const [unlockedLevels, setUnlockedLevels] = useState(new Set(['level-1']));
-  const [quizHistory, setQuizHistory] = useState({});
+  // Load persisted progress from localStorage on mount (per-user, per-class)
+  const [completed, setCompleted] = useState(() => loadSet(progressKey(userId, moduleId)));
+  const [unlockedLevels, setUnlockedLevels] = useState(() => {
+    const saved = loadSet(levelUnlockKey(userId, moduleId));
+    if (saved.size === 0) saved.add('level-1');
+    return saved;
+  });
+  const [quizHistory, setQuizHistory] = useState(() => loadJSON(quizHistKey(userId, moduleId), {}));
   const [readingProgress, setReadingProgress] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
 
@@ -70,18 +79,75 @@ export default function ClassDetailPage() {
 
   const contentRef = useRef(null);
 
+  // Re-load persisted state when user or class changes
   useEffect(() => {
+    setCompleted(loadSet(progressKey(userId, moduleId)));
+    const savedUnlocks = loadSet(levelUnlockKey(userId, moduleId));
+    if (savedUnlocks.size === 0) savedUnlocks.add('level-1');
+    setUnlockedLevels(savedUnlocks);
+    setQuizHistory(loadJSON(quizHistKey(userId, moduleId), {}));
     fetchClassDetail();
-  }, [moduleId]);
+  }, [moduleId, userId]);
 
-  const fetchClassDetail = () => {
+  // Persist completed set to localStorage whenever it changes
+  useEffect(() => {
+    saveSet(progressKey(userId, moduleId), completed);
+  }, [completed, userId, moduleId]);
+
+  // Persist quiz history whenever it changes
+  useEffect(() => {
+    saveJSON(quizHistKey(userId, moduleId), quizHistory);
+  }, [quizHistory, userId, moduleId]);
+
+  // Persist unlocked levels whenever they change
+  useEffect(() => {
+    saveSet(levelUnlockKey(userId, moduleId), unlockedLevels);
+  }, [unlockedLevels, userId, moduleId]);
+
+  const fetchClassDetail = async () => {
     setLoading(true);
+    
+    // 1. Try fetching from server first
+    if (user) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const res = await fetch(`http://localhost:5000/api/classes/${moduleId}`, {
+          headers: {
+            'Authorization': `Bearer ${session?.access_token}`
+          }
+        });
+        const json = await res.json();
+        
+        if (json.success && json.data) {
+          const apiData = json.data;
+          setClassData(apiData);
+          
+          // Seed completed items from server
+          if (apiData.completed_chapter_ids) {
+            setCompleted(prev => {
+              const next = new Set(prev);
+              apiData.completed_chapter_ids.forEach(id => next.add(String(id)));
+              // Also add video- prefix to match UI expectations if necessary, 
+              // but it's better to unify IDs. For now, we add both.
+              apiData.completed_chapter_ids.forEach(id => next.add(`video-${id}`));
+              return next;
+            });
+          }
+          
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to fetch class detail from API:", err);
+      }
+    }
+
+    // 2. Fallback to localStorage/Mock if server fails or guest
     const saved = localStorage.getItem('finlitgo_classes');
     let dataList = [];
     if (saved) {
       dataList = JSON.parse(saved);
     } else {
-      // Fake fallback matching index
       dataList = [
         { id: 1, title: 'Money Management Basics', category: 'Foundation', description: 'Learn the fundamentals of managing your money wisely.', chapters: 12, youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500&q=80', quizzes: [
           { question: 'What percentage of income should go to Needs in the 50/30/20 rule?', options: ['20%', '30%', '50%', '10%'], correctAnswer: 2 },
@@ -191,20 +257,28 @@ export default function ClassDetailPage() {
 
   // ── Actions ──
   const markComplete = async (itemId) => {
-    const next = new Set(completed);
-    next.add(itemId);
-    setCompleted(next);
+    setCompleted(prev => {
+      const next = new Set(prev);
+      next.add(itemId);
+      // saveSet is handled by the useEffect above
+      return next;
+    });
     
     // Sync with backend if logged in
-    if (user && itemId.startsWith('video-')) {
-        const chapterId = itemId.replace('video-', '');
+    if (user) {
+        // Handle both simple numeric IDs and prefixed string IDs
+        const chapterId = String(itemId).replace('video-', '');
         try {
+            const { data: { session } } = await supabase.auth.getSession();
             await fetch('http://localhost:5000/api/classes/progress', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${session?.access_token}`
+                },
                 body: JSON.stringify({ 
                     chapterId, 
-                    earnedPoints: 10 // Fixed points for now
+                    earnedPoints: 10 
                 })
             });
         } catch (error) {
@@ -258,7 +332,7 @@ export default function ClassDetailPage() {
     const now = new Date();
     const dateStr = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-    // Save history locally for immediate feedback
+    // Save history locally for immediate feedback (useEffect persists to localStorage)
     const hist = { ...quizHistory };
     if (!hist[activeQuiz.quizId]) hist[activeQuiz.quizId] = [];
     hist[activeQuiz.quizId].push({ date: dateStr, percentage: pct, status: passed ? 'Lulus' : 'Gagal' });
@@ -271,6 +345,12 @@ export default function ClassDetailPage() {
         const lvlIdx = getLevelIndex(activeQuiz.levelId);
         if (lvlIdx < levels.length - 1) {
           const nextLvl = levels[lvlIdx + 1];
+          // Unlock next level and persist
+          setUnlockedLevels(prev => {
+            const next = new Set(prev);
+            next.add(nextLvl.id);
+            return next;
+          });
           setOpenLevels(prev => ({ ...prev, [nextLvl.id]: true }));
           const firstItem = nextLvl.items[0];
           if (firstItem) {
