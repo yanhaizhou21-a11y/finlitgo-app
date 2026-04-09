@@ -64,8 +64,8 @@ const AuthContainer = () => {
           alert("Database Error: " + error.message);
       }
 
-      // Check if profile has enough data (we require full_name)
-      const hasRequiredProfile = userProfile && userProfile.full_name;
+      // Check if user is registered in the database
+      const hasRequiredProfile = !!userProfile;
 
       if (hasRequiredProfile) {
         navigate(redirectTo);

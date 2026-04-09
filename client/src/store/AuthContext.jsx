@@ -55,8 +55,8 @@ export const AuthProvider = ({ children }) => {
   // Admin detection: role column or known admin email
   const isAdmin = profile?.role === 'admin' || user?.email === 'amrpendragon@gmail.com';
   
-  // Profile completeness check: user must have full_name set
-  const profileComplete = !!(profile?.full_name);
+  // Profile completeness check: user account is registered in database
+  const profileComplete = !!profile;
 
   // Function to refresh profile (e.g., after completing profile)
   const refreshProfile = async () => {
