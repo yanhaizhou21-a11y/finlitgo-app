@@ -7,10 +7,12 @@ import SignUp from './SignUp';
 import CompleteProfile from './CompleteProfile';
 import { useAuth } from '../../store/AuthContext';
 
+const ADMIN_EMAIL = 'amrpendragon@gmail.com';
+
 const AuthContainer = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, profileComplete, loading: authLoading, refreshProfile } = useAuth();
+  const { user, profileComplete, isAdmin, loading: authLoading, refreshProfile } = useAuth();
   const searchParams = new URLSearchParams(location.search);
   const redirectTo = searchParams.get('redirect') || '/dashboard';
   const forceView = searchParams.get('view'); // e.g. ?view=complete
@@ -27,7 +29,7 @@ const AuthContainer = () => {
     
     // If user is logged in and lands on auth page
     if (user) {
-      if (forceView === 'complete' || !profileComplete) {
+      if ((forceView === 'complete' && !isAdmin) || (!profileComplete && !isAdmin)) {
         // Need to complete profile
         setView('completeProfile');
       } else {
@@ -35,7 +37,7 @@ const AuthContainer = () => {
         navigate(redirectTo, { replace: true });
       }
     }
-  }, [user, profileComplete, authLoading, forceView, redirectTo, navigate]);
+  }, [user, profileComplete, isAdmin, authLoading, forceView, redirectTo, navigate]);
 
   useEffect(() => {
     if (view !== 'completeProfile') {
@@ -66,8 +68,9 @@ const AuthContainer = () => {
 
       // Check if user is registered in the database
       const hasRequiredProfile = !!userProfile;
+      const isAdminByEmail = authUser?.email?.toLowerCase() === ADMIN_EMAIL;
 
-      if (hasRequiredProfile) {
+      if (hasRequiredProfile || isAdminByEmail) {
         navigate(redirectTo);
       } else {
         setView('completeProfile');

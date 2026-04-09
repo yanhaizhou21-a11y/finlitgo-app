@@ -70,12 +70,12 @@ function DashboardSwitch() {
 
 // Wrapper that checks profile completeness for dashboard routes
 function ProfileGuard({ children }) {
-  const { user, profileComplete, loading } = useAuth();
+  const { user, profileComplete, loading, isAdmin } = useAuth();
 
   if (loading) return null;
 
   // If user is logged in but profile not complete, redirect to complete profile
-  if (user && !profileComplete) {
+  if (user && !profileComplete && !isAdmin) {
     return <Navigate to="/register?view=complete" replace />;
   }
 

@@ -126,7 +126,7 @@ export default function ClassDetailPage() {
     category: classData?.category || 'Uncategorized',
     difficulty: 2, // Default or fetched from DB
   };
-  
+
   // Transform DB chapters to "levels" UI structure for dynamically added classes
   const dynamicLevels = (classData?.chapters || []).map((ch, idx) => ({
     id: ch.id || `ch-${idx}`,
