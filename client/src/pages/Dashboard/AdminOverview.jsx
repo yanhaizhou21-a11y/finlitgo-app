@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { IconUsers, IconBook2, IconArticle, IconSchool, IconWriting, IconChartBar } from '@tabler/icons-react';
+import { IconUsers, IconBook2, IconArticle, IconSchool, IconWriting, IconChartBar, IconHistory } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function AdminOverview() {
@@ -16,6 +16,7 @@ export default function AdminOverview() {
     { title: 'Manage Classes', desc: 'CRUD Classes & Quiz', icon: <IconSchool />, path: '/dashboard/manage-classes' },
     { title: 'Manage Blog', desc: 'CRUD Blog Posts', icon: <IconWriting />, path: '/dashboard/manage-blog' },
     { title: 'Financial', desc: 'Cashflow & Goals', icon: <IconChartBar />, path: '/dashboard/finance' },
+    { title: 'History', desc: 'Transactions & Study Logs', icon: <IconHistory />, path: '/dashboard/history' },
   ];
 
   // Recent activity mock

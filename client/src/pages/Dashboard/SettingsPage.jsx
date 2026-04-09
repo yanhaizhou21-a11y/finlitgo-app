@@ -17,6 +17,7 @@ export default function SettingsPage() {
   const [error, setError] = useState('');
   const [photoURL, setPhotoURL] = useState('');
   const [photoError, setPhotoError] = useState('');
+  const [isPasswordless, setIsPasswordless] = useState(false);
 
   // Notification settings
   const [notifications, setNotifications] = useState({
@@ -42,6 +43,16 @@ export default function SettingsPage() {
   // Load profile from Firestore
   useEffect(() => {
     if (!user) return;
+    
+    // Detect if user is passwordless
+    // Passwordless = tidak ada 'password' provider (login via email magic link, Google, GitHub, dll)
+    const hasPasswordProvider = user.identities?.some(identity => identity.provider === 'password');
+    setIsPasswordless(!hasPasswordProvider);
+    
+    // Debug log
+    console.log('User identities:', user.identities);
+    console.log('Has password provider:', hasPasswordProvider);
+    console.log('Is passwordless:', !hasPasswordProvider);
     
     const loadProfile = async () => {
       try {
@@ -225,24 +236,59 @@ export default function SettingsPage() {
     setError('');
 
     try {
-      const wantsPasswordUpdate = Boolean(securityData.currentPassword || securityData.newPassword || securityData.confirmPassword);
+      const wantsPasswordUpdate = Boolean(securityData.newPassword || securityData.confirmPassword);
 
       if (wantsPasswordUpdate) {
-        if (!securityData.newPassword || !securityData.confirmPassword) {
-          throw new Error('Lengkapi password baru.');
-        }
-        if (securityData.newPassword.length < 8) {
-          throw new Error('Password minimal 8 karakter.');
-        }
-        if (securityData.newPassword !== securityData.confirmPassword) {
-          throw new Error('Konfirmasi password tidak cocok.');
-        }
+        // For passwordless users, only require new password
+        if (isPasswordless) {
+          if (!securityData.newPassword || !securityData.confirmPassword) {
+            throw new Error('Lengkapi password baru.');
+          }
+          if (securityData.newPassword.length < 8) {
+            throw new Error('Password minimal 8 karakter.');
+          }
+          if (securityData.newPassword !== securityData.confirmPassword) {
+            throw new Error('Konfirmasi password tidak cocok.');
+          }
 
-        const { error } = await supabase.auth.updateUser({
-          password: securityData.newPassword
-        });
-        
-        if (error) throw error;
+          // Update password directly for passwordless users
+          const { error } = await supabase.auth.updateUser({
+            password: securityData.newPassword
+          });
+          
+          if (error) throw error;
+        } else {
+          // For regular users, require current password verification
+          if (!securityData.currentPassword) {
+            throw new Error('Masukkan password saat ini untuk verifikasi.');
+          }
+          if (!securityData.newPassword || !securityData.confirmPassword) {
+            throw new Error('Lengkapi password baru.');
+          }
+          if (securityData.newPassword.length < 8) {
+            throw new Error('Password minimal 8 karakter.');
+          }
+          if (securityData.newPassword !== securityData.confirmPassword) {
+            throw new Error('Konfirmasi password tidak cocok.');
+          }
+
+          // Reauthenticate with current password before updating
+          const { error: reAuthError } = await supabase.auth.signInWithPassword({
+            email: user.email,
+            password: securityData.currentPassword
+          });
+          
+          if (reAuthError) {
+            throw new Error('Password saat ini salah.');
+          }
+
+          // Update password after successful reauthentication
+          const { error } = await supabase.auth.updateUser({
+            password: securityData.newPassword
+          });
+          
+          if (error) throw error;
+        }
       }
 
       setSecurityData(prev => ({
@@ -650,20 +696,28 @@ export default function SettingsPage() {
 
               <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg">
                 <h4 className="text-sm font-medium text-white mb-1">Change Password</h4>
-                <p className="text-xs text-zinc-400">Isi field di bawah kalau kamu ingin ganti password akun.</p>
+                <p className="text-xs text-zinc-400">
+                  {isPasswordless 
+                    ? 'Set password untuk akun Anda. Kamu bisa login dengan email + password setelah ini.'
+                    : 'Isi field di bawah kalau kamu ingin ganti password akun.'
+                  }
+                </p>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-zinc-300">Current Password</label>
-                <input
-                  type="password"
-                  name="currentPassword"
-                  value={securityData.currentPassword}
-                  onChange={handleSecurityChange}
-                  placeholder="Enter current password"
-                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/30 transition-all"
-                />
-              </div>
+              {/* Only show current password field for users with existing password */}
+              {!isPasswordless && (
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-zinc-300">Current Password</label>
+                  <input
+                    type="password"
+                    name="currentPassword"
+                    value={securityData.currentPassword}
+                    onChange={handleSecurityChange}
+                    placeholder="Enter current password"
+                    className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/30 transition-all"
+                  />
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">

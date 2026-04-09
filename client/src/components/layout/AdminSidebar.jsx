@@ -4,9 +4,8 @@ import { motion } from 'framer-motion';
 import { 
   IconLayoutDashboard, 
   IconChartBar, 
+  IconHistory,
   IconSettings, 
-  IconBook2,
-  IconArticle,
   IconLogout,
   IconSchool,
   IconWriting
@@ -74,6 +73,7 @@ export default function AdminSidebar() {
         
         <div className="w-8 h-px bg-zinc-800 my-2" />
         <AnimatedNavItem to="/dashboard/finance" icon={IconChartBar} label="Financial" />
+        <AnimatedNavItem to="/dashboard/history" icon={IconHistory} label="History" />
       </nav>
 
       <div className="mt-auto w-full flex flex-col items-center gap-2">
