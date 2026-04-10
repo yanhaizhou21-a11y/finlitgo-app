@@ -691,7 +691,6 @@ export default function ClassDetailPage() {
 
                 {activeItem.content.videoId && (
                   <div className="relative w-full pb-[56.25%] rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-700 mb-8 shadow-2xl">
-<<<<<<< HEAD
                     <iframe
                       className="absolute inset-0 w-full h-full"
                       src={`https://www.youtube.com/embed/${activeItem.content.videoId}?rel=0`}
@@ -699,9 +698,6 @@ export default function ClassDetailPage() {
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     />
-=======
-                    <iframe className="absolute inset-0 w-full h-full" src={`https://www.youtube.com/embed/${activeItem.content.videoId}?rel=0`} title={activeItem.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
->>>>>>> 0fae3a19073509d087484f9e518f1e2c95370bf1
                   </div>
                 )}
 
@@ -711,15 +707,11 @@ export default function ClassDetailPage() {
                   ))}
                 </div>
 
-<<<<<<< HEAD
                 {activeItem.content.quote && (
                   <div className="my-10 bg-zinc-900 border-l-4 border-violet-500 p-6 rounded-r-xl">
                     <p className="text-white italic text-base">{activeItem.content.quote}</p>
                   </div>
                 )}
-=======
-                {activeItem.content.quote && <div className="my-10 bg-zinc-900 border-l-4 border-violet-500 p-6 rounded-r-xl"><p className="text-white italic text-base">{activeItem.content.quote}</p></div>}
->>>>>>> 0fae3a19073509d087484f9e518f1e2c95370bf1
 
                 {completed.has(activeItemId) && (
                   <motion.div initial={{ opacity:0, scale:0.9 }} animate={{ opacity:1, scale:1 }}
