@@ -1,464 +1,396 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSearchParams } from 'react-router-dom';
-import {
-  IconRobot, IconSend, IconSparkles, IconWallet, IconChartBar,
-  IconPigMoney, IconUser, IconTrash, IconTarget, IconTrendingUp,
-  IconLoader2, IconChartPie
-} from '@tabler/icons-react';
+import { IconRobot, IconSend, IconSparkles, IconWallet, IconChartBar, IconPigMoney, IconUser, IconTrash, IconTarget } from '@tabler/icons-react';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useAuth } from '../../store/AuthContext';
-import { supabase } from '../../services/supabase';
 
-// ─── Groq config ─────────────────────────────────────────────────────────────
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
-const GROQ_MODEL   = 'llama-3.3-70b-versatile'; // 30 RPM · 14,400 RPD · 6,000 TPM free
-const GROQ_URL     = 'https://api.groq.com/openai/v1/chat/completions';
-const MAX_TOKENS   = 700;   // keeps each request ≤ ~2,000 tokens total → well under TPM
-const MAX_DAILY_LIMIT = 10; // per-user app-level daily cap
-
-// ─── Intent label map ─────────────────────────────────────────────────────────
-const INTENT_LABELS = {
-  analyze_cashflow: 'Analyze Cash Flow',
-  analyze_expenses: 'Analyze Expenses',
-  analyze_revenue:  'Analyze Revenue',
-  analyze_budget:   'Analyze Budget',
-  free_chat:        'Chat',
-};
-
-// ─── Quick-action cards ───────────────────────────────────────────────────────
-const CATEGORIES = [
-  { intent: 'analyze_cashflow', title: 'Analyze Cash Flow',  icon: <IconChartBar size={22} />,  color: 'text-green-400 border-green-500/20 bg-green-500/5',  sub: 'Cashflow kamu sekarang' },
-  { intent: 'analyze_expenses', title: 'Analyze Expenses',   icon: <IconChartPie size={22} />,  color: 'text-orange-400 border-orange-500/20 bg-orange-500/5', sub: 'Breakdown pengeluaran' },
-  { intent: 'analyze_revenue',  title: 'Analyze Revenue',    icon: <IconTrendingUp size={22} />, color: 'text-blue-400 border-blue-500/20 bg-blue-500/5',   sub: 'Sumber pendapatanmu' },
-  { intent: 'analyze_budget',   title: 'Analyze Budget',     icon: <IconWallet size={22} />,    color: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/5',   sub: 'Budget vs aktual 50/30/20' },
-  {
-    intent: 'free_chat', title: 'Saving Strategy', icon: <IconPigMoney size={22} />,
-    color: 'text-violet-400 border-violet-500/20 bg-violet-500/5', sub: 'Strategi menabung',
-    customPrompt: 'Berikan strategi menabung dan investasi terbaik berdasarkan data keuangan saya.',
+// FinLitGo SDK Config — model instance created once outside component
+const GEMINI_API_KEY = "AIzaSyCsdlQ_tIjcepfmuHiB30kkRC1b2Nt4QWQ";
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const geminiModel = genAI.getGenerativeModel({
+  model: "gemini-2.0-flash",
+  generationConfig: {
+    temperature: 0.7,
+    maxOutputTokens: 2048,
   },
-  {
-    intent: 'free_chat', title: 'Goal Planning', icon: <IconTarget size={22} />,
-    color: 'text-purple-400 border-purple-500/20 bg-purple-500/5', sub: 'Rencana tujuan keuangan',
-    customPrompt: 'Bantu saya merencanakan cara mencapai tujuan keuangan lebih cepat berdasarkan data saya.',
-  },
-];
+});
+const MAX_DAILY_LIMIT = 10;
 
-// ─── Fetch & build LEAN financial context from Supabase ───────────────────────
-// Deliberately compact — keeps system prompt ≈ 500-700 tokens (Groq TPM friendly)
-async function fetchFinancialContextText(userId) {
-  if (!userId) return null;
-
-  const [txRes, goalsRes, pocketsRes] = await Promise.all([
-    supabase.from('transactions').select('type,amount,category').eq('user_id', userId),
-    supabase.from('goals').select('name,target,current').eq('user_id', userId),
-    supabase.from('pockets').select('name,balance').eq('user_id', userId),
-  ]);
-
-  const txs     = txRes.data     || [];
-  const goals   = goalsRes.data  || [];
-  const pockets = pocketsRes.data || [];
-
-  const incomes  = txs.filter(t => t.type === 'income');
-  const expenses = txs.filter(t => t.type === 'expense');
-  const totalIn  = incomes.reduce((s, t) => s + Number(t.amount), 0);
-  const totalEx  = expenses.reduce((s, t) => s + Number(t.amount), 0);
-  const balance  = totalIn - totalEx;
-  const savingsRate = totalIn > 0 ? Math.round(((totalIn - totalEx) / totalIn) * 100) : 0;
-
-  const byCategory = (arr) => {
-    const map = {};
-    arr.forEach(t => { map[t.category || 'Lainnya'] = (map[t.category || 'Lainnya'] || 0) + Number(t.amount); });
-    return Object.entries(map).sort((a, b) => b[1] - a[1])
-      .map(([k, v]) => `${k}: Rp${v.toLocaleString('id-ID')}`).join(', ') || 'none';
-  };
-
-  const goalsText = goals.length
-    ? goals.map(g => {
-        const pct = g.target > 0 ? Math.round((g.current / g.target) * 100) : 0;
-        return `${g.name} (${pct}% dari Rp${Number(g.target).toLocaleString('id-ID')})`;
-      }).join('; ')
-    : 'belum ada';
-
-  const pocketsText = pockets.length
-    ? pockets.map(p => `${p.name}: Rp${Number(p.balance).toLocaleString('id-ID')}`).join('; ')
-    : 'belum ada';
-
-  return `RINGKASAN KEUANGAN USER:
-- Saldo Utama: Rp${balance.toLocaleString('id-ID')}
-- Total Pemasukan: Rp${totalIn.toLocaleString('id-ID')}
-- Total Pengeluaran: Rp${totalEx.toLocaleString('id-ID')}
-- Tingkat Tabungan: ${savingsRate}%
-- Total Transaksi: ${txs.length}
-SUMBER PEMASUKAN: ${byCategory(incomes)}
-RINCIAN PENGELUARAN: ${byCategory(expenses)}
-TUJUAN KEUANGAN: ${goalsText}
-POCKETS: ${pocketsText}`;
-}
-
-// ─── Build system prompt (compact — target ≈ 600 tokens) ─────────────────────
-function buildSystemPrompt(financialContext) {
-  const data = financialContext || 'Data keuangan belum tersedia.';
-  return `Kamu adalah FinLitGo AI, asisten keuangan cerdas yang tertanam di dalam dashboard FinLitGo. Kamu hanya menganalisis data keuangan yang diberikan di bawah ini. Jangan mengarang angka atau data yang tidak ada.
-
-DATA KEUANGAN USER (satu-satunya sumber kebenaran):
-${data}
-
-ATURAN WAJIB:
-1. Hanya gunakan data di atas. Jika data tidak ada, katakan: "Data untuk [X] tidak tersedia di dashboard kamu saat ini."
-2. Jika pesan user mengandung tag [INTENT: analyze_cashflow] → fokus pada arus kas, pemasukan vs pengeluaran, posisi bersih.
-3. [INTENT: analyze_expenses] → fokus kategori pengeluaran terbesar, anomali.
-4. [INTENT: analyze_revenue] → fokus sumber pemasukan, pertumbuhan, celah.
-5. [INTENT: analyze_budget] → evaluasi budget vs aktual pakai aturan 50/30/20.
-6. [INTENT: free_chat] → jawab bebas berdasarkan konteks keuangan.
-7. Respons: 3–5 poin singkat. Selalu akhiri dengan SATU rekomendasi aksi.
-8. Bahasa: ikuti bahasa user (Indonesia atau Inggris). Jangan gunakan tabel kecuali diminta.
-9. Jangan ulangi JSON/data mentah ke user. Jangan bilang "sebagai AI...".`;
-}
-
-// ─── Markdown → JSX renderer ─────────────────────────────────────────────────
-function renderText(text) {
-  return text.split('\n').map((line, i) => {
-    if (!line.trim()) return <span key={i} className="block mb-1" />;
-    const parts = line.split(/(\*\*.*?\*\*)/g);
-    return (
-      <span key={i} className="block mb-1.5 leading-relaxed">
-        {parts.map((part, j) =>
-          part.startsWith('**') && part.endsWith('**')
-            ? <strong key={j} className="text-white font-semibold">{part.slice(2, -2)}</strong>
-            : part
-        )}
-      </span>
-    );
-  });
-}
-
-// ─── Main component ───────────────────────────────────────────────────────────
 export default function AIAssistPage() {
   const { user } = useAuth();
-  const userId   = user?.id || null;
-  const [searchParams] = useSearchParams();
+  const userId = user?.id || 'guest';
 
-  const chatKey  = `finlitgo_ai_chat_${userId}`;
+  // Per-user keys
+  const chatKey = `finlitgo_ai_chat_${userId}`;
   const usageKey = `finlitgo_ai_usage_${userId}`;
 
-  const [prompt, setPrompt]       = useState('');
-  const [isTyping, setIsTyping]   = useState(false);
-  const [dataLoading, setDataLoading] = useState(false);
-  const [financialContext, setFinancialContext] = useState(null);
-  const [messages, setMessages]   = useState(() => {
-    if (!userId) return [];
-    try { const s = localStorage.getItem(`finlitgo_ai_chat_${userId}`); return s ? JSON.parse(s) || [] : []; }
-    catch { return []; }
+  const [prompt, setPrompt] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [messages, setMessages] = useState(() => {
+    const savedMsg = localStorage.getItem(chatKey);
+    if (savedMsg) {
+      try {
+        const parsed = JSON.parse(savedMsg);
+        return Array.isArray(parsed) ? parsed : (parsed.data || []);
+      } catch (_) {}
+    }
+    return [];
   });
   const [usageCount, setUsageCount] = useState(0);
 
-  // Groq needs full message history sent each request
-  const chatHistoryRef   = useRef([]); // [{role, content}]
+  // Refs
   const chatContainerRef = useRef(null);
-  const isAtBottomRef    = useRef(true);
-  const autoTriggeredRef = useRef(false);
-  const financialCtxRef  = useRef(null); // sync ref for handlers
+  const chatSessionRef = useRef(null);
+  const isAtBottomRef = useRef(true);
 
-  // ── Load Supabase financial data ──────────────────────────────────────────
-  useEffect(() => {
-    if (!userId) return;
-    setDataLoading(true);
-    fetchFinancialContextText(userId)
-      .then(ctx => { setFinancialContext(ctx); financialCtxRef.current = ctx; })
-      .catch(err => console.error('AI: data fetch failed', err))
-      .finally(() => setDataLoading(false));
+  // ───────────────────────────────────────────
+  // Build rich system instruction with user's cashflow data
+  // ───────────────────────────────────────────
+  const buildSystemInstruction = useCallback(() => {
+    const txs = JSON.parse(localStorage.getItem(`finlitgo_transactions_${userId}`) || '[]');
+    const goals = JSON.parse(localStorage.getItem(`finlitgo_goals_${userId}`) || '[]');
+    const pockets = JSON.parse(localStorage.getItem(`finlitgo_pockets_${userId}`) || '[]');
+
+    const incomes = txs.filter(t => t.type === 'income');
+    const expenses = txs.filter(t => t.type === 'expense');
+    const totalIncome = incomes.reduce((s, t) => s + t.amount, 0);
+    const totalExpense = expenses.reduce((s, t) => s + t.amount, 0);
+    const mainBalance = totalIncome - totalExpense;
+
+    // Category breakdown
+    const expenseByCategory = {};
+    expenses.forEach(t => {
+      const cat = t.category || 'Lainnya';
+      expenseByCategory[cat] = (expenseByCategory[cat] || 0) + t.amount;
+    });
+    const categoryBreakdown = Object.entries(expenseByCategory)
+      .sort((a, b) => b[1] - a[1])
+      .map(([cat, amt]) => `${cat}: Rp${amt.toLocaleString('id-ID')}`)
+      .join(', ') || 'none';
+
+    const incomeByCategory = {};
+    incomes.forEach(t => {
+      const cat = t.category || 'Lainnya';
+      incomeByCategory[cat] = (incomeByCategory[cat] || 0) + t.amount;
+    });
+    const incomeBreakdown = Object.entries(incomeByCategory)
+      .sort((a, b) => b[1] - a[1])
+      .map(([cat, amt]) => `${cat}: Rp${amt.toLocaleString('id-ID')}`)
+      .join(', ') || 'none';
+
+    const goalsText = goals.length > 0
+      ? goals.map(g => `${g.name} (Rp${g.current.toLocaleString('id-ID')}/${g.target.toLocaleString('id-ID')} — ${Math.round((g.current / g.target) * 100)}%)`).join('; ')
+      : 'belum ada goals';
+    const pocketsText = pockets.length > 0
+      ? pockets.map(p => `${p.name}: Rp${p.balance.toLocaleString('id-ID')}`).join('; ')
+      : 'belum ada pockets';
+
+    const savingsRate = totalIncome > 0 ? Math.round(((totalIncome - totalExpense) / totalIncome) * 100) : 0;
+
+    return `You are FinLitGo AI, a smart and friendly Indonesian financial literacy assistant for Gen Z users. You give concise, actionable, and encouraging financial advice in a casual tone.
+
+CRITICAL: Always respond in the SAME LANGUAGE the user uses. If they write in Indonesian, respond in Indonesian. If English, respond in English.
+
+USER'S FINANCIAL DATA:
+- Main Balance: Rp${mainBalance.toLocaleString('id-ID')}
+- Total Income: Rp${totalIncome.toLocaleString('id-ID')} (${incomeBreakdown})
+- Total Expenses: Rp${totalExpense.toLocaleString('id-ID')} (${categoryBreakdown})
+- Savings Rate: ${savingsRate}%
+- Pockets: ${pocketsText}
+- Financial Goals: ${goalsText}
+- Total Transactions: ${txs.length}
+
+GUIDELINES:
+- When analyzing cashflow, point out spending patterns, suggest improvements
+- For budgeting advice, reference the 50/30/20 rule adapted to their situation
+- If savings rate < 20%, gently encourage more saving
+- If they have goals, suggest strategies to reach them faster
+- Be concise — keep responses under 300 words unless they ask for detail
+- Use **bold** for key numbers and important tips
+- Use emojis sparingly to keep it friendly 💰`;
   }, [userId]);
 
-  // ── Daily usage limit ─────────────────────────────────────────────────────
+  const startNewChatSession = useCallback(() => {
+    chatSessionRef.current = geminiModel.startChat({
+      history: [],
+      systemInstruction: buildSystemInstruction(),
+    });
+  }, [buildSystemInstruction]);
+
+  // Start new session on mount or user change
+  useEffect(() => {
+    startNewChatSession();
+  }, [startNewChatSession]);
+
+  // ───────────────────────────────────────────
+  // Daily limit check (per-user)
+  // ───────────────────────────────────────────
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
-    try {
-      const saved = localStorage.getItem(usageKey);
-      if (saved) {
-        const p = JSON.parse(saved);
-        setUsageCount(p.date === today ? p.count : 0);
-        if (p.date !== today) localStorage.setItem(usageKey, JSON.stringify({ date: today, count: 0 }));
-      } else {
-        localStorage.setItem(usageKey, JSON.stringify({ date: today, count: 0 }));
-      }
-    } catch { /* noop */ }
+    const savedData = localStorage.getItem(usageKey);
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        if (parsed.date === today) {
+          setUsageCount(parsed.count);
+        } else {
+          localStorage.setItem(usageKey, JSON.stringify({ date: today, count: 0 }));
+          setUsageCount(0);
+        }
+      } catch (_) {}
+    } else {
+      localStorage.setItem(usageKey, JSON.stringify({ date: today, count: 0 }));
+    }
   }, [usageKey]);
 
   const incrementUsage = () => {
     const today = new Date().toISOString().split('T')[0];
-    const next  = usageCount + 1;
-    setUsageCount(next);
-    localStorage.setItem(usageKey, JSON.stringify({ date: today, count: next }));
+    const newCount = usageCount + 1;
+    setUsageCount(newCount);
+    localStorage.setItem(usageKey, JSON.stringify({ date: today, count: newCount }));
   };
 
-  // ── Persist display messages ──────────────────────────────────────────────
+  // Sync messages to per-user localStorage
   useEffect(() => {
-    if (userId) localStorage.setItem(chatKey, JSON.stringify(messages));
-  }, [messages, chatKey, userId]);
+    localStorage.setItem(chatKey, JSON.stringify(messages));
+  }, [messages, chatKey]);
 
+  // Reload messages when user changes
   useEffect(() => {
-    try {
-      const s = localStorage.getItem(chatKey);
-      setMessages(s ? JSON.parse(s) || [] : []);
-    } catch { setMessages([]); }
-    chatHistoryRef.current = [];
+    const savedMsg = localStorage.getItem(chatKey);
+    if (savedMsg) {
+      try {
+        const parsed = JSON.parse(savedMsg);
+        setMessages(Array.isArray(parsed) ? parsed : []);
+      } catch (_) {
+        setMessages([]);
+      }
+    } else {
+      setMessages([]);
+    }
   }, [chatKey]);
 
-  // ── Scroll ────────────────────────────────────────────────────────────────
+  // ───────────────────────────────────────────
+  // Smooth scroll
+  // ───────────────────────────────────────────
   const scrollToBottom = useCallback((force = false) => {
-    const el = chatContainerRef.current;
-    if (!el) return;
-    if (force || isAtBottomRef.current) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    const container = chatContainerRef.current;
+    if (!container) return;
+    if (force || isAtBottomRef.current) {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    }
   }, []);
 
   const handleScroll = useCallback(() => {
-    const el = chatContainerRef.current;
-    if (!el) return;
-    isAtBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    const container = chatContainerRef.current;
+    if (!container) return;
+    const threshold = 80;
+    isAtBottomRef.current =
+      container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
   }, []);
 
-  useEffect(() => { scrollToBottom(); }, [messages.length, scrollToBottom]);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages.length, scrollToBottom]);
 
-  // ── Core send via Groq streaming ──────────────────────────────────────────
-  const handleSend = useCallback(async (overridePrompt = null, intentTag = null) => {
-    const raw = overridePrompt || prompt;
-    if (!raw.trim() || isTyping) return;
-    if (usageCount >= MAX_DAILY_LIMIT) { alert('Daily limit 10 chat sudah habis. Coba lagi besok.'); return; }
-    if (!GROQ_API_KEY) { alert('Groq API key belum dikonfigurasi.'); return; }
-
-    const wireText    = intentTag ? `[INTENT: ${intentTag}] ${raw}` : raw;
-    const displayText = intentTag ? (INTENT_LABELS[intentTag] || raw) : raw;
+  // ───────────────────────────────────────────
+  // Send message handler
+  // ───────────────────────────────────────────
+  const handleSend = async (overridePrompt = null) => {
+    const textToSend = overridePrompt || prompt;
+    if (!textToSend.trim() || isTyping) return;
+    if (usageCount >= MAX_DAILY_LIMIT) {
+      alert("You have reached your daily limit of 10 free AI queries.");
+      return;
+    }
 
     setPrompt('');
     setIsTyping(true);
     isAtBottomRef.current = true;
 
-    // Add user to display + history
-    setMessages(prev => [...prev, { role: 'user', content: displayText }]);
-    chatHistoryRef.current.push({ role: 'user', content: wireText });
+    setMessages(prev => [...prev, { role: 'user', content: textToSend }]);
 
-    // Prepare empty assistant bubble
-    setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
-    setIsTyping(false);
-    requestAnimationFrame(() => scrollToBottom(true));
+    // Ensure session is active
+    if (!chatSessionRef.current) startNewChatSession();
 
     try {
-      const systemPrompt = buildSystemPrompt(financialCtxRef.current);
+      // Pre-add empty assistant message for streaming
+      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+      setIsTyping(false);
 
-      const res = await fetch(GROQ_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type':  'application/json',
-          'Authorization': `Bearer ${GROQ_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model:       GROQ_MODEL,
-          messages:    [{ role: 'system', content: systemPrompt }, ...chatHistoryRef.current],
-          stream:      true,
-          temperature: 0.65,
-          max_tokens:  MAX_TOKENS,
-        }),
-      });
+      requestAnimationFrame(() => scrollToBottom(true));
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        const msg = errData?.error?.message || `Groq error ${res.status}`;
-        throw new Error(msg);
-      }
+      const result = await chatSessionRef.current.sendMessageStream(textToSend);
 
-      const reader  = res.body.getReader();
-      const decoder = new TextDecoder();
-      let fullText  = '';
-      let lastScroll = 0;
+      let fullText = '';
+      let lastScrollTime = 0;
 
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      for await (const chunk of result.stream) {
+        fullText += chunk.text();
+        setMessages(prev => {
+          const updated = [...prev];
+          updated[updated.length - 1] = { ...updated[updated.length - 1], content: fullText };
+          return updated;
+        });
 
-        const lines = decoder.decode(value).split('\n');
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
-          const data = line.slice(6).trim();
-          if (data === '[DONE]') break;
-          try {
-            const token = JSON.parse(data)?.choices?.[0]?.delta?.content || '';
-            fullText += token;
-            setMessages(prev => {
-              const updated = [...prev];
-              updated[updated.length - 1] = { ...updated[updated.length - 1], content: fullText };
-              return updated;
-            });
-            const now = Date.now();
-            if (now - lastScroll > 100) { lastScroll = now; requestAnimationFrame(() => scrollToBottom()); }
-          } catch { /* partial chunk, skip */ }
+        const now = Date.now();
+        if (now - lastScrollTime > 120) {
+          lastScrollTime = now;
+          requestAnimationFrame(() => scrollToBottom());
         }
       }
 
-      // Add assistant response to history
-      chatHistoryRef.current.push({ role: 'assistant', content: fullText });
       requestAnimationFrame(() => scrollToBottom(true));
       incrementUsage();
-
-    } catch (err) {
-      console.error('Groq error:', err);
-      const errMsg = err.message?.includes('rate_limit') || err.message?.includes('429')
-        ? 'Request terlalu banyak dalam 1 menit. Tunggu sebentar ya ⏳'
-        : 'Maaf, ada gangguan koneksi. Coba lagi sebentar ya 🙏';
+    } catch (error) {
+      console.error("AI Error:", error);
+      startNewChatSession();
       setMessages(prev => {
         const updated = [...prev];
-        if (updated.length > 0 && updated[updated.length - 1].content === '') updated.pop();
-        return [...updated, { role: 'assistant', content: errMsg }];
+        if (updated.length > 0 && updated[updated.length - 1].content === '') {
+          updated.pop();
+        }
+        return [...updated, { role: 'assistant', content: "Sorry, I'm having trouble connecting. Please try again." }];
       });
-      chatHistoryRef.current.pop(); // remove failed user message from history
     } finally {
       setIsTyping(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prompt, isTyping, usageCount, scrollToBottom]);
-
-  // ── URL auto-trigger (from Financial page shortcuts) ──────────────────────
-  useEffect(() => {
-    const intentParam = searchParams.get('intent');
-    if (!intentParam || autoTriggeredRef.current || dataLoading) return;
-    if (!financialContext) return;
-
-    autoTriggeredRef.current = true;
-
-    const autoPrompts = {
-      analyze_cashflow: 'Analisis posisi kas saya: pemasukan vs pengeluaran, tren, dan rekomendasi.',
-      analyze_expenses:  'Analisis pengeluaran saya per kategori, temukan yang terbesar dan berikan saran.',
-      analyze_revenue:   'Analisis sumber pendapatan saya dan berikan saran optimasi.',
-      analyze_budget:    'Evaluasi budget saya dengan aturan 50/30/20 dan tunjukkan over/under-spending.',
-    };
-
-    const p = autoPrompts[intentParam];
-    if (p) setTimeout(() => handleSend(p, intentParam), 500);
-  }, [searchParams, dataLoading, financialContext, handleSend]);
+  };
 
   const handleClearChat = () => {
     setMessages([]);
-    chatHistoryRef.current = [];
-    autoTriggeredRef.current = false;
-    if (userId) localStorage.removeItem(chatKey);
+    localStorage.removeItem(chatKey);
+    startNewChatSession();
   };
 
-  const limitReached = usageCount >= MAX_DAILY_LIMIT;
+  // ───────────────────────────────────────────
+  // Markdown formatter
+  // ───────────────────────────────────────────
+  const formatText = (text) => {
+    return text.split('\n').map((line, i) => {
+      const parts = line.split(/(\*\*.*?\*\*)/g);
+      return (
+        <span key={i} className="block mb-2">
+          {parts.map((part, pidx) => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+              return <strong key={pidx} className="text-white font-bold">{part.slice(2, -2)}</strong>;
+            }
+            return part;
+          })}
+        </span>
+      );
+    });
+  };
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // Finance-relevant quick action categories
+  const categories = [
+    { title: 'Analyze Cashflow', icon: <IconChartBar size={20} />, color: 'bg-green-500/10 text-green-500', prompt: 'Analyze my current cashflow. Look at my income vs spending breakdown, identify my biggest expense categories, and give me actionable tips to improve my financial health.' },
+    { title: 'Budgeting Tips', icon: <IconWallet size={20} />, color: 'bg-blue-500/10 text-blue-500', prompt: 'Based on my current financial data, help me create a practical monthly budget using the 50/30/20 rule. Give me specific suggestions for my situation.' },
+    { title: 'Saving Strategy', icon: <IconPigMoney size={20} />, color: 'bg-violet-500/10 text-violet-400', prompt: 'Suggest the best saving and investing strategies for my current financial situation. Consider my income, expenses, goals, and pockets.' },
+    { title: 'Goal Planning', icon: <IconTarget size={20} />, color: 'bg-purple-500/10 text-purple-500', prompt: 'Help me plan how to reach my financial goals faster. Calculate how long it will take at my current savings rate and suggest ways to accelerate.' }
+  ];
+
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] max-w-5xl mx-auto py-8 px-4">
-
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6 px-1">
+      <div className="flex justify-between items-center mb-6 px-4">
         <div>
           <h2 className="text-4xl font-bold font-orbitron uppercase tracking-widest text-white">FinLitGo AI</h2>
-          <p className="text-zinc-400 mt-1 text-sm">Your personal financial intelligence assistant.</p>
+          <p className="text-zinc-400 mt-1">Your personal financial intelligence assistant.</p>
         </div>
         <div className="flex items-center gap-3">
-          {/* Data sync status */}
-          {dataLoading ? (
-            <div className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] border border-zinc-800 rounded-xl text-xs text-zinc-500">
-              <IconLoader2 size={14} className="animate-spin" /><span>Loading data...</span>
-            </div>
-          ) : financialContext ? (
-            <div className="flex items-center gap-2 px-3 py-2 bg-green-500/10 border border-green-500/20 rounded-xl text-xs text-green-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /><span>Data synced</span>
-            </div>
-          ) : null}
-
-          {/* Daily counter */}
           <div className="px-4 py-2 bg-[#1A1A1A] border border-zinc-800 rounded-xl text-sm font-mono">
-            <span className="text-zinc-400">Limit: </span>
-            <span className={limitReached ? 'text-red-400 font-bold' : 'text-violet-400 font-bold'}>
-              {usageCount}/{MAX_DAILY_LIMIT}
+            <span className="text-zinc-400">Daily limit: </span>
+            <span className={usageCount >= MAX_DAILY_LIMIT ? 'text-red-400 font-bold' : 'text-violet-400 font-bold'}>
+              {usageCount} / {MAX_DAILY_LIMIT}
             </span>
           </div>
-
-          <button onClick={handleClearChat} className="p-2.5 text-zinc-500 hover:text-red-400 hover:bg-zinc-900 rounded-xl transition-colors border border-zinc-800" title="Clear Chat">
-            <IconTrash size={18} />
+          <button
+            onClick={handleClearChat}
+            className="p-2 text-zinc-500 hover:text-red-400 hover:bg-zinc-900 rounded-lg transition-colors"
+            title="Clear Chat"
+          >
+            <IconTrash size={20} />
           </button>
         </div>
       </div>
 
-      {/* Empty state — quick-action grid */}
       {messages.length === 0 ? (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          className="flex-1 flex flex-col items-center justify-center mb-6 px-2">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-400 flex items-center justify-center mb-5 shadow-[0_0_40px_rgba(124,58,237,0.35)]">
-            <IconRobot size={40} className="text-white" />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex-1 flex flex-col items-center justify-center mb-6"
+        >
+          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-violet-600 to-purple-400 flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(124,58,237,0.3)]">
+            <IconRobot size={48} className="text-white" />
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2">
-            Halo, {user?.user_metadata?.full_name?.split(' ')[0] || 'Learner'} 👋
-          </h3>
-          <p className="text-zinc-400 text-center max-w-md mb-10 text-sm leading-relaxed">
-            Saya bisa menganalisis cashflow, pengeluaran, budgeting, dan membantu merencanakan tujuan keuanganmu — semua berdasarkan data real dari dashboard kamu.
+          <h3 className="text-2xl font-bold text-white mb-2">Hello, {user?.user_metadata?.full_name || 'Learner'}</h3>
+          <p className="text-zinc-400 text-center max-w-md mb-10">
+            I can analyze your cashflow, give budgeting tips, and help you plan your financial goals. Try one of the quick actions below!
           </p>
 
-          {!userId ? (
-            <p className="text-sm text-zinc-500 border border-zinc-800 rounded-xl px-4 py-3">Login dulu untuk pakai AI 🔒</p>
-          ) : dataLoading ? (
-            <div className="flex items-center gap-2 text-zinc-500 text-sm">
-              <IconLoader2 size={16} className="animate-spin" /> Memuat data keuangan...
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 w-full max-w-3xl">
-              {CATEGORIES.map((cat, i) => (
-                <motion.button key={i}
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
-                  onClick={() => handleSend(cat.customPrompt || cat.title, cat.intent)}
-                  disabled={limitReached}
-                  className={`flex flex-col items-start text-left p-5 border rounded-2xl transition-all group hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed ${cat.color}`}
-                >
-                  <div className={`p-3 rounded-xl mb-3 border ${cat.color} group-hover:scale-110 transition-transform`}>
-                    {cat.icon}
-                  </div>
-                  <span className="font-semibold text-sm text-white group-hover:text-violet-300 transition-colors">{cat.title}</span>
-                  <span className="text-[11px] text-zinc-500 mt-0.5">{cat.sub}</span>
-                </motion.button>
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4 w-full">
+            {categories.map((cat, i) => (
+              <button
+                key={i}
+                onClick={() => handleSend(cat.prompt)}
+                className="flex flex-col items-center text-center p-6 bg-[#1A1A1A] border border-zinc-800 hover:border-violet-500/50 hover:bg-zinc-900 rounded-2xl transition-all group"
+              >
+                <div className={`p-4 rounded-2xl mb-4 ${cat.color} group-hover:scale-110 transition-transform`}>
+                  {cat.icon}
+                </div>
+                <span className="font-bold text-sm text-white group-hover:text-violet-400 transition-colors">{cat.title}</span>
+              </button>
+            ))}
+          </div>
         </motion.div>
       ) : (
-        /* Chat thread */
         <div className="flex-1 bg-[#1A1A1A] border border-zinc-800 rounded-3xl overflow-hidden mb-6 flex flex-col relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-violet-900/5 to-transparent pointer-events-none rounded-3xl" />
-          <div ref={chatContainerRef} onScroll={handleScroll}
-            className="flex-1 overflow-y-auto p-6 space-y-5"
-            style={{ scrollBehavior: 'smooth', overscrollBehavior: 'contain' }}>
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-900/5 to-transparent pointer-events-none" />
+
+          <div
+            ref={chatContainerRef}
+            onScroll={handleScroll}
+            className="flex-1 overflow-y-auto p-6 space-y-6"
+            style={{ scrollBehavior: 'smooth', overscrollBehavior: 'contain' }}
+          >
             <AnimatePresence initial={false}>
               {messages.map((msg, idx) => (
-                <motion.div key={idx}
-                  initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.18 }}
-                  className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <div className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center shadow-md ${
-                    msg.role === 'user' ? 'bg-zinc-800' : 'bg-gradient-to-br from-violet-600 to-purple-400'}`}>
-                    {msg.role === 'user' ? <IconUser size={18} className="text-zinc-400" /> : <IconRobot size={20} className="text-white" />}
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                >
+                  <div className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg ${
+                    msg.role === 'user' ? 'bg-zinc-800' : 'bg-gradient-to-br from-violet-600 to-purple-400'
+                  }`}>
+                    {msg.role === 'user' ? <IconUser size={20} className="text-zinc-400" /> : <IconRobot size={24} className="text-white" />}
                   </div>
-                  <div className={`max-w-[78%] rounded-2xl px-5 py-4 text-sm ${
+                  <div className={`max-w-[80%] rounded-2xl p-5 ${
                     msg.role === 'user'
-                      ? 'bg-zinc-800 text-white rounded-tr-sm'
-                      : 'bg-zinc-900/80 border border-zinc-800/60 text-zinc-300 rounded-tl-sm'}`}>
-                    {msg.role === 'user'
-                      ? msg.content
-                      : msg.content
-                        ? renderText(msg.content)
-                        : <span className="flex gap-1.5 items-center py-1">
-                            {[0, 150, 300].map(d => <span key={d} className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: `${d}ms` }} />)}
-                          </span>
-                    }
+                      ? 'bg-zinc-800 text-white rounded-tr-none'
+                      : 'bg-zinc-900/80 border border-zinc-800/50 text-zinc-300 rounded-tl-none leading-relaxed'
+                  }`}>
+                    {msg.role === 'user' ? msg.content : formatText(msg.content)}
                   </div>
                 </motion.div>
               ))}
 
               {isTyping && (
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex gap-3">
-                  <div className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-violet-600 to-purple-400 shadow-md">
-                    <IconRobot size={20} className="text-white" />
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex gap-4 flex-row"
+                >
+                  <div className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-violet-600 to-purple-400">
+                    <IconRobot size={24} className="text-white" />
                   </div>
-                  <div className="bg-zinc-900/80 border border-zinc-800/60 rounded-2xl rounded-tl-sm px-5 py-4 flex items-center gap-1.5">
-                    {[0, 150, 300].map(d => <div key={d} className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: `${d}ms` }} />)}
+                  <div className="bg-zinc-900/80 border border-zinc-800/50 rounded-2xl rounded-tl-none p-5 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </motion.div>
               )}
@@ -467,38 +399,40 @@ export default function AIAssistPage() {
         </div>
       )}
 
-      {/* Input bar */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        className="w-full bg-[#1A1A1A] border-2 border-zinc-800 focus-within:border-violet-500/40 transition-all rounded-3xl p-2 shadow-2xl shrink-0">
+      {/* Input Area */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full bg-[#1A1A1A] border-2 border-zinc-800 focus-within:border-violet-500/50 transition-all rounded-3xl p-2 shadow-2xl relative shrink-0"
+      >
         <textarea
           value={prompt}
-          onChange={e => setPrompt(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-          placeholder={
-            !userId ? 'Login untuk menggunakan AI...'
-            : limitReached ? 'Daily limit 10 sudah habis. Coba lagi besok.'
-            : dataLoading ? 'Memuat data keuangan...'
-            : 'Tanya tentang keuanganmu... (Enter kirim · Shift+Enter baris baru)'
-          }
-          disabled={limitReached || !userId || dataLoading}
-          rows={2}
-          className="w-full bg-transparent text-white placeholder-zinc-600 p-4 pb-2 focus:outline-none resize-none font-sans text-sm leading-relaxed"
+          onChange={(e) => setPrompt(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
+          placeholder={usageCount >= MAX_DAILY_LIMIT ? "Daily limit reached. Try again tomorrow." : "Ask me anything about your finances, budgeting, or investments..."}
+          disabled={usageCount >= MAX_DAILY_LIMIT}
+          className="w-full h-20 bg-transparent text-white placeholder-zinc-500 p-4 pt-4 focus:outline-none resize-none font-sans"
         />
-        <div className="flex items-center justify-between px-4 pb-3 pt-1">
-          <div className="flex items-center gap-2">
-            <IconSparkles size={14} className="text-violet-400" />
-            <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
-              Powered by Groq · Llama 3.3 · Data from Supabase
-            </span>
-          </div>
+        <div className="absolute left-6 bottom-4 flex items-center gap-2">
+          <IconSparkles size={16} className="text-violet-400" />
+          <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Powered by Gemini</span>
+        </div>
+        <div className="absolute right-4 bottom-4 flex items-center gap-2">
           <button
             onClick={() => handleSend()}
-            disabled={!prompt.trim() || isTyping || limitReached || !userId || dataLoading}
-            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
-              prompt.trim() && !isTyping && !limitReached && userId && !dataLoading
-                ? 'bg-gradient-to-r from-violet-600 to-purple-400 text-white shadow-[0_0_15px_rgba(124,58,237,0.3)] hover:scale-105 cursor-pointer'
-                : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'}`}>
-            <IconSend size={16} />
+            disabled={!prompt.trim() || isTyping || usageCount >= MAX_DAILY_LIMIT}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+              prompt.trim() && !isTyping && usageCount < MAX_DAILY_LIMIT
+                ? 'bg-gradient-to-r from-violet-600 to-purple-400 text-white cursor-pointer shadow-[0_0_15px_rgba(124,58,237,0.3)] hover:scale-105'
+                : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+            }`}
+          >
+            <IconSend size={18} />
           </button>
         </div>
       </motion.div>

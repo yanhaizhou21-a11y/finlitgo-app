@@ -1,6 +1,6 @@
-import { getSupabaseClient } from '../utils/supabaseClient.js';
+const { getSupabaseClient } = require('../utils/supabaseClient');
 
-export const getAllBlogs = async (req, res) => {
+exports.getAllBlogs = async (req, res) => {
   try {
     const supabase = getSupabaseClient(req);
     const { data: blogs, error } = await supabase
@@ -16,11 +16,11 @@ export const getAllBlogs = async (req, res) => {
   }
 };
 
-export const getBlogById = async (req, res) => {
+exports.getBlogById = async (req, res) => {
   try {
     const supabase = getSupabaseClient(req);
     const { id } = req.params;
-
+    
     const { data: blog, error } = await supabase
       .from('blogs')
       .select('*')
@@ -31,17 +31,17 @@ export const getBlogById = async (req, res) => {
     if (!blog) {
       return res.status(404).json({ success: false, message: 'Blog post not found' });
     }
-
+    
     res.json({ success: true, data: blog });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const createBlog = async (req, res) => {
+exports.createBlog = async (req, res) => {
   try {
     const supabase = getSupabaseClient(req);
-
+    
     const newBlog = {
         title: req.body.title,
         excerpt: req.body.excerpt,
@@ -64,11 +64,11 @@ export const createBlog = async (req, res) => {
   }
 };
 
-export const updateBlog = async (req, res) => {
+exports.updateBlog = async (req, res) => {
   try {
     const supabase = getSupabaseClient(req);
     const { id } = req.params;
-
+    
     const updatedBlog = {
         title: req.body.title,
         excerpt: req.body.excerpt,
@@ -92,7 +92,7 @@ export const updateBlog = async (req, res) => {
   }
 };
 
-export const deleteBlog = async (req, res) => {
+exports.deleteBlog = async (req, res) => {
   try {
     const supabase = getSupabaseClient(req);
     const { id } = req.params;
@@ -109,5 +109,4 @@ export const deleteBlog = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
 

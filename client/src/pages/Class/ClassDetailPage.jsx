@@ -129,11 +129,7 @@ export default function ClassDetailPage() {
 
       if (user?.id) {
         const done = await fetchClassProgress(user.id, cls.id);
-        const serverCompleted = new Set([...done].map((id) => `chapter-${id}`));
-        setCompleted(prev => {
-          const merged = new Set([...prev, ...serverCompleted]);
-          return merged;
-        });
+        setCompleted(new Set([...done].map((id) => `chapter-${id}`)));
       }
       setLoading(false);
       return;
@@ -224,8 +220,8 @@ export default function ClassDetailPage() {
     },
   }));
 
-  // IMPORTANT: Priority: Supabase levels_data > local static content > fallback dynamic
-  const levels = classData?.parsedLevels || CLASS_LEVELS[moduleId] || dynamicLevels;
+  // IMPORTANT: For pre-built rich content (like Dicoding), prioritize CLASS_LEVELS!
+  const levels = CLASS_LEVELS[moduleId] || dynamicLevels;
 
   const isLevelUnlocked = (lvlId) => {
     // For now, always unlock. You could use levelUnlockKey logic here.
@@ -281,12 +277,8 @@ export default function ClassDetailPage() {
     });
     
     // Sync with backend if logged in
-    if (isDbClass && user?.id && classData?.id) {
-      // Handle both "chapter-1" format and "c1-l1-1" format
-      let chapterId = String(itemId);
-      if (chapterId.startsWith('chapter-')) {
-        chapterId = chapterId.replace('chapter-', '');
-      }
+    if (isDbClass && user?.id && classData?.id && itemId.startsWith('chapter-')) {
+      const chapterId = String(itemId).replace('chapter-', '');
       try {
         await markChapterComplete({ userId: user.id, classId: classData.id, chapterId });
       } catch (error) {

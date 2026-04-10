@@ -4,7 +4,7 @@ export async function fetchClasses() {
   const { data, error } = await supabase
     .from('classes')
     .select('*, class_chapters(*), class_quizzes(*)')
-    .order('id', { ascending: true });
+    .order('created_at', { ascending: false });
   if (error) throw error;
   return data || [];
 }
@@ -16,11 +16,6 @@ export async function fetchClassById(id) {
     .eq('id', id)
     .single();
   if (error) throw error;
-
-  if (data?.levels_data) {
-    data.parsedLevels = typeof data.levels_data === 'string' ? JSON.parse(data.levels_data) : data.levels_data;
-  }
-
   return data;
 }
 
