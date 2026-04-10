@@ -9,25 +9,20 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
-  "dependencies": {
-<<<<<<< HEAD
+   "dependencies": {
     "axios": "^1.13.6",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-router-dom": "^7.13.1"
-=======
+    "react-router-dom": "^7.13.2",
     "@tabler/icons-react": "^3.40.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "motion": "^12.38.0",
     "ogl": "^1.0.11",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
     "react-icons": "^5.6.0",
-    "react-router-dom": "^7.13.2",
     "tailwind-merge": "^3.5.0"
->>>>>>> auth-backend
   },
+  
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "@tailwindcss/vite": "^4.2.2",
