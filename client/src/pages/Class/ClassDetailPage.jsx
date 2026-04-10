@@ -10,6 +10,7 @@ import { recordStudyActivity } from '../../utils/streak';
 import { CLASS_META, CLASS_LEVELS } from '../../data/classContent';
 import { useAuth } from '../../store/AuthContext';
 import { supabase } from '../../services/supabase';
+import { fetchClassById, fetchClassProgress, markChapterComplete, submitQuizResult } from '../../services/classService';
 import QuizEngine from '../../components/Class/QuizEngine';
 import QuizLanding from '../../components/Class/QuizLanding';
 
@@ -48,12 +49,17 @@ function ConfettiParticle({ delay }) {
 
 // ── Main Component ──
 // ── Main Component ──
+function isUuidLike(value) {
+  return typeof value === 'string' && value.includes('-') && value.length >= 32;
+}
+
 export default function ClassDetailPage() {
   const { moduleId } = useParams();
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const [loading, setLoading] = useState(true);
   const [classData, setClassData] = useState(null);
+  const [isDbClass, setIsDbClass] = useState(false);
   
   // Derive userId for per-user progress isolation
   const userId = user?.id || 'guest';
@@ -106,40 +112,29 @@ export default function ClassDetailPage() {
 
   const fetchClassDetail = async () => {
     setLoading(true);
-    
-    // 1. Try fetching from server first
-    if (user) {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const res = await fetch(`http://localhost:5000/api/classes/${moduleId}`, {
-          headers: {
-            'Authorization': `Bearer ${session?.access_token}`
-          }
-        });
-        const json = await res.json();
-        
-        if (json.success && json.data) {
-          const apiData = json.data;
-          setClassData(apiData);
-          
-          // Seed completed items from server
-          if (apiData.completed_chapter_ids) {
-            setCompleted(prev => {
-              const next = new Set(prev);
-              apiData.completed_chapter_ids.forEach(id => next.add(String(id)));
-              // Also add video- prefix to match UI expectations if necessary, 
-              // but it's better to unify IDs. For now, we add both.
-              apiData.completed_chapter_ids.forEach(id => next.add(`video-${id}`));
-              return next;
-            });
-          }
-          
-          setLoading(false);
-          return;
-        }
-      } catch (err) {
-        console.error("Failed to fetch class detail from API:", err);
+    const staticModule = !isUuidLike(moduleId) && Boolean(CLASS_LEVELS[moduleId]);
+    if (staticModule) {
+      setIsDbClass(false);
+      setClassData(null);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const cls = await fetchClassById(moduleId);
+      setIsDbClass(true);
+      const chapters = [...(cls.class_chapters || [])].sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
+      const quizzes = [...(cls.class_quizzes || [])].sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
+      setClassData({ ...cls, chapters, quizzes });
+
+      if (user?.id) {
+        const done = await fetchClassProgress(user.id, cls.id);
+        setCompleted(new Set([...done].map((id) => `chapter-${id}`)));
       }
+      setLoading(false);
+      return;
+    } catch (err) {
+      console.error('Failed to fetch class detail from Supabase:', err);
     }
 
     // 2. Fallback to localStorage/Mock if server fails or guest
@@ -167,6 +162,7 @@ export default function ClassDetailPage() {
       });
       setOpenLevels({ [1]: true });
     }
+    setIsDbClass(false);
     setLoading(false);
   };
 
@@ -196,17 +192,32 @@ export default function ClassDetailPage() {
   // Transform DB chapters to "levels" UI structure for dynamically added classes
   const dynamicLevels = (classData?.chapters || []).map((ch, idx) => ({
     id: ch.id || `ch-${idx}`,
-    title: ch.title || `Chapter ${idx+1}`,
+    title: ch.title || `Chapter ${idx + 1}`,
     items: [
-        { id: `video-${ch.id || idx}`, title: 'Materi Utama', type: 'video', videoId: getYouTubeId(classData?.youtubeUrl || classData?.youtube_url), duration: '10 min', description: classData?.description || '' }
+      {
+        id: `chapter-${ch.id || idx}`,
+        title: ch.title || `Chapter ${idx + 1}`,
+        type: 'lesson',
+        duration: '10 min',
+        content: {
+          heading: ch.bold_header || ch.title || `Chapter ${idx + 1}`,
+          body: String(ch.body_text || '').split('\n').filter(Boolean),
+          quote: ch.caption || '',
+          videoId: ch.has_video ? getYouTubeId(ch.youtube_url) : null,
+        },
+      },
     ],
     finalQuiz: {
-        id: `quiz-${ch.id || idx}`,
-        title: `Quiz: ${ch.title || 'Akhir'}`,
-        questionCount: ch.quizzes?.length || 0,
-        questions: ch.quizzes || [],
-        duration: '5 menit'
-    }
+      id: `quiz-class-${classData?.id || moduleId}`,
+      title: `Quiz: ${classData?.title || 'Akhir'}`,
+      questionCount: (classData?.quizzes || []).length,
+      questions: (classData?.quizzes || []).map((q) => ({
+        question: q.question,
+        options: Array.isArray(q.options) ? q.options : [],
+        correctAnswer: q.correct_answer ?? 0,
+      })),
+      duration: '5 menit',
+    },
   }));
 
   // IMPORTANT: For pre-built rich content (like Dicoding), prioritize CLASS_LEVELS!
@@ -266,25 +277,13 @@ export default function ClassDetailPage() {
     });
     
     // Sync with backend if logged in
-    if (user) {
-        // Handle both simple numeric IDs and prefixed string IDs
-        const chapterId = String(itemId).replace('video-', '');
-        try {
-            const { data: { session } } = await supabase.auth.getSession();
-            await fetch('http://localhost:5000/api/classes/progress', {
-                method: 'POST',
-                headers: { 
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${session?.access_token}`
-                },
-                body: JSON.stringify({ 
-                    chapterId, 
-                    earnedPoints: 10 
-                })
-            });
-        } catch (error) {
-            console.error("Error syncing progress:", error);
-        }
+    if (isDbClass && user?.id && classData?.id && itemId.startsWith('chapter-')) {
+      const chapterId = String(itemId).replace('chapter-', '');
+      try {
+        await markChapterComplete({ userId: user.id, classId: classData.id, chapterId });
+      } catch (error) {
+        console.error("Error syncing progress:", error);
+      }
     }
   };
 
@@ -364,6 +363,15 @@ export default function ClassDetailPage() {
         if (lvlIdx === levels.length - 1) {
           setShowCelebration(true);
         }
+      }
+    }
+
+    if (isDbClass && user?.id && classData?.id && activeQuiz.type === 'final') {
+      try {
+        await submitQuizResult({ userId: user.id, classId: classData.id, score, total });
+        await refreshProfile?.();
+      } catch (error) {
+        console.error('Error submitting quiz result:', error);
       }
     }
 
@@ -655,7 +663,7 @@ export default function ClassDetailPage() {
                   </motion.div>
                 ) : (
                   <button
-                    onClick={() => { markComplete(activeItemId); navigateNext(); }}
+                    onClick={() => { markComplete(activeItemId); goNext(); }}
                     className="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-500 hover:from-violet-500 hover:to-purple-400 text-white rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2"
                   >
                     <IconCheck size={16} /> Tandai Sudah Ditonton & Lanjut
@@ -683,6 +691,7 @@ export default function ClassDetailPage() {
 
                 {activeItem.content.videoId && (
                   <div className="relative w-full pb-[56.25%] rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-700 mb-8 shadow-2xl">
+<<<<<<< HEAD
                     <iframe
                       className="absolute inset-0 w-full h-full"
                       src={`https://www.youtube.com/embed/${activeItem.content.videoId}?rel=0`}
@@ -690,6 +699,9 @@ export default function ClassDetailPage() {
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     />
+=======
+                    <iframe className="absolute inset-0 w-full h-full" src={`https://www.youtube.com/embed/${activeItem.content.videoId}?rel=0`} title={activeItem.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+>>>>>>> 0fae3a19073509d087484f9e518f1e2c95370bf1
                   </div>
                 )}
 
@@ -699,11 +711,15 @@ export default function ClassDetailPage() {
                   ))}
                 </div>
 
+<<<<<<< HEAD
                 {activeItem.content.quote && (
                   <div className="my-10 bg-zinc-900 border-l-4 border-violet-500 p-6 rounded-r-xl">
                     <p className="text-white italic text-base">{activeItem.content.quote}</p>
                   </div>
                 )}
+=======
+                {activeItem.content.quote && <div className="my-10 bg-zinc-900 border-l-4 border-violet-500 p-6 rounded-r-xl"><p className="text-white italic text-base">{activeItem.content.quote}</p></div>}
+>>>>>>> 0fae3a19073509d087484f9e518f1e2c95370bf1
 
                 {completed.has(activeItemId) && (
                   <motion.div initial={{ opacity:0, scale:0.9 }} animate={{ opacity:1, scale:1 }}

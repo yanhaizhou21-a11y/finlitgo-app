@@ -5,7 +5,7 @@ import { useAuth } from '../../store/AuthContext';
 import { supabase } from '../../services/supabase';
 
 export default function SettingsPage() {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [formData, setFormData] = useState({
     fullName: '',
@@ -40,7 +40,7 @@ export default function SettingsPage() {
     allowPersonalization: true,
   });
 
-  // Load profile from Firestore
+  // Load profile from Supabase
   useEffect(() => {
     if (!user) return;
 
@@ -64,8 +64,12 @@ export default function SettingsPage() {
             email: user.email || '',
           });
           if (data.avatar_url) setPhotoURL(data.avatar_url);
-          // Assuming notifications, security, privacy are in JSON columns if you added them, or just skip if they aren't standard 
-          // (For now, we'll keep the UI state as is to prevent crashing)
+          if (data.notifications && typeof data.notifications === 'object') {
+            setNotifications(prev => ({ ...prev, ...data.notifications }));
+          }
+          if (data.privacy && typeof data.privacy === 'object') {
+            setPrivacyData(prev => ({ ...prev, ...data.privacy }));
+          }
         } else {
           setFormData(prev => ({
             ...prev,
@@ -165,18 +169,22 @@ export default function SettingsPage() {
 
     try {
       // Save to Supabase 'users' table
-      await supabase
+      const { error: updateError } = await supabase
         .from('users')
         .update({
           full_name: formData.fullName,
           avatar_url: photoURL
         })
         .eq('id', user.id);
+      if (updateError) throw updateError;
 
       // Update auth profile
-      await supabase.auth.updateUser({
+      const { error: authError } = await supabase.auth.updateUser({
         data: { full_name: formData.fullName, avatar_url: photoURL }
       });
+      if (authError) throw authError;
+
+      await refreshProfile?.();
 
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
@@ -200,14 +208,14 @@ export default function SettingsPage() {
     setError('');
 
     try {
-      await setDoc(
-        doc(db, 'users', user.uid),
-        {
-          notifications: notifications,
-          updatedAt: new Date().toISOString(),
-        },
-        { merge: true }
-      );
+      const { error: notifError } = await supabase
+        .from('users')
+        .update({
+          notifications,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+      if (notifError) throw notifError;
 
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
@@ -313,14 +321,14 @@ export default function SettingsPage() {
     setError('');
 
     try {
-      await setDoc(
-        doc(db, 'users', user.uid),
-        {
+      const { error: privacyError } = await supabase
+        .from('users')
+        .update({
           privacy: privacyData,
-          updatedAt: new Date().toISOString(),
-        },
-        { merge: true }
-      );
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+      if (privacyError) throw privacyError;
 
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);

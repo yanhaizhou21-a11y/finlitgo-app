@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
 import { getCurrentStreak } from '../../utils/streak';
 import { CLASS_META, CLASS_LEVELS } from '../../data/classContent';
+import { fetchClasses as fetchClassesFromDb } from '../../services/classService';
 import {
   IconFlame,
   IconBook2,
@@ -14,18 +15,20 @@ import {
   IconArrowRight,
 } from '@tabler/icons-react';
 
-const STORAGE_KEY = 'finlitgo_classes';
-
-function getInitialClasses() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) return JSON.parse(saved);
+function getStaticClassesFallback() {
   return [
+<<<<<<< HEAD
     { id: 1, title: 'THE FINANCIAL BLUEPRINT', category: 'Foundation', description: 'Dari Mindset, Alokasi, hingga Proteksi. Bangun fondasi keuangan yang mustahil runtuh..', chapters: 12, youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', image: 'https://i.pinimg.com/736x/73/2f/cd/732fcd0132b3818c03c01c1d4fb99589.jpg  x', quizzes: [
       { question: 'What percentage of income should go to Needs in the 50/30/20 rule?', options: ['20%', '30%', '50%', '10%'], correctAnswer: 2 },
       { question: 'Which is considered a "Want"?', options: ['Rent', 'Groceries', 'Dining Out', 'Electricity'], correctAnswer: 2 }
     ]},
     { id: 2, title: 'Investing for Beginners', category: 'Growth', description: 'Start your investment journey with confidence.', chapters: 8, youtubeUrl: 'https://www.youtube.com/watch?v=PHe0bXAIuk0', image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=500&q=80', quizzes: [] },
     { id: 3, title: 'Crypto & Digital Assets', category: 'Advanced', description: 'Understand the world of cryptocurrency and blockchain.', chapters: 10, youtubeUrl: '', image: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=500&q=80', quizzes: [] },
+=======
+    { id: 1, title: 'Money Management Basics', category: 'Foundation', description: 'Learn the fundamentals of managing your money wisely.' },
+    { id: 2, title: 'Investing for Beginners', category: 'Growth', description: 'Start your investment journey with confidence.' },
+    { id: 3, title: 'Crypto & Digital Assets', category: 'Advanced', description: 'Understand the world of cryptocurrency and blockchain.' },
+>>>>>>> 0fae3a19073509d087484f9e518f1e2c95370bf1
   ];
 }
 
@@ -43,18 +46,22 @@ export default function ClassPage() {
     fetchClasses();
   }, []);
 
-  const fetchClasses = () => {
-    const data = getInitialClasses();
-    setClasses(data);
-    setLoading(false);
+  const fetchClasses = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchClassesFromDb();
+      setClasses(data?.length ? data : getStaticClassesFallback());
+    } catch (e) {
+      console.error('Failed to fetch classes:', e);
+      setClasses(getStaticClassesFallback());
+    } finally {
+      setLoading(false);
+    }
   };
 
 
-  // IDs of classes that require login
-  const loginRequiredIds = [1, 2, 3];
-
   const handleClassClick = (course) => {
-    if (loginRequiredIds.includes(course.id) && !user) {
+    if (!user) {
       navigate(`/register?redirect=/class/${course.id}`);
       return;
     }
@@ -179,8 +186,8 @@ export default function ClassPage() {
                 >
                   {/* Image */}
                   <div className="h-48 w-full relative overflow-hidden bg-zinc-900 border-b border-zinc-800">
-                    {course.image ? (
-                      <img src={course.image} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-70 group-hover:opacity-90" />
+                    {image ? (
+                      <img src={image} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-70 group-hover:opacity-90" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-zinc-600">
                         <IconBook2 size={48} />

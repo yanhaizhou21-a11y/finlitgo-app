@@ -54,28 +54,29 @@ const Problems = () => {
             <div
               key={blog.id}
               onClick={() => navigate(`/blog/${blog.id}`)}
-              className="group flex-1 bg-white rounded-2xl overflow-hidden cursor-pointer hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 flex flex-col"
+              className="group flex-1 bg-[#11131d] rounded-2xl overflow-hidden cursor-pointer hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 flex flex-col border border-white/8"
             >
-              <div className="h-52 w-full overflow-hidden relative bg-gray-200">
+              <div className="h-52 w-full overflow-hidden relative bg-[#0d0f16]">
                 <img
                   src={blog.image}
                   alt={blog.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#11131d] via-transparent to-transparent" />
               </div>
 
-              <div className="flex-1 p-5 flex flex-col justify-between">
+              <div className="flex-1 p-5 flex flex-col justify-between bg-gradient-to-b from-[#11131d] to-[#0d0f16]">
                 <div className="space-y-2">
-                  <p className="text-xs text-purple-600 font-bold uppercase tracking-wider">
+                  <p className="text-xs text-violet-300 font-bold uppercase tracking-wider">
                     {blog.category}
                   </p>
-                  <h3 className="text-base lg:text-lg font-bold text-gray-800 line-clamp-3">
+                  <h3 className="text-base lg:text-lg font-bold text-white line-clamp-3">
                     {blog.title}
                   </h3>
                 </div>
                 
                 <div className="pt-4 mt-2">
-                  <span className="text-sm text-purple-600 font-semibold inline-flex items-center gap-1">
+                  <span className="text-sm text-violet-300 font-semibold inline-flex items-center gap-1">
                     Baca selengkapnya →
                   </span>
                 </div>
