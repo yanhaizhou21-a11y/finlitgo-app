@@ -1,97 +1,55 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { IconFlame, IconBook2, IconArticle, IconChevronRight } from '@tabler/icons-react';
-import { getCurrentStreak, getWeeklyStreak } from '../../utils/streak';
+import { IconFlame, IconBook2, IconArticle, IconChevronRight, IconTrophy } from '@tabler/icons-react';
 import { useAuth } from '../../store/AuthContext';
 import { supabase } from '../../services/supabase';
-import { CLASS_META, CLASS_LEVELS } from '../../data/classContent';
-
+import { fetchClasses, fetchUserQuizResults } from '../../services/classService';
 
 export default function OverviewPage() {
   const { user, profile } = useAuth();
   const [myClasses, setMyClasses] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [recentQuizzes, setRecentQuizzes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const streakCount = profile?.streak_count || 0;
   const points = profile?.points || 0;
 
-  // Read real-time progress from localStorage
   const refreshProgress = async () => {
-    const userId = user?.id || 'guest';
-    
-    // 1. Initial local data
-    let localData = [1, 2, 3].map((id) => {
-      const meta = CLASS_META[id];
-      const levels = CLASS_LEVELS[id];
-      const totalItems = levels.reduce((sum, l) => sum + l.items.length, 0);
-      let completedCount = 0;
-      try {
-        const raw = localStorage.getItem(`finlitgo_progress_${userId}_class_${id}`);
-        if (raw) completedCount = JSON.parse(raw).length;
-      } catch {}
-      const progress = Math.min(100, Math.round((completedCount / totalItems) * 100));
-      return { id, title: meta.title, category: meta.category, totalItems, completedCount, progress };
-    });
+    if (!user?.id) {
+      setMyClasses([]);
+      setRecentQuizzes([]);
+      setLoading(false);
+      return;
+    }
 
-    setMyClasses(localData);
+    try {
+      const [classes, quizRows, progressRes] = await Promise.all([
+        fetchClasses(),
+        fetchUserQuizResults(user.id),
+        supabase.from('class_progress').select('class_id, chapter_id').eq('user_id', user.id),
+      ]);
 
-    // 2. Fetch real data from server if logged in
-    if (user) {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const res = await fetch('http://localhost:5000/api/classes', {
-          headers: {
-            'Authorization': `Bearer ${session?.access_token}`
-          }
-        });
-        const json = await res.json();
-        
-        if (json.success && json.data.classes) {
-          const apiClasses = json.data.classes.map(apiClass => {
-            const meta = CLASS_META[apiClass.id] || { 
-              title: apiClass.title, 
-              category: apiClass.category, 
-              description: apiClass.description 
-            };
-            
-            // Take the higher of local vs api for migration
-            const localCourse = localData.find(ld => ld.id === apiClass.id);
-            const apiProgress = apiClass.progress || 0;
-            const localProgress = localCourse?.progress || 0;
-            const finalProgress = Math.min(100, Math.max(apiProgress, localProgress));
-            
-            // Calculate item counts based on final percentage
-            const chaptersCount = apiClass.chapters_count || 1;
-            const finalCompletedCount = Math.min(chaptersCount, Math.round((finalProgress / 100) * chaptersCount));
+      const progressRows = progressRes.error ? [] : (progressRes.data || []);
+      const byClass = new Map();
+      for (const row of progressRows) byClass.set(row.class_id, (byClass.get(row.class_id) || 0) + 1);
 
-            return {
-               ...meta,
-               id: apiClass.id,
-               progress: finalProgress,
-               totalItems: chaptersCount,
-               completedCount: finalCompletedCount
-            };
-          });
-          setMyClasses(apiClasses);
-        }
-      } catch (err) {
-        console.error("Dashboard Sync Error:", err);
-      }
+      const progressCards = (classes || []).slice(0, 3).map((cls) => {
+        const totalItems = (cls.class_chapters || []).length || 1;
+        const completedCount = byClass.get(cls.id) || 0;
+        const progress = Math.min(100, Math.round((completedCount / totalItems) * 100));
+        return { id: cls.id, title: cls.title, category: cls.category, totalItems, completedCount, progress };
+      });
+
+      setMyClasses(progressCards);
+      setRecentQuizzes((quizRows || []).slice(0, 5));
+    } catch (err) {
+      console.error('Overview sync error:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    refreshProgress();
-    const onStorage = (e) => {
-      if (e.key && e.key.startsWith('finlitgo_progress_')) refreshProgress();
-    };
-    window.addEventListener('storage', onStorage);
-    const interval = setInterval(refreshProgress, 10000);
-    return () => {
-      window.removeEventListener('storage', onStorage);
-      clearInterval(interval);
-    };
-  }, [user]);
+  useEffect(() => { refreshProgress(); }, [user?.id]);
 
   const blogHistory = [
     { id: 1, title: 'How to Build an Emergency Fund in 6 Months', readDate: '2026-04-06', timeToRead: '4 min', category: 'Foundation' },
@@ -106,11 +64,20 @@ export default function OverviewPage() {
           <h2 className="text-xl text-zinc-400 font-medium">GOOD MORNING, LEARNER</h2>
           <p className="text-sm text-zinc-500">Track your learning progress and reading history.</p>
         </div>
-        <div className="flex bg-[#1E1E1E] px-4 py-2 rounded-xl items-center gap-3 border border-zinc-800 shadow-lg">
-          <IconFlame size={28} className="text-orange-500 animate-pulse" />
-          <div className="flex flex-col">
-            <span className="text-lg font-bold font-orbitron">{streakCount}</span>
-            <span className="text-[10px] text-zinc-400 uppercase tracking-widest">Day Streak</span>
+        <div className="flex items-center gap-3">
+          <div className="flex bg-[#1E1E1E] px-4 py-2 rounded-xl items-center gap-3 border border-zinc-800 shadow-lg">
+            <IconFlame size={28} className="text-orange-500 animate-pulse" />
+            <div className="flex flex-col">
+              <span className="text-lg font-bold font-orbitron">{streakCount}</span>
+              <span className="text-[10px] text-zinc-400 uppercase tracking-widest">Day Streak</span>
+            </div>
+          </div>
+          <div className="flex bg-[#1E1E1E] px-4 py-2 rounded-xl items-center gap-3 border border-zinc-800 shadow-lg">
+            <IconTrophy size={28} className="text-yellow-400" />
+            <div className="flex flex-col">
+              <span className="text-lg font-bold font-orbitron">{points}</span>
+              <span className="text-[10px] text-zinc-400 uppercase tracking-widest">Points</span>
+            </div>
           </div>
         </div>
       </div>
@@ -206,6 +173,36 @@ export default function OverviewPage() {
             </motion.div>
           ))}
         </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="bg-[#1E1E1E] border border-zinc-800 rounded-2xl p-6"
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-medium text-white flex items-center gap-2">
+            <IconTrophy className="text-yellow-400" /> Recent Quiz Activity
+          </h3>
+        </div>
+        {recentQuizzes.length === 0 ? (
+          <p className="text-sm text-zinc-500 text-center py-4">No quiz attempts yet.</p>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {recentQuizzes.map((q) => (
+              <div key={q.id} className="flex items-center justify-between p-4 bg-zinc-900 border border-zinc-800 rounded-xl">
+                <div>
+                  <p className="text-sm text-white font-medium">{q?.classes?.title || 'Class Quiz'}</p>
+                  <p className="text-xs text-zinc-500 font-mono mt-1">Score: {q.score}/{q.total} • {q.percentage}%</p>
+                </div>
+                <span className={`text-xs font-bold px-2 py-1 rounded-full border ${q.passed ? 'bg-green-500/10 text-green-400 border-green-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'}`}>
+                  {q.passed ? 'PASS' : 'FAIL'}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </motion.div>
 
       {/* Blog Reading History */}

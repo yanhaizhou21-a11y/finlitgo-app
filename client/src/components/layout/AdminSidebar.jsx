@@ -47,7 +47,9 @@ export default function AdminSidebar() {
     navigate('/login');
   };
 
-  const photoURL = profile?.photoUrl || user?.photoURL || `https://i.pravatar.cc/150?u=${user?.email}`;
+  const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email || 'User';
+  const initial = String(displayName).trim().charAt(0).toUpperCase() || 'U';
+  const photoURL = profile?.avatar_url || user?.user_metadata?.avatar_url || '';
 
   return (
     <motion.aside 
@@ -92,8 +94,14 @@ export default function AdminSidebar() {
         </button>
 
         {/* Avatar */}
-        <div className="relative w-10 h-10 rounded-full border-2 border-violet-500/30 overflow-hidden hover:border-violet-400 transition-colors mt-1 group cursor-pointer" onClick={() => navigate('/dashboard/settings')}>
-          <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
+        <div className="relative w-10 h-10 rounded-full border-2 border-violet-500/30 overflow-hidden hover:border-violet-400 transition-colors mt-1 group cursor-pointer bg-zinc-900" onClick={() => navigate('/dashboard/settings')}>
+          {photoURL ? (
+            <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-violet-600 to-purple-400 flex items-center justify-center">
+              <span className="text-xs font-black text-white">{initial}</span>
+            </div>
+          )}
           <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-violet-500 to-purple-400 rounded-full border-2 border-[var(--color-primary-dark)] flex items-center justify-center" title="Admin">
             <span className="text-[6px] font-black text-white">A</span>
           </div>
