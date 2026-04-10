@@ -220,8 +220,8 @@ export default function ClassDetailPage() {
     },
   }));
 
-  // IMPORTANT: For pre-built rich content (like Dicoding), prioritize CLASS_LEVELS!
-  const levels = CLASS_LEVELS[moduleId] || dynamicLevels;
+  // IMPORTANT: Priority: Supabase levels_data > local static content > fallback dynamic
+  const levels = classData?.parsedLevels || CLASS_LEVELS[moduleId] || dynamicLevels;
 
   const isLevelUnlocked = (lvlId) => {
     // For now, always unlock. You could use levelUnlockKey logic here.

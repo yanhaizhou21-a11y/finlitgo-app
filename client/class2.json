@@ -1,0 +1,395 @@
+[
+  {
+    "id": "level-1",
+    "title": "Fondasi Hutang & Psikolgi Fintech",
+    "description": "Pahami kenapa kita berhutang dan bagaimana ekosistem fintech bekerja.",
+    "items": [
+      {
+        "id": "c2-l1-video",
+        "type": "video",
+        "title": "Video: Bahaya Paylater yang Nggak Kamu Sadari",
+        "duration": "10 menit",
+        "videoId": "xDxKg3B1MeU",
+        "description": "Simak penjelasan lengkap tentang cara kerja Paylater, potensi jebakan hutang, dan bagaimana menghindarinya.",
+        "transcript": [
+          {
+            "time": "00:00",
+            "text": "Siapa di sini yang pernah pakai Paylater? Mari kita bongkar sisi gelap Paylater."
+          },
+          {
+            "time": "02:30",
+            "text": "Perusahaan fintech untung dari bunga 2-5% per bulan. Denda harian bisa 1%."
+          },
+          {
+            "time": "05:00",
+            "text": "Paylater menghilangkan \"Pain of Paying\", membuat otak tidak merasa kehilangan uang saat checkout."
+          },
+          {
+            "time": "09:00",
+            "text": "Solusinya: hapus fitur Paylater dan gunakan metode Snowball/Avalanche."
+          }
+        ]
+      },
+      {
+        "id": "c2-l1-1",
+        "type": "lesson",
+        "title": "Apa itu Hutang? (Good vs Bad Debt)",
+        "duration": "8 menit",
+        "content": {
+          "heading": "Hutang: Alat atau Beban?",
+          "body": [
+            "Good Debt: Pinjaman untuk aset produktif (KPR, Modal Usaha).",
+            "Bad Debt: Pinjaman untuk konsumsi/gaya hidup (Paylater nongkrong)."
+          ]
+        }
+      },
+      {
+        "id": "c2-l1-quiz",
+        "type": "in-lesson-quiz",
+        "title": "Quiz Dasar Hutang",
+        "questions": [
+          {
+            "question": "Hutang produktif disebut...",
+            "options": [
+              "Bad Debt",
+              "Good Debt",
+              "Social Debt",
+              "Quick Debt"
+            ],
+            "correctAnswer": 1
+          },
+          {
+            "question": "Denda harian fintech legal rata-rata...",
+            "options": [
+              "0.01%",
+              "1%",
+              "10%",
+              "50%"
+            ],
+            "correctAnswer": 1
+          }
+        ]
+      }
+    ],
+    "finalQuiz": {
+      "id": "c2-l1-checkpoint",
+      "title": "Checkpoint Level 1: Fondasi Hutang",
+      "questionCount": 5,
+      "duration": "5 menit",
+      "description": "Tes pemahaman dasar tentang jenis hutang dan bahaya pinjol.",
+      "questions": [
+        {
+          "question": "Manakah yang termasuk Good Debt?",
+          "options": [
+            "Paylater skincare",
+            "KPR Rumah",
+            "Cicilan HP",
+            "Kasbon jajan"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Fintech legal diawasi oleh...",
+          "options": [
+            "OJK",
+            "WHO",
+            "KPK",
+            "PBB"
+          ],
+          "correctAnswer": 0
+        },
+        {
+          "question": "Pain of Paying adalah...",
+          "options": [
+            "Rasa sakit saat denda",
+            "Rasa sakit saat mengeluarkan uang",
+            "Rasa lapar",
+            "Rasa malas"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Batas aman cicilan bulanan adalah...",
+          "options": [
+            "10%",
+            "30%",
+            "50%",
+            "70%"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Langkah pertama menghindari jebakan Paylater...",
+          "options": [
+            "Pinjam lagi",
+            "Hapus fitur di aplikasi",
+            "Ganti HP",
+            "Abaikan"
+          ],
+          "correctAnswer": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "level-2",
+    "title": "Manajemen & Strategi Pelunasan",
+    "description": "Kelola hutangmu dan temukan jalan keluar tercepat untuk bebas hutang.",
+    "items": [
+      {
+        "id": "c2-l2-1",
+        "type": "lesson",
+        "title": "Batas Aman Hutang (DSR)",
+        "duration": "7 menit",
+        "content": {
+          "heading": "Debt Service Ratio (DSR)",
+          "body": [
+            "Maksimal total cicilan adalah 30% dari pemasukan.",
+            "Gaji Rp 5jt? Max cicilan Rp 1.5jt."
+          ]
+        }
+      },
+      {
+        "id": "c2-l2-2",
+        "type": "lesson",
+        "title": "Strategi Snowball & Avalanche",
+        "duration": "9 menit",
+        "content": {
+          "heading": "Dua Strategi Pelunasan",
+          "body": [
+            "Snowball: Fokus hutang terkecil (psikologis).",
+            "Avalanche: Fokus bunga tertinggi (matematis)."
+          ]
+        }
+      },
+      {
+        "id": "c2-l2-quiz",
+        "type": "in-lesson-quiz",
+        "title": "Quiz Pelunasan",
+        "questions": [
+          {
+            "question": "Metode fokus bunga tertinggi adalah...",
+            "options": [
+              "Snowball",
+              "Avalanche",
+              "Waterfall",
+              "Lightning"
+            ],
+            "correctAnswer": 1
+          },
+          {
+            "question": "DSR aman maksimal adalah...",
+            "options": [
+              "10%",
+              "30%",
+              "50%",
+              "80%"
+            ],
+            "correctAnswer": 1
+          }
+        ]
+      }
+    ],
+    "finalQuiz": {
+      "id": "c2-l2-checkpoint",
+      "title": "Checkpoint Level 2: Manajemen Hutang",
+      "questionCount": 5,
+      "duration": "5 menit",
+      "description": "Gunakan strategi Snowball atau Avalanche untuk keluar dari hutang.",
+      "questions": [
+        {
+          "question": "Keunggulan Snowball adalah...",
+          "options": [
+            "Hemat bunga",
+            "Momentum psikologis",
+            "Paling cepat",
+            "Gratis pajak"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Avalanche fokus pada...",
+          "options": [
+            "Hutang lama",
+            "Bunga tinggi",
+            "Bank galak",
+            "Hutang kecil"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Apa itu DSR?",
+          "options": [
+            "Bunga bank",
+            "Rasio cicilan vs pendapatan",
+            "Pajak fintech",
+            "Simpanan"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Gaji Rp 10jt, max cicilan aman?",
+          "options": [
+            "Rp 1jt",
+            "Rp 3jt",
+            "Rp 5jt",
+            "Rp 7jt"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Kenapa \"gali lubang tutup lubang\" bahaya?",
+          "options": [
+            "Capek",
+            "Spiral bunga menumpuk",
+            "Dilarang",
+            "Pusing"
+          ],
+          "correctAnswer": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "level-3",
+    "title": "Reputasi Finansial (Skor Kredit)",
+    "description": "Jaga rapot keuanganmu agar masa depanmu (KPR, dll) terjamin.",
+    "items": [
+      {
+        "id": "c2-l3-1",
+        "type": "lesson",
+        "title": "Memahami SLIK OJK (BI Checking)",
+        "duration": "8 menit",
+        "content": {
+          "heading": "Rapot Keuanganmu",
+          "body": [
+            "Catatan seluruh riwayat kreditmu di lembaga keuangan.",
+            "Kol-1 (Lancar) sampai Kol-5 (Macet)."
+          ]
+        }
+      },
+      {
+        "id": "c2-l3-2",
+        "type": "lesson",
+        "title": "Dampak Telat Bayar Paylater",
+        "duration": "7 menit",
+        "content": {
+          "heading": "Paylater Tercatat di OJK",
+          "body": [
+            "Catatan buruk di OJK bisa menghalangi KPR.",
+            "Satu-satunya cara pulih: Lunasi dan tunggu 1-2 tahun."
+          ]
+        }
+      }
+    ],
+    "finalQuiz": {
+      "id": "c2-checkpoint",
+      "title": "Final Quiz Modul 2: Hutang & Kredit",
+      "questionCount": 10,
+      "duration": "10 menit",
+      "description": "Uji pemahaman akhir tentang hutang, manajemen, dan reputasi kreditmu.",
+      "questions": [
+        {
+          "question": "Hutang konsumsi disebut...",
+          "options": [
+            "Good Debt",
+            "Bad Debt",
+            "Easy Debt",
+            "No Debt"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Data SLIK dikelola oleh...",
+          "options": [
+            "BI",
+            "OJK",
+            "KPK",
+            "Polisi"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Avalanche fokus pada...",
+          "options": [
+            "Hutang kecil",
+            "Bunga tinggi",
+            "Tempo",
+            "Bank"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Kol-5 berarti...",
+          "options": [
+            "Lancar",
+            "Macet",
+            "Baru",
+            "Pending"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "DSR aman adalah...",
+          "options": [
+            "20%",
+            "30%",
+            "50%",
+            "80%"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Paylater termasuk bad debt jika...",
+          "options": [
+            "Untuk modal",
+            "Untuk tiket konser impulsif",
+            "Gratis",
+            "Bunga nol"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Snowball memberikan...",
+          "options": [
+            "Hemat bunga",
+            "Momentum psikologis",
+            "Proses otomatis",
+            "Hadiah"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "OJK mengawasi...",
+          "options": [
+            "RT",
+            "Fintech & Bank",
+            "Pasar",
+            "Kantin"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Slik OJK mencatat...",
+          "options": [
+            "Followers",
+            "Riwayat Kredit",
+            "Nilai Kuliah",
+            "Belanja"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Cara bebas hutang...",
+          "options": [
+            "Boros",
+            "Pangkas gaya hidup & bayar",
+            "Abaikan",
+            "Ganti HP"
+          ],
+          "correctAnswer": 1
+        }
+      ]
+    }
+  }
+]

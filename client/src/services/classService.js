@@ -16,6 +16,11 @@ export async function fetchClassById(id) {
     .eq('id', id)
     .single();
   if (error) throw error;
+
+  if (data?.levels_data) {
+    data.parsedLevels = typeof data.levels_data === 'string' ? JSON.parse(data.levels_data) : data.levels_data;
+  }
+
   return data;
 }
 

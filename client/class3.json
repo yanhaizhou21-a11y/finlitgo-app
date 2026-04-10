@@ -1,0 +1,408 @@
+[
+  {
+    "id": "level-1",
+    "title": "Persiapan & Mindset Investor",
+    "description": "Kenali profil risikomu dan bangun fondasi sebelum berinvestasi.",
+    "items": [
+      {
+        "id": "c3-l1-video",
+        "type": "video",
+        "title": "Video: Mulai Investasi dari Nol",
+        "duration": "12 menit",
+        "videoId": "p7HKvqRI_Bo",
+        "description": "Panduan memulai investasi dengan aman dan memahami risiko.",
+        "transcript": [
+          {
+            "time": "00:00",
+            "text": "Investasi itu maraton, bukan sprint. Jangan tergiur kaya cepat."
+          },
+          {
+            "time": "03:00",
+            "text": "Tiga pilar sebelum invest: Bebas hutang konsumtif, Dana Darurat, dan BPJS."
+          },
+          {
+            "time": "06:00",
+            "text": "Pahami profil risikomu: Konservatif, Moderat, atau Agresif."
+          },
+          {
+            "time": "10:00",
+            "text": "Mulai dari nominal kecil, konsistensi adalah kunci."
+          }
+        ]
+      },
+      {
+        "id": "c3-l1-1",
+        "type": "lesson",
+        "title": "Menabung vs Investasi (Inflasi)",
+        "duration": "8 menit",
+        "content": {
+          "heading": "Kenapa Harus Investasi?",
+          "body": [
+            "Menabung saja tidak cukup karena ada inflasi (penurunan nilai mata uang).",
+            "Investasi bertujuan mengejar return di atas inflasi agar kekayaan bertumbuh."
+          ]
+        }
+      },
+      {
+        "id": "c3-l1-quiz",
+        "type": "in-lesson-quiz",
+        "title": "Quiz Mindset",
+        "questions": [
+          {
+            "question": "Pilar pertama sebelum investasi adalah...",
+            "options": [
+              "Beli saham",
+              "Dana Darurat",
+              "Cari pinjaman",
+              "Pamer"
+            ],
+            "correctAnswer": 1
+          },
+          {
+            "question": "Penurunan nilai mata uang disebut...",
+            "options": [
+              "Deflasi",
+              "Inflasi",
+              "Investasi",
+              "Korupsi"
+            ],
+            "correctAnswer": 1
+          }
+        ]
+      }
+    ],
+    "finalQuiz": {
+      "id": "c3-l1-checkpoint",
+      "title": "Checkpoint Level 1: Persiapan",
+      "questionCount": 5,
+      "duration": "5 menit",
+      "description": "Tes kesiapan investasimu.",
+      "questions": [
+        {
+          "question": "Investasi untuk pemula sebaiknya...",
+          "options": [
+            "Pakai uang dapur",
+            "Pakai \"uang dingin\"",
+            "Berhutang",
+            "Jual rumah"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Profil risiko konservatif takut akan...",
+          "options": [
+            "Keuntungan",
+            "Penurunan nilai (Drawdown)",
+            "Kenaikan harga",
+            "Dividen"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Tujuan utama investasi adalah...",
+          "options": [
+            "Kaya instan",
+            "Melawan inflasi & masa depan",
+            "Buang uang",
+            "Cari teman"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "BPJS penting karena...",
+          "options": [
+            "Syarat investasi",
+            "Proteksi risiko kesehatan",
+            "Dapat uang",
+            "Wajib lapor"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Dana darurat minimal...",
+          "options": [
+            "1 bulan",
+            "3-6 bulan pengeluaran",
+            "1 tahun",
+            "Nol"
+          ],
+          "correctAnswer": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "level-2",
+    "title": "Instrumen & Strategi Pertumbuhan",
+    "description": "Pilih kendaraan investasimu: Reksadana, Emas, atau SBN.",
+    "items": [
+      {
+        "id": "c3-l2-1",
+        "type": "lesson",
+        "title": "Reksadana: Cara Mudah Diversifikasi",
+        "duration": "9 menit",
+        "content": {
+          "heading": "Apa itu Reksadana?",
+          "body": [
+            "Wadah untuk menghimpun dana investor yang dikelola Manajer Investasi.",
+            "Cocok untuk pemula: Reksadana Pasar Uang (RDPU) sangat aman."
+          ]
+        }
+      },
+      {
+        "id": "c3-l2-2",
+        "type": "lesson",
+        "title": "Emas Digital: Pelindung Nilai",
+        "duration": "7 menit",
+        "content": {
+          "heading": "Kenapa Emas?",
+          "body": [
+            "Aset \"Safe Haven\" saat ekonomi tidak menentu.",
+            "Bisa dibeli mulai Rp 10rb di aplikasi fintech."
+          ]
+        }
+      },
+      {
+        "id": "c3-l2-3",
+        "type": "lesson",
+        "title": "Strategi DCA (Dollar Cost Averaging)",
+        "duration": "8 menit",
+        "content": {
+          "heading": "Investasi Rutin vs Sekaligus",
+          "body": [
+            "DCA: Investasi rutin jumlah sama setiap bulan (Misal: 1jt/bulan).",
+            "Tidak pusing timing pasar, rata-rata harga jadi lebih rendah."
+          ]
+        }
+      },
+      {
+        "id": "c3-l2-quiz",
+        "type": "in-lesson-quiz",
+        "title": "Quiz Instrumen",
+        "questions": [
+          {
+            "question": "Investasi rutin disebut metode...",
+            "options": [
+              "DCA",
+              "Lump Sum",
+              "FOMO",
+              "Flash Sale"
+            ],
+            "correctAnswer": 0
+          },
+          {
+            "question": "Reksadana dikelola oleh...",
+            "options": [
+              "RT",
+              "Manajer Investasi (MI)",
+              "Kasir",
+              "Dukun"
+            ],
+            "correctAnswer": 1
+          }
+        ]
+      }
+    ],
+    "finalQuiz": {
+      "id": "c3-l2-checkpoint",
+      "title": "Checkpoint Level 2: Instrumen",
+      "questionCount": 5,
+      "duration": "5 menit",
+      "description": "Pilih instrumen yang tepat.",
+      "questions": [
+        {
+          "question": "RDPU kepanjangannya...",
+          "options": [
+            "Pasar Uang",
+            "Pasti Untung",
+            "Pengen Untung",
+            "Pilih Utang"
+          ],
+          "correctAnswer": 0
+        },
+        {
+          "question": "Emas berfungsi sebagai...",
+          "options": [
+            "Modal usaha",
+            "Lindung nilai (Hedging)",
+            "Hutang",
+            "Konsumsi"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Keunggulan DCA adalah...",
+          "options": [
+            "Kaya cepat",
+            "Disiplin & meminimalisir risiko timing",
+            "Nggak bayar",
+            "Pasti cuan"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "SBN adalah pinjaman ke...",
+          "options": [
+            "Tetangga",
+            "Negara/Pemerintah",
+            "Bank Gelap",
+            "Teman"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Spread harga emas adalah...",
+          "options": [
+            "Selisih beli-jual",
+            "Bonus",
+            "Pajak",
+            "Diskon"
+          ],
+          "correctAnswer": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "level-3",
+    "title": "Portfolio & Financial Freedom",
+    "description": "Visualisasi masa depan dan kekuatan Compound Interest.",
+    "items": [
+      {
+        "id": "c3-l3-1",
+        "type": "lesson",
+        "title": "Keajaiban Compound Interest",
+        "duration": "10 menit",
+        "content": {
+          "heading": "Bunga Berbunga",
+          "body": [
+            "Uangmu menghasilkan untung, untungnya menghasilkan untung lagi.",
+            "Waktu adalah faktor terpenting (Mulai sedini mungkin)."
+          ]
+        }
+      },
+      {
+        "id": "c3-l3-2",
+        "type": "lesson",
+        "title": "Diversifikasi Portfolio",
+        "duration": "8 menit",
+        "content": {
+          "heading": "Don't Put All Eggs in One Basket",
+          "body": [
+            "Sebarkan investasi di berbagai instrumen (Emas + Reksadana + Saham).",
+            "Jika satu turun, yang lain bisa menyeimbangkan."
+          ]
+        }
+      }
+    ],
+    "finalQuiz": {
+      "id": "c3-checkpoint",
+      "title": "Final Quiz Modul 3: Investasi Masa Depan",
+      "questionCount": 10,
+      "duration": "10 menit",
+      "description": "Lulus level ini berarti kamu siap menjadi investor cerdas!",
+      "questions": [
+        {
+          "question": "Mulai investasi sebaiknya...",
+          "options": [
+            "Setelah kaya",
+            "Sedini mungkin",
+            "Nunggu pensiun",
+            "Besok terus"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Compound interest akan maksimal jika...",
+          "options": [
+            "Modalnya ditarik",
+            "Dibiarkan jangka panjang",
+            "Beli saat mahal",
+            "Investasi sekali"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Inflasi dilawan dengan...",
+          "options": [
+            "Menabung di bawah kasur",
+            "Investasi yang return > inflasi",
+            "Beli baju baru",
+            "Kasbon"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Manakah investasi paling berisiko tinggi?",
+          "options": [
+            "SBN",
+            "RDPU",
+            "Saham Individual",
+            "Emas"
+          ],
+          "correctAnswer": 2
+        },
+        {
+          "question": "Pentingnya diversifikasi adalah...",
+          "options": [
+            "Biar kelihatan kaya",
+            "Mengurangi risiko total portfolio",
+            "Menambah hutang",
+            "Biar ribet"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Uang dingin adalah...",
+          "options": [
+            "Uang dari kulkas",
+            "Uang yang tidak digunakan dalam waktu dekat",
+            "Uang pinjaman",
+            "Uang sisa jajan"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Minimal dana darurat single?",
+          "options": [
+            "1x pengeluaran",
+            "3-6x pengeluaran",
+            "12x pengeluaran",
+            "0"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Aset safe-haven tradisional?",
+          "options": [
+            "Jam tangan",
+            "Emas",
+            "Tiket konser",
+            "Crypto micin"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "DCA singkatan dari...",
+          "options": [
+            "Dollar Cost Averaging",
+            "Direct Cash Action",
+            "Dana Cepat Aman",
+            "Daily Class Action"
+          ],
+          "correctAnswer": 0
+        },
+        {
+          "question": "Financial freedom tercapai saat...",
+          "options": [
+            "Gaji naik",
+            "Passive income > Biaya hidup",
+            "Punya mobil",
+            "Liburan terus"
+          ],
+          "correctAnswer": 1
+        }
+      ]
+    }
+  }
+]
