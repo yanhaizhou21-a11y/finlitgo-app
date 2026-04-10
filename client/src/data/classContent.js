@@ -1,15 +1,41 @@
 // MODULE 1: FINANCIAL FOUNDATION & MINDSET (/class/1)
 // ═══════════════════════════════════════════════════════════════
 const CLASS_1_LEVELS = [
+  // ── LEVEL 0: PENGANTAR MODUL ──
+  {
+    id: 'level-0',
+    title: 'Pengantar Modul',
+    description: 'Selamat datang di langkah pertama menuju kebebasan finansial. Sebelum kita menyentuh angka, grafik, atau aplikasi investasi, kita harus memperbaiki "mesin" utama dalam keuangan: Pola Pikir (Mindset). Tanpa fondasi yang kuat, berapa pun uang yang kamu hasilkan akan habis tanpa jejak.',
+    items: [
+      {
+        id: 'c1-l0-1', type: 'lesson', title: 'Selamat Datang', duration: '2 menit',
+        content: {
+          heading: 'Pengantar Modul 1',
+          body: [
+            'Selamat datang di langkah pertama menuju kebebasan finansial. Sebelum kita menyentuh angka, grafik, atau aplikasi investasi, kita harus memperbaiki "mesin" utama dalam keuangan: Pola Pikir (Mindset). Tanpa fondasi yang kuat, berapa pun uang yang kamu hasilkan akan habis tanpa jejak.',
+          ],
+        },
+      },
+    ],
+    finalQuiz: {
+      id: 'c1-l0-checkpoint', title: 'Siap Lanjut?', questionCount: 1, duration: '1 menit',
+      description: 'Konfirmasi pemahaman.',
+      questions: [
+        { question: 'Apakah kamu siap mengubah mindset?', options: ['Belum', 'Siap!', 'Mungkin', 'Tidak Tahu'], correctAnswer: 1 }
+      ]
+    }
+  },
   // ── LEVEL 1: MINDSET & FONDASI DASAR ──
   {
+  
+
     id: 'level-1',
     title: 'Mindset & Fondasi Dasar',
-    description: 'Ubah cara pandangmu terhadap uang dan bangun fondasi finansial yang kokoh.',
+    description: 'Selamat datang di langkah pertama menuju kebebasan finansial. Sebelum kita menyentuh angka, grafik, atau aplikasi investasi, kita harus memperbaiki "mesin" utama dalam keuangan: Pola Pikir (Mindset). Tanpa fondasi yang kuat, berapa pun uang yang kamu hasilkan akan habis tanpa jejak.',
     items: [
       {
         id: 'c1-l1-video', type: 'video', title: 'Video: Psikologi Uang & Mindset Kaya', duration: '10 menit',
-        videoId: 'p7HKvqRI_Bo',
+        videoId: 'mj2Kk4FVN40',
         description: 'Belajar bagaimana mindset mempengaruhi keputusan finansialmu dan cara membangun kebiasaan uang yang sehat.',
         transcript: [
           { time: '00:00', text: 'Selamat datang di FinLitGo! Hari ini kita akan membahas hal yang paling krusial: Mindset.' },
@@ -19,23 +45,43 @@ const CLASS_1_LEVELS = [
         ],
       },
       {
-        id: 'c1-l1-1', type: 'lesson', title: 'Kenapa Literasi Keuangan Penting?', duration: '8 menit',
+        id: 'c1-l1-1', type: 'lesson', title: 'Melawan "LIFESTYLE CREEP"', duration: '10 menit',
         content: {
-          heading: 'Literasi Keuangan: Skill Bertahan Hidup Abad 21',
+          heading: 'Jebakan Lifestyle Creep & Kebutuhan vs Keinginan',
           body: [
-            'Literasi keuangan bukan cuma soal menghitung uang, tapi memahami bagaimana uang bekerja di dunia nyata.',
-            'Tanpa literasi keuangan, sebesar apapun gaji kamu, uang itu akan selalu terasa kurang.',
+            'Pernahkah kamu merasa gajimu naik, tapi tabunganmu tetap saja tidak bertambah? Itulah yang disebut dengan Lifestyle Creep.',
+            'Lifestyle Creep adalah fenomena di mana standar hidup dan pengeluaran tidak wajibmu (diskresioner) meningkat sejalan dengan peningkatan penghasilan. Apa yang dulunya dianggap sebagai kemewahan, pelan-pelan berubah menjadi "kebutuhan" sehari-hari.',
+            'Contoh sederhananya: Saat bergaji UMR, kamu biasa makan siang bawa bekal atau di warteg. Setelah gajimu naik jadi dua kali lipat, kamu mulai merasa "butuh" makan siang di kafe atau pesan makanan lewat ojol setiap hari. Inilah alasan mengapa orang bergaji Rp20 juta bisa merasa sama "miskinnya" dengan saat ia bergaji Rp5 juta.',
+            'Teknik Membedakan: Jebakan "Self-Reward"',
+            'Media sosial sering membuat kita membungkus Keinginan (Wants) dengan label Kebutuhan (Needs) berkedok self-reward. Mari kita luruskan batasannya:',
+            '1. Kebutuhan (Needs): Hal-hal esensial untuk hidup. Jika tidak dipenuhi, hidup atau pekerjaanmu akan terganggu (Makan bergizi, tempat tinggal, transportasi kerja, listrik, asuransi dasar).',
+            '2. Keinginan (Wants): Ekstra yang membuat hidup lebih nyaman secara emosional. Jika tidak dipenuhi, kamu hanya merasa kurang puas sementara (Kopi kekinian tiap pagi, gadget terbaru, langganan 5 platform streaming, baju baru tiap bulan).',
+            'Waspadai "Jebakan Upgrade": Makan adalah kebutuhan, tapi makan di restoran mewah adalah keinginan. Pakaian adalah kebutuhan, tapi tas branded adalah keinginan.',
+            'Strategi Melawan Lifestyle Creep',
+            '1. The 72-Hour Rule (Aturan 3 Hari): Jika ingin membeli barang non-pokok (misal di atas Rp200.000), masukkan ke keranjang belanja tapi jangan langsung bayar. Tunggu 72 jam. Biasanya emosi impulsif hilang di 24 jam pertama. Jika setelah 3 hari kamu masih merasa barang itu berdampak positif dan sesuai budget, silakan beli.',
+            '2. Pay Yourself First (Gaji Dirimu Sendiri): Begitu gajian turun, transfer 20% langsung ke rekening tabungan atau investasi. Hadapi bulan tersebut dengan 80% sisanya. Jangan pernah menabung dari sisa uang di akhir bulan, karena uang memiliki sifat akan selalu habis jika ada di dompet.',
+            '3. Hitung Harga dengan "Jam Kerja": Jika gajimu Rp5 juta per bulan (160 jam kerja), berart upahmu sekitar Rp31.250/jam. Jika ingin beli sepatu Rp1,5 juta, tanyakan pada dirimu: "Apakah sepatu ini sepadan ditukar dengan 48 jam penderitaanku bekerja?"'
           ],
+          quote: '"Jangan menabung apa yang tersisa setelah berbelanja, tapi belanjakan apa yang tersisa setelah menabung." — Warren Buffett'
         },
       },
       {
-        id: 'c1-l1-2', type: 'lesson', title: 'Mengenal Kebutuhan vs Keinginan', duration: '7 menit',
+        id: 'c1-l1-2', type: 'lesson', title: 'THE POWER OF COMPOUNDING & BAHAYA INFLASI', duration: '15 menit',
         content: {
-          heading: 'Kebutuhan vs Keinginan: Mana yang Harus Didahului?',
+          heading: 'Dua Kekuatan Terselubung: Compounding & Inflasi',
+          videoId: 'kP_TyTTsv68',
           body: [
-            'Kebutuhan adalah hal-hal esensial untuk hidup (makan, tempat tinggal, kesehatan).',
-            'Keinginan adalah hal-hal yang membuat hidup lebih nyaman tapi tidak esensial (gadget baru, kopi kekinian).',
+            'Dalam dunia keuangan, ada dua kekuatan besar yang bekerja tanpa henti setiap hari. Satu kekuatan bisa melipatgandakan asetmu tanpa kamu sadari, sementara kekuatan lainnya perlahan menggerus kekayaanmu secara diam-diam. Kedua kekuatan itu adalah Compounding Interest (Bunga Majemuk) dan Inflasi.',
+            '1. Compounding Interest (Bunga Majemuk)',
+            'Konsep dasar compounding adalah uangmu bekerja untukmu. Keuntungan (bunga) yang didapat dari investasi kembali ditambahkan ke modal awal, sehingga di periode berikutnya, keuntungan tersebut juga ikut menghasilkan keuntungan baru lagi.',
+            'Contoh nyata: Jika kamu menginvestasikan Rp1.000.000 dengan keuntungan 10% per tahun, maka di tahun pertama uangmu menjadi Rp1.100.000. Di tahun kedua, bunga 10% dihitung dari Rp1.100.000 (bukan modal asli Rp1 juta), menghasilkan total Rp1.210.000. Semakin lama dibiarkan, pertumbuhannya semakin ekstrem meroket ke atas (Snowball Effect).',
+            '2. Bahaya Inflasi (Pencuri Tak Kasat Mata)',
+            'Berkebalikan dengan The Power of Compounding, inflasi adalah penurunan daya beli mata uang karena naiknya harga barang dan jasa. Jika uangmu hanya diam di rekening tanpa bunga yang sepadan, daya belinya merosot termakan waktu.',
+            'Contoh nyata: Ingat harga semangkuk bakso di tahun 2014 yang mungkin hanya Rp10.000? Kini di tahun 2024, harga bakso yang sama sudah mencapai Rp20.000. Ini membuktikan uang memang tidak ke mana-mana dari dompetmu, tapi nilainya "basi" dan tak bisa membeli barang yang sama jumlahnya di beberapa tahun kemudian.',
+            'Kesimpulan: Mulailah Sedini Mungkin!',
+            'Waktu lebih penting daripada jumlah modal awalmu. Menabung dan berinvestasi dana kecil namun KONSISTEN dan dimulai di usia muda (misal usia 20 tahun), akan memberikan hasil pensiun yang jauh lebih masif ketimbang investasi skala jumbo tapi baru dimulai di usia 40 tahun. Jadikan compounding senjatamu untuk menaklukkan inflasi!'
           ],
+          quote: '"Compound interest is the eighth wonder of the world. He who understands it, earns it; he who doesn\'t, pays it." — Albert Einstein'
         },
       },
       {
@@ -47,14 +93,19 @@ const CLASS_1_LEVELS = [
       },
     ],
     finalQuiz: {
-      id: 'c1-l1-checkpoint', title: 'Checkpoint Level 1: Mindset', questionCount: 5, duration: '5 menit',
-      description: 'Tes pemahamanmu tentang mindset dan dasar keuangan.',
+      id: 'c1-l1-checkpoint', title: 'Checkpoint Level 1: Mindset', questionCount: 10, duration: '10 menit',
+      description: 'Tes pemahamanmu tentang mindset dan materi yang baru dipelajari.',
       questions: [
-        { question: 'Financial freedom artinya...', options: ['Punya banyak hutang', 'Passive income > Biaya hidup', 'Gaji 100 juta', 'Bisa beli apa saja'], correctAnswer: 1 },
-        { question: 'Langkah awal mengatur keuangan adalah...', options: ['Investasi saham', 'Mencatat pengeluaran', 'Beli mobil', 'Ganti HP'], correctAnswer: 1 },
-        { question: 'Bedanya aset dan liabilitas adalah...', options: ['Aset bikin kaya, liabilitas bikin miskin', 'Aset kasih uang masuk, liabilitas narik uang keluar', 'Tidak ada bedanya', 'Aset itu rumah, liabilitas itu mobil'], correctAnswer: 1 },
-        { question: 'Kenapa Gen Z sulit menabung?', options: ['Gaji kecil', 'Gaya hidup/FOMO', 'Inflasi', 'Semua benar'], correctAnswer: 3 },
-        { question: 'Uang dingin adalah...', options: ['Uang dari kulkas', 'Uang yang tidak digunakan dalam waktu dekat', 'Uang koin', 'Uang sisa kembalian'], correctAnswer: 1 },
+        { question: 'Apa yang dimaksud dengan fenomena "Lifestyle Creep"?', options: ['Gaya hidup merayap naik seiring bertambahnya penghasilan', 'Hidup hemat walau gaji besar', 'Naiknya harga barang setiap tahun', 'Investasi berbunga majemuk'], correctAnswer: 0 },
+        { question: 'Mana dari berikut ini yang merupakan contoh jebakan "keinginan" berkedok kebutuhan?', options: ['Makan siang bergizi', 'Membeli tas branded mahal untuk bekerja', 'Membayar tagihan listrik', 'Membeli obat saat sakit'], correctAnswer: 1 },
+        { question: 'Apa fungsi dari "The 72-Hour Rule"?', options: ['Aturan jam kerja dalam seminggu', 'Menunggu 3 hari sebelum memutuskan beli barang non-pokok', 'Syarat pencairan deposito', 'Batas waktu membayar hutang bulanan'], correctAnswer: 1 },
+        { question: 'Bagaimana cara kerja metode "Pay Yourself First"?', options: ['Belanja dulu baru menabung sisanya', 'Menyisihkan tabungan di awal saat baru gajian', 'Berhutang ke diri sendiri', 'Membayar gaji karyawan terlebih dahulu'], correctAnswer: 1 },
+        { question: 'Menghitung harga barang konsumtif dengan "Jam Kerja" berguna untuk...', options: ['Menghitung upah lembur bulanan', 'Pamer kepada atasan', 'Mengukur apakah suatu barang sepadan dengan waktu dan lelah kita', 'Syarat pengajuan pinjaman bank'], correctAnswer: 2 },
+        { question: 'Apa inti dari konsep Compounding Interest (Bunga Majemuk)?', options: ['Bunga kredit yang menumpuk jadi hutang', 'Keuntungan investasi ikut ditambahkan ke modal sehingga menghasilkan keuntungan baru', 'Bunga flat yang tidak berubah dari tahun ke tahun', 'Pajak dari keuntungan investasi'], correctAnswer: 1 },
+        { question: 'Apa dampak utama dari Inflasi terhadap uang simpanan kita?', options: ['Membuat uang bertambah banyak nilainya', 'Tidak memberikan dampak apapun', 'Menurunkan daya beli uang di masa depan', 'Membuat harga barang menjadi lebih murah'], correctAnswer: 2 },
+        { question: 'Kapan waktu terbaik untuk mulai berinvestasi agar efek Compounding maksimal?', options: ['Sedini mungkin, walau dengan uang nominal kecil', 'Saat usia sudah tua dan kaya raya', 'Saat sudah bisa membeli rumah tangga mewah', 'Di akhir tahun jika ada bonus saja'], correctAnswer: 0 },
+        { question: 'Mengapa menabung uang tunai di celengan tidak dianjurkan untuk tujuan jangka panjang?', options: ['Bisa dihabiskan untuk jajan', 'Karena nilainya akan tergerus oleh inflasi secara diam-diam', 'Karena bank akan menghentikan akun', 'Karena celengan tanah liat mudah pecah'], correctAnswer: 1 },
+        { question: '"Jangan menabung apa yang tersisa setelah berbelanja, tapi belanjakan apa yang tersisa setelah menabung." Kutipan ini mewakili strategi apa?', options: ['Lifestyle Creep', 'The 72-Hour Rule', 'Pay Yourself First', 'Compounding Interest'], correctAnswer: 2 },
       ],
     },
   },
@@ -65,33 +116,44 @@ const CLASS_1_LEVELS = [
     description: 'Kuasai seni mengalokasikan uang dengan metode yang sudah terbukti.',
     items: [
       {
-        id: 'c1-l2-1', type: 'lesson', title: 'Metode Budgeting 50/30/20', duration: '9 menit',
+        id: 'c1-l2-1', type: 'lesson', title: 'Cashflow Tracking & Kebocoran Halus', duration: '12 menit',
         content: {
-          heading: 'Alokasi Gaji yang Ideal',
+          heading: 'Cashflow Tracking: Menemukan Kebocoran Halus',
+          videoId: 'sCUghGYNGC4',
           body: [
-            '50% untuk Kebutuhan Pokok (Needs).',
-            '30% untuk Keinginan/Gaya Hidup (Wants).',
-            '20% untuk Tabungan dan Investasi (Savings).',
+            'Banyak orang merasa uangnya perlahan hilang begitu saja di pertengahan bulan tanpa tahu ke mana perginya. Tanpa pencatatan arus kas (cashflow tracking), kamu seolah sedang menyetir mobil dengan mata tertutup di jalan tol. Pencatatan keuangan bukanlah tentang menjadi pelit atau mengekang diri, melainkan tentang memiliki kendali penuh atas hidup dan uangmu.',
+            'Dalam bab ini, kita membagi pengeluaran menjadi tiga kategori utama yang wajib kamu pantau:',
+            '1. Fixed Expenses (Pengeluaran Tetap): Biaya yang jumlah dan waktu tagihannya selalu sama setiap bulan. Contohnya adalah biaya sewa kost, cicilan kendaraan, tagihan internet, dan asuransi. Biaya ini sangat mudah diprediksi.',
+            '2. Variable Expenses (Pengeluaran Tidak Tetap): Biaya yang frekuensi dan nominalnya berubah-ubah tergantung gaya hidup dan kebutuhanmu di bulan tersebut. Misalnya anggaran makan, bensin, belanja bulanan, dan kebutuhan rumah tangga. Di sinilah letak fluktuasi terbesar dari pengeluaranmu.',
+            '3. Invisible Leaks (Bocor Alus): Biaya berskala kecil yang sangat sering diabaikan namun berakibat fatal jika diakumulasi dalam setahun. Contohnya adalah biaya admin transfer antar bank, uang parkir harian, biaya layanan ekspedisi pesanan makanan, atau langganan aplikasi streaming yang sebenarnya sudah jarang kamu tonton.',
+            'Langkah pertama yang paling krusial sebelum melakukan budgeting adalah melihat kenyataan pahit dari riwayat transaksimu selama satu atau tiga bulan terakhir. Dari situ, kamu akan menyadari seberapa besar uang yang menguap pada kategori pengeluaran tidak tetap dan kebocoran-kebocoran halus.'
           ],
         },
       },
       {
-        id: 'c1-l2-2', type: 'lesson', title: 'Cara Membuat Laporan Keuangan Simple', duration: '10 menit',
+        id: 'c1-l2-2', type: 'lesson', title: 'Strategi Alokasi Gaji 50/30/20', duration: '10 menit',
         content: {
-          heading: 'Tracking Uang Keluar',
+          heading: 'Strategi Alokasi Gaji: Metode 50/30/20',
+          videoId: 'a5e0Xzik9SA',
           body: [
-            'Gunakan aplikasi atau spreadsheet untuk mencatat setiap rupiah yang keluar.',
-            'Evaluasi mingguan untuk melihat kebocoran anggaran.',
+            'Setelah mengetahui ke mana aliran uangmu pergi, saatnya kamu menjadi manajer yang mengarahkan ke mana uang tersebut seharusnya pergi. Metode 50/30/20 adalah standar emas manajemen keuangan dasar bagi pemula.',
+            'Metode ini membagi pendapatan bersih (setelah pajak) ke dalam tiga pos besar:',
+            '1. 50% Needs (Kebutuhan Pokok): Ini adalah alokasi untuk mempertahankan kelangsungan hidupmu. Uang di pos ini digunakan untuk membayar sewa tempat tinggal, bahan makanan pokok, tagihan listrik, transportasi bekerja, dan asuransi kesehatan dasar.',
+            '2. 30% Wants (Keinginan dan Gaya Hidup): Ini adalah alokasi untuk menikmati hasil kerja kerasmu. Pos ini sah digunakan untuk nongkrong di kafe, menjalani hobi, langganan hiburan, liburan akhir pekan, atau sekadar membeli baju baru. Keuangan yang sehat tetap menyediakan ruang untuk kebahagiaan masa kini.',
+            '3. 20% Savings and Debt (Masa Depan dan Kewajiban): Ini adalah alokasi masa depan. Prioritas pertama di pos ini adalah membangun dana darurat, melunasi hutang konsumtif (seperti paylater atau kartu kredit), dan memulai investasi.',
+            'Satu hal yang perlu diingat: Metode ini bukanlah aturan baku yang tidak bisa diubah. Jika kondisi finansialmu saat ini sedang sulit atau gajimu didominasi oleh kebutuhan utama yang mendesak, modifikasilah rasio ini sesuai dengan realitas. Kamu bisa menggunakan rasio 70/20/10 atau 60/30/10. Yang terpenting adalah kamu memiliki persentase tabungan yang konsisten setiap bulan.'
           ],
         },
       },
       {
-        id: 'c1-l2-3', type: 'lesson', title: 'The Power of Small Habit (Latte Factor)', duration: '8 menit',
+        id: 'c1-l2-3', type: 'lesson', title: 'Teknik Jar System & Otomasi Digital', duration: '10 menit',
         content: {
-          heading: 'Latte Factor: Pengeluaran Kecil yang Mematikan',
+          heading: 'Teknik Jar System & Otomasi Keuangan Digital',
           body: [
-            'Kopi Rp 40rb/hari x 30 hari = Rp 1.2 juta/bulan.',
-            'Bayangkan jika uang itu diinvestasikan selama 10 tahun.',
+            'Sebesar apa pun tekadmu, disiplin dan kemauan manusia memiliki batas. Oleh karena itu, kita tidak bisa hanya mengandalkan niat untuk menabung setiap bulannya. Kita membutuhkan sebuah sistem yang bekerja otomatis layaknya mesin.',
+            'Konsep pertama adalah Teknik Jar System (Sistem Toples). Daripada mencampur semua uang dalam satu rekening utama penampung gaji yang rawan memicu kebocoran, pisahkan dana sesuai tujuan ke dalam toples-toples berbeda. Di era modern, kamu tidak perlu membuat banyak rekening bank berbiaya admin mahal. Manfaatkan fitur Kantong atau Pocket pada bank digital masa kini (seolah-olah seperti amplop virtual) untuk memilah saldo dengan mudah tanpa terpotong biaya admin.',
+            'Konsep kedua adalah Strategi Otomasi. Kesalahan terbesar pekerja pemula adalah menunggu sisa uang di akhir bulan untuk ditabung. Padahal, uang selalu mencari pola untuk segera dihabiskan jika terus dilihat di layar rekening mobile banking.',
+            'Gunakan fitur Auto-Debet (pemotongan otomatis) yang tersedia di aplikasi perbankanmu. Atur agar sistem bank memotong nominal atau sekian persen dari gajimu tepat satu hari setelah tanggal gajian turun, dan memindahkannya langsung ke rekening tabungan mandiri atau instrumen investasi. Dengan teknik ini, kamu secara tidak sadar memaksakan dirimu untuk menyesuaikan gaya hidup hanya dengan sisa uang yang ada di rekening pengeluaran.'
           ],
         },
       },
@@ -100,18 +162,26 @@ const CLASS_1_LEVELS = [
         questions: [
           { question: 'Dalam metode 50/30/20, berapa persen untuk keinginan?', options: ['50%', '30%', '20%', '10%'], correctAnswer: 1 },
           { question: 'Apa yang dimaksud Latte Factor?', options: ['Hobi minum kopi', 'Pengeluaran kecil rutin yang tidak disadari', 'Pajak minuman', 'Gaya hidup mewah'], correctAnswer: 1 },
+          { question: 'Biaya sewa tempat tinggal dan tagihan internet bulanan termasuk kategori...', options: ['Variable Expenses', 'Invisible Leaks', 'Fixed Expenses', 'Needs and Wants'], correctAnswer: 2 },
+          { question: 'Apa tujuan mengaktifkan fitur Auto-Debet untuk tabungan?', options: ['Agar mendapat promo bank', 'Supaya tabungan otomatis terpotong di awal tanpa menunggu sisa', 'Agar bank tidak memblokir rekening', 'Meningkatkan limit kredit'], correctAnswer: 1 },
+          { question: 'Konsep dasar dari Teknik Jar System adalah...', options: ['Menyimpan uang tunai di toples kaca', 'Membuat sebanyak mungkin rekening bank', 'Memisahkan dana ke pos atau kantong berbeda sesuai tujuan', 'Menggabungkan seluruh penghasilan di satu rekening'], correctAnswer: 2 },
         ],
       },
     ],
     finalQuiz: {
-      id: 'c1-l2-checkpoint', title: 'Checkpoint Level 2: Management', questionCount: 5, duration: '5 menit',
-      description: 'Tes kemampuan mengelola anggaran.',
+      id: 'c1-l2-checkpoint', title: 'Checkpoint Level 2: Management', questionCount: 10, duration: '10 menit',
+      description: 'Tes kemampuan mengelola anggaran berdasarkan materi yang telah dipelajari.',
       questions: [
-        { question: 'Prinsip utama menabung yang benar adalah...', options: ['Sisa belanja baru nabung', 'Nabung dulu baru belanja (Pay Yourself First)', 'Nabung kalau ingat', 'Nabung uang koin saja'], correctAnswer: 1 },
-        { question: 'Contoh kebocoran halus (Latte Factor) adalah...', options: ['Biaya admin bank & subscription yang tidak dipakai', 'Beli beras', 'Bayar kos', 'Beli bensin'], correctAnswer: 0 },
-        { question: 'Needs (50%) meliputi...', options: ['Nonton konser', 'Makan & Transportasi kerja', 'Beli sepatu basket', 'Top up game'], correctAnswer: 1 },
-        { question: 'Budgeting membantu kita untuk...', options: ['Pelit', 'Tahu ke mana uang pergi, bukan bertanya ke mana uangnya', 'Membatasi kebahagiaan', 'Jadi kaya dalam semalam'], correctAnswer: 1 },
-        { question: 'Aplikasi pencatat keuangan berguna untuk...', options: ['Pajangan', 'Melihat histori pengeluaran secara real-time', 'Dapat uang gratis', 'Meminjam uang'], correctAnswer: 1 },
+        { question: 'Tujuan utama melakukan pencatatan arus kas (cashflow tracking) adalah...', options: ['Mencari alasan untuk pelit', 'Mengetahui secara pasti ke mana uang pergi setiap bulannya', 'Syarat mengajukan pinjaman bank', 'Melihat seberapa kaya diri kita'], correctAnswer: 1 },
+        { question: 'Kategori pengeluaran manakah yang paling sering mengalami fluktuasi (paling berubah-ubah) setiap bulannya?', options: ['Invisible Leaks', 'Fixed Expenses', 'Variable Expenses', 'Masa Depan'], correctAnswer: 2 },
+        { question: 'Langganan streaming yang tidak pernah ditonton atau biaya parkir harian sering dikategorikan sebagai...', options: ['Beban mutlak', 'Kebocoran halus (Invisible Leaks)', 'Kebutuhan pokok', 'Keinginan terpendam'], correctAnswer: 1 },
+        { question: 'Dalam aturan finansial 50/30/20, porsi alokasi 50% idealnya digunakan untuk...', options: ['Gaya hidup dan liburan', 'Tabungan dan investasi', 'Membayar hutang KPR', 'Kebutuhan pokok untuk bertahan hidup (Needs)'], correctAnswer: 3 },
+        { question: 'Mengapa metode Jar System (Sistem Toples) efektif digunakan?', options: ['Karena dana dipisah sesuai tujuan agar tidak rawan terpakai untuk hal lain', 'Karena membebaskan kita dari pajak', 'Karena bunga bank lebih tinggi', 'Karena memaksa kita tidak belanja'], correctAnswer: 0 },
+        { question: 'Berapa porsi yang dianjurkan untuk Tabungan dan Pembayaran Hutang (Savings and Debt) pada metode dasar 50/30/20?', options: ['10%', '20%', '30%', '50%'], correctAnswer: 1 },
+        { question: 'Apa kesalahan terbesar pekerja pemula dalam hal menabung?', options: ['Menunggu sisa uang di akhir bulan untuk ditabung', 'Terlalu banyak jenis tabungan', 'Investasi terlalu besar', 'Menolak menabung tunai'], correctAnswer: 0 },
+        { question: 'Apa fungsi utama fitur Auto-Debet dalam strategi otomatisasi keuangan?', options: ['Membayar pajak bulanan', 'Memblokir uang pencurian', 'Memotong penghasilan secara otomatis di awal bulan untuk dipindahkan ke tabungan', 'Membuat uang tidak bisa ditarik selamanya'], correctAnswer: 2 },
+        { question: 'Jika kondisi finansial sedang cukup sulit, apakah komposisi metode 50/30/20 boleh diubah?', options: ['Tidak boleh, harus diusahakan', 'Boleh, disesuaikan realitas namun persentase tabungan harus tetap konsisten', 'Boleh, tapi lapor bank terlebih dahulu', 'Boleh dengan menghilangkan tabungan'], correctAnswer: 1 },
+        { question: 'Karakteristik utama dari pengeluaran tetap (Fixed Expenses) adalah...', options: ['Bisa dinegosiasi setiap saat', 'Jumlah dan waktu tagihannya selalu sama dan mudah diprediksi', 'Hanya dibayar jika ada sisa uang', 'Muncul tanpa disadari'], correctAnswer: 1 },
       ],
     },
   },
@@ -122,32 +192,50 @@ const CLASS_1_LEVELS = [
     description: 'Siapkan jaring pengaman agar rencana finansialmu tidak berantakan saat badai datang.',
     items: [
       {
-        id: 'c1-l3-1', type: 'lesson', title: 'Dana Darurat: Fondasi Anti Panik', duration: '9 menit',
+        id: 'c1-l3-1', type: 'lesson', title: 'Dana Darurat: Fondasi Anti Panik', duration: '15 menit',
         content: {
           heading: 'Emergency Fund: Kenapa Kamu Butuh?',
+          videoId: 'j-E-D8be2qY',
           body: [
-            'Dana darurat adalah uang yang disisihkan khusus untuk kejadian tak terduga (sakit, PHK, motor rusak).',
-            'Minimal 3-6 kali pengeluaran bulanan untuk yang masih single.',
+            'Dana Darurat (Emergency Fund) adalah jaring pengaman finansial berupa dana tunai yang sengaja disisihkan murni untuk menghadapi keadaan darurat yang tidak terduga. Keadaan darurat ini mencakup pemutusan hubungan kerja (PHK), biaya perbaikan rumah atau kendaraan yang mendesak, kecelakaan, atau tagihan medis di luar jangkauan asuransi.',
+            'Banyak orang mengabaikan pos ini dan langsung melompat ke investasi. Padahal, berinvestasi tanpa dana darurat ibarat membangun rumah mewah di atas pasir. Ketika terjadi guncangan, kamu akan terpaksa mencairkan investasi saat portofolio sedang rugi (cut loss) atau lebih parah lagi, terjerat hutang paylater dan pinjaman online berbunga tinggi.',
+            'Berapa jumlah ideal Dana Darurat?',
+            'Jumlah dana darurat tidak sama bagi setiap orang dan sangat bergantung pada status tanggungan dan stabilitas pekerjaan:',
+            '1. Lajang (Single) tanpa tanggungan: 3 hingga 6 kali pengeluaran bulanan. Jika pengeluaran bulananmu Rp3 juta, kamu butuh Rp9 juta - Rp18 juta.',
+            '2. Menikah tanpa anak: 6 hingga 9 kali pengeluaran bulanan.',
+            '3. Menikah dengan anak atau pekerja lepas (freelancer): 9 hingga 12 kali pengeluaran bulanan.',
+            'Kriteria Penyimpanan Dana Darurat:',
+            'Uang ini harus memenuhi dua kriteria utama: Aman dari fluktuasi nilai dan Sangat Mudah Dicairkan (Likuid). Jangan simpan dana darurat di instrumen saham atau properti. Tempat terbaik untuk menyimpannya adalah di rekening tabungan terpisah yang tidak memiliki kartu ATM, atau pada instrumen reksadana pasar uang (RDPU) yang minim risiko namun memberikan pengembalian sedikit lebih baik daripada bunga bank konvensional.'
           ],
         },
       },
       {
-        id: 'c1-l3-2', type: 'lesson', title: 'Asuransi & BPJS 101', duration: '8 menit',
+        id: 'c1-l3-2', type: 'lesson', title: 'Asuransi & BPJS 101', duration: '12 menit',
         content: {
           heading: 'Transfer Risiko: Kenapa Kita Perlu Proteksi?',
           body: [
-            'Asuransi bukan investasi, asuransi adalah biaya untuk melindungi aset kamu.',
-            'Minimal memiliki BPJS Kesehatan agar tabungan tidak habis saat sakit keras.',
+            'Dalam piramida keuangan yang sehat, setelah kamu memiliki arus kas yang positif dan dana darurat yang memadai, lapisan selanjutnya yang harus dipenuhi adalah Proteksi atau Asuransi. Asuransi pada dasarnya adalah mekanisme "Transfer Risiko". Kamu membayar premi dalam jumlah tertentu kepada perusahaan asuransi, agar mereka bersedia menanggung risiko finansial yang sangat besar ketika terjadi musibah sakit parah.',
+            'Satu kesalahpahaman terbesar di masyarakat adalah menganggap asuransi sebagai alat untuk mencari keuntungan atau media investasi. Asuransi murni adalah biaya (expense). Tujuan kamu membeli asuransi bukanlah untuk balik modal, melainkan untuk memastikan bahwa jika kamu jatuh sakit parah, seluruh tabungan, dana darurat, dan aset investasimu tidak habis terkuras untuk membayar tagihan rumah sakit.',
+            'BPJS Kesehatan: Perlindungan Dasar Wajib',
+            'Sebagai Warga Negara Indonesia, memiliki BPJS Kesehatan aktif adalah sebuah keharusan mutlak. Tidak peduli seberapa besar gajimu, biaya penyakit kritis (seperti kanker, operasi jantung, atau rawat inap ICU berminggu-minggu) bisa membuat seseorang bangkrut seketika. BPJS Kesehatan memberikan perlindungan berlapis dan sering kali tidak memiliki batas limit biaya asalkan sesuai dengan prosedur medis.',
+            'Asuransi Tambahan yang Perlu Dipertimbangkan:',
+            '1. Asuransi Kesehatan Swasta: Digunakan jika kamu menginginkan kenyamanan lebih, seperti memilih rumah sakit, opsi rawat inap satu kamar, mendapatkan fasilitas yang mungkin tidak dijangkau BPJS, dan penanganan yang lebih cepat.',
+            '2. Asuransi Jiwa: Ini sangat wajib jika kamu adalah pencari nafkah utama (breadwinner) yang memiliki tanggungan hidup (anak, istri, atau orang tua). Uang pertanggungan (UP) asuransi jiwa berfungsi sebagai pengganti penghasilan yang hilang jika hal terburuk terjadi padamu, sehingga keluargamu tetap dapat melanjutkan hidup secara layak.'
           ],
         },
       },
       {
-        id: 'c1-l3-3', type: 'lesson', title: 'Menjaga Cashflow Tetap Positif', duration: '10 menit',
+        id: 'c1-l3-3', type: 'lesson', title: 'Menjaga Cashflow Tetap Positif', duration: '12 menit',
         content: {
           heading: 'Positive Cashflow: Income > Spending',
           body: [
-            'Fokus meningkatkan income atau memangkas spending untuk menjaga surplus.',
-            'Surplus inilah yang nantinya akan digunakan untuk berinvestasi.',
+            'Semua teori tentang budgeting, penempatan dana darurat, dan strategi investasi menjadi tidak relevan jika satu aturan paling fundamental dalam hierarki keuangan diabaikan: Kamu harus menghabiskan uang lebih sedikit daripada total uang yang kamu hasilkan. Inilah yang disebut dengan Positive Cashflow atau Arus Kas Positif.',
+            'Sebuah kondisi keuangan dikatakan sehat bukan dilihat dari seberapa besar nominal gaji atau penghasilannya, melainkan dari seberapa konsisten seseorang mampu mempertahankan surplus antara pendapatan (income) dan pengeluaran (spending). Ada dua strategi utama untuk menjaga dan memperlebar jarak surplus tersebut:',
+            '1. Memangkas Pengeluaran (Defensive Strategy)',
+            'Ini adalah opsi pertama yang paling mudah dan paling bisa bisa kamu kendalikan saat ini. Seperti yang sudah dipelajari, pantau catatan arus kas kamu untuk menemukan kebocoran halus dan perbaiki kebiasaan konsumtif yang merugikan. Batasi hutang dan tahan keinginan untuk terus menaikkan gaya hidup seiring dengan naiknya gaji (Lifestyle Creep). Namun, kamu harus ingat bahwa strategi memangkas gaya hidup ini ada batas maksimalnya; kamu tidak bisa memangkas biaya hidup hingga Rp0.',
+            '2. Meningkatkan Pendapatan (Offensive Strategy)',
+            'Jika strategi bertahan sudah maksimal diterapkan namun surplus yang kamu dapatkan masih terlalu kecil, satu-satunya jalan keluar logis adalah meningkatkan kapasitas mesin pendapatanmu. Hal ini bisa dilakukan dengan cara meminta negosiasi promosi gaji, mencari pekerjaan baru yang menawarkan kompensasi lebih tinggi, membangun sumber pendapatan sampingan (side hustle), atau memonetisasi keahlian kamu.',
+            'Surplus keuangan yang berhasil kamu amankan setiap bulannya inilah yang akan menjadi "amunisi" utamamu. Surplus ini yang akan mendanai toples dana daruratmu dengan cepat, menutup premi proteksimu, dan akhirnya akan menjadi modal utamamu untuk memasuki tahapan berinvestasi secara profesional.'
           ],
         },
       },

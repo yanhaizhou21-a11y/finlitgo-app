@@ -241,6 +241,7 @@ export default function ClassDetailPage() {
 
   // Get level completion status
   const getLevelStatus = (level) => {
+    if (!level || !level.items || !level.finalQuiz) return 'not-started';
     if (!isLevelUnlocked(level.id)) return 'locked';
     const allItems = level.items;
     const allDone = allItems.every(i => completed.has(i.id));
@@ -680,15 +681,29 @@ export default function ClassDetailPage() {
                 <h1 className="text-3xl md:text-4xl font-bold font-orbitron text-white mb-3 leading-tight">{activeItem.content.heading}</h1>
                 <p className="text-zinc-500 text-sm font-mono mb-10 flex items-center gap-2"><IconClock size={14} /> Estimasi baca: {activeItem.duration}</p>
 
+                {activeItem.content.videoId && (
+                  <div className="relative w-full pb-[56.25%] rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-700 mb-8 shadow-2xl">
+                    <iframe
+                      className="absolute inset-0 w-full h-full"
+                      src={`https://www.youtube.com/embed/${activeItem.content.videoId}?rel=0`}
+                      title="YouTube video player"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                )}
+
                 <div className="space-y-6 text-zinc-300 text-base leading-relaxed">
                   {activeItem.content.body.map((para, i) => (
                     <motion.p key={i} initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1+i*0.08 }}>{para}</motion.p>
                   ))}
                 </div>
 
-                <div className="my-10 bg-zinc-900 border-l-4 border-violet-500 p-6 rounded-r-xl">
-                  <p className="text-white italic text-base">{activeItem.content.quote}</p>
-                </div>
+                {activeItem.content.quote && (
+                  <div className="my-10 bg-zinc-900 border-l-4 border-violet-500 p-6 rounded-r-xl">
+                    <p className="text-white italic text-base">{activeItem.content.quote}</p>
+                  </div>
+                )}
 
                 {completed.has(activeItemId) && (
                   <motion.div initial={{ opacity:0, scale:0.9 }} animate={{ opacity:1, scale:1 }}

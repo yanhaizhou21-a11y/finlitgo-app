@@ -4,9 +4,23 @@ import { useNavigate } from "react-router-dom";
 const STORAGE_KEY = "finlitgo_blogs";
 
 function getBlogs() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) return JSON.parse(saved);
-  return [];
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      console.log("Blogs loaded successfully:", parsed);
+      return parsed;
+    }
+    console.warn("No blogs found in localStorage");
+    return [];
+  } catch (error) {
+    console.error("Error loading blogs from localStorage:", {
+      message: error.message,
+      key: STORAGE_KEY,
+      savedData: localStorage.getItem(STORAGE_KEY),
+    });
+    return [];
+  }
 }
 
 const Problems = () => {
