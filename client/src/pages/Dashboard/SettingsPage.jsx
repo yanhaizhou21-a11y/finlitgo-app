@@ -17,6 +17,7 @@ export default function SettingsPage() {
   const [error, setError] = useState('');
   const [photoURL, setPhotoURL] = useState('');
   const [photoError, setPhotoError] = useState('');
+  const [hasPassword, setHasPassword] = useState(false);
 
   // Notification settings
   const [notifications, setNotifications] = useState({
@@ -42,6 +43,11 @@ export default function SettingsPage() {
   // Load profile from Supabase
   useEffect(() => {
     if (!user) return;
+
+    const metadataHasPassword = user.user_metadata?.has_password === true;
+    const passwordIdentityExists = user.identities?.some(identity => identity.provider === 'password');
+    const detectedHasPassword = metadataHasPassword || passwordIdentityExists;
+    setHasPassword(detectedHasPassword);
     
     const loadProfile = async () => {
       try {
@@ -233,7 +239,7 @@ export default function SettingsPage() {
     setError('');
 
     try {
-      const wantsPasswordUpdate = Boolean(securityData.currentPassword || securityData.newPassword || securityData.confirmPassword);
+      const wantsPasswordUpdate = Boolean(securityData.newPassword || securityData.confirmPassword);
 
       if (wantsPasswordUpdate) {
         if (!securityData.newPassword || !securityData.confirmPassword) {
@@ -246,11 +252,36 @@ export default function SettingsPage() {
           throw new Error('Konfirmasi password tidak cocok.');
         }
 
-        const { error } = await supabase.auth.updateUser({
-          password: securityData.newPassword
-        });
-        
-        if (error) throw error;
+        if (hasPassword) {
+          if (!securityData.currentPassword) {
+            throw new Error('Masukkan password saat ini untuk verifikasi.');
+          }
+
+          // Reauthenticate with current password before updating
+          const { error: reAuthError } = await supabase.auth.signInWithPassword({
+            email: user.email,
+            password: securityData.currentPassword
+          });
+          
+          if (reAuthError) {
+            throw new Error('Password saat ini salah.');
+          }
+
+          // Update password after successful reauthentication
+          const { error } = await supabase.auth.updateUser({
+            password: securityData.newPassword,
+            data: { has_password: true }
+          });
+          
+          if (error) throw error;
+        } else {
+          const { error } = await supabase.auth.updateUser({
+            password: securityData.newPassword,
+            data: { has_password: true }
+          });
+
+          if (error) throw error;
+        }
       }
 
       setSecurityData(prev => ({
@@ -658,41 +689,52 @@ export default function SettingsPage() {
 
               <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg">
                 <h4 className="text-sm font-medium text-white mb-1">Change Password</h4>
-                <p className="text-xs text-zinc-400">Isi field di bawah kalau kamu ingin ganti password akun.</p>
+                <p className="text-xs text-zinc-400">
+                  {hasPassword
+                    ? 'Akun ini sudah punya password. Masukkan password lama untuk verifikasi sebelum ganti password.'
+                    : 'Akun ini belum punya password. Kamu bisa langsung set password baru; field password lama boleh dikosongkan.'}
+                </p>
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-zinc-300">Current Password</label>
+                <label className="text-sm font-medium text-zinc-300">
+                  Password Lama {hasPassword ? '' : '(opsional)'}
+                </label>
                 <input
                   type="password"
                   name="currentPassword"
                   value={securityData.currentPassword}
                   onChange={handleSecurityChange}
-                  placeholder="Enter current password"
+                  placeholder={hasPassword ? 'Masukkan password lama' : 'Kosongkan jika belum punya password'}
                   className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/30 transition-all"
                 />
+                <p className="text-xs text-zinc-500">
+                  {hasPassword
+                    ? 'Wajib diisi untuk verifikasi sebelum password baru disimpan.'
+                    : 'Kalau akun ini belum punya password, field ini tidak perlu diisi.'}
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-zinc-300">New Password</label>
+                  <label className="text-sm font-medium text-zinc-300">Password Baru</label>
                   <input
                     type="password"
                     name="newPassword"
                     value={securityData.newPassword}
                     onChange={handleSecurityChange}
-                    placeholder="Min. 8 characters"
+                    placeholder="Min. 8 karakter"
                     className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/30 transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-zinc-300">Confirm New Password</label>
+                  <label className="text-sm font-medium text-zinc-300">Konfirmasi Password Baru</label>
                   <input
                     type="password"
                     name="confirmPassword"
                     value={securityData.confirmPassword}
                     onChange={handleSecurityChange}
-                    placeholder="Repeat new password"
+                    placeholder="Ulangi password baru"
                     className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/30 transition-all"
                   />
                 </div>

@@ -118,18 +118,13 @@ function getBlogs() {
 export default function BlogPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [visibleCount, setVisibleCount] = useState(3);
 
   const blogs = getBlogs();
 
   const filteredBlogs = blogs.filter((b) =>
     b.title.toLowerCase().includes(search.toLowerCase())
-  ).map(b => ({
-    ...b,
-    image: b.thumbnail_url || b.image,
-    date: new Date(b.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-  }));
+  );
 
   const featured = filteredBlogs[0];
   const restPosts = filteredBlogs.slice(1, 1 + visibleCount);
@@ -161,7 +156,7 @@ export default function BlogPage() {
             </p>
           </motion.div>
 
-          {/* Search Component dengan Animasi Placeholder ke Icon */}
+          {/* Search Component */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -174,7 +169,7 @@ export default function BlogPage() {
               value={search}
               onChange={e => {
                 setSearch(e.target.value);
-                setVisibleCount(3); // ✅ reset saat search berubah
+                setVisibleCount(3);
               }}
               placeholder="Search articles..."
               className="w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl py-4 px-12 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-400 focus:shadow-[0_0_30px_rgba(124,58,237,0.2)] transition-all text-lg"
@@ -245,10 +240,32 @@ export default function BlogPage() {
 
       {/* Recent Articles Grid */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 py-8 pb-20">
-        <h3 className="text-2xl font-bold font-orbitron mb-8 border-b border-zinc-800 pb-4 flex items-center gap-2">
-          <span className="w-1 h-6 bg-gradient-to-b from-violet-500 to-purple-400 rounded-full" />
-          Recent Articles
-        </h3>
+        <div className="flex items-center justify-between mb-8 border-b border-zinc-800 pb-4">
+          <h3 className="text-2xl font-bold font-orbitron flex items-center gap-2">
+            <span className="w-1 h-6 bg-gradient-to-b from-violet-500 to-purple-400 rounded-full" />
+            Recent Articles
+          </h3>
+
+          <div className="flex gap-3">
+            {remainingPosts > 0 && (
+              <button
+                onClick={() => setVisibleCount((prev) => prev + 3)}
+                className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-400 text-white text-sm rounded-lg font-semibold hover:shadow-lg transition-all"
+              >
+                Load More
+              </button>
+            )}
+
+            {visibleCount > 3 && (
+              <button
+                onClick={() => setVisibleCount(3)}
+                className="px-4 py-2 bg-zinc-800 border border-zinc-700 text-white text-sm rounded-lg font-semibold hover:bg-zinc-700 transition-all"
+              >
+                Show Less
+              </button>
+            )}
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {restPosts.map((post, i) => (
@@ -302,27 +319,6 @@ export default function BlogPage() {
               </div>
             </motion.div>
           ))}
-        </div>
-
-        {/* Load More / Show Less Buttons */}
-        <div className="text-center mt-10 flex justify-center gap-4">
-          {remainingPosts > 0 && (
-            <button
-              onClick={() => setVisibleCount((prev) => prev + 3)}
-              className="px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-400 text-white rounded-xl font-bold hover:shadow-lg transition-all cursor-pointer"
-            >
-              Load More ({remainingPosts} remaining)
-            </button>
-          )}
-
-          {visibleCount > 3 && (
-            <button
-              onClick={() => setVisibleCount(3)}
-              className="px-6 py-3 bg-zinc-800 border border-zinc-700 text-white rounded-xl font-bold hover:bg-zinc-700 transition-all cursor-pointer"
-            >
-              Show Less
-            </button>
-          )}
         </div>
 
         {/* Empty State */}
