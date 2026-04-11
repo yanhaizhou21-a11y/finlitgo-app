@@ -9,6 +9,7 @@ import {
 } from "motion/react";
 
 import React, { useRef, useState } from "react";
+import logoUrl from "../../assets/logo.svg";
 
 
 interface NavbarProps {
@@ -51,25 +52,43 @@ interface MobileNavMenuProps {
 
 export const Navbar = ({ children, className }: NavbarProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
+  const { scrollY } = useScroll();
   const [visible, setVisible] = useState<boolean>(false);
+  const [isNavbarVisible, setIsNavbarVisible] = useState<boolean>(true);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest > 100) {
-      setVisible(true);
-    } else {
+    const previous = scrollY.getPrevious() ?? 0;
+    const scrollingDown = latest > previous;
+    const scrollingUp = latest < previous;
+
+    if (latest <= 0) {
       setVisible(false);
+      setIsNavbarVisible(true);
+      return;
+    }
+
+    setVisible(latest > 100);
+
+    if (scrollingDown && latest > 80) {
+      setIsNavbarVisible(false);
+      return;
+    }
+
+    if (scrollingUp) {
+      setIsNavbarVisible(true);
     }
   });
 
   return (
     <motion.div
       ref={ref}
-      // IMPORTANT: Change this to class of `fixed` if you want the navbar to be fixed
-      className={cn("sticky inset-x-0 top-20 z-40 w-full", className)}
+      animate={{
+        y: isNavbarVisible ? 0 : -120,
+        opacity: isNavbarVisible ? 1 : 0,
+      }}
+      transition={{ duration: 0.25, ease: "easeInOut" }}
+      style={{ pointerEvents: isNavbarVisible ? "auto" : "none" }}
+      className={cn("fixed inset-x-0 top-0 z-40 w-full", className)}
     >
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
@@ -120,7 +139,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
+        "hidden min-w-0 flex-1 flex-row items-center justify-center space-x-1 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
         className,
       )}
     >
@@ -233,16 +252,11 @@ export const MobileNavToggle = ({
 export const NavbarLogo = () => {
   return (
     <a
-      href="#"
+      href="/"
       className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black"
     >
-      <img
-        src="https://assets.aceternity.com/logo-dark.png"
-        alt="logo"
-        width={30}
-        height={30}
-      />
-      <span className="font-medium text-black dark:text-white">Startup</span>
+      <img src={logoUrl} alt="FinLitGo Logo" className="h-8 w-8 object-contain" />
+      <span className="font-bold text-black dark:text-white" style={{ fontFamily: "'Orbitron', sans-serif" }}>FinLitGo</span>
     </a>
   );
 };

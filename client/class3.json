@@ -1,0 +1,358 @@
+[
+  {
+    "id": "level-0",
+    "title": "Pengantar Modul Wealth Mastery",
+    "description": "Selamat datang di tahap akhir perjalanan finansialmu: WEALTH MASTERY & FINANCIAL FREEDOM. Di tahap ini, kita bukan lagi berfokus pada bertahan hidup atau sekadar menabung dari sisa gaji. Fokus utama kita sekarang adalah tentang mempercepat akumulasi kekayaan, meminimalkan kebocoran nilai akibat pajak, dan mendesain portofolio yang dapat membiayai gaya hidup impianmu sepenuhnya secara pasif tanpa harus bekerja lagi.",
+    "items": [
+      {
+        "id": "c3-l0-1",
+        "type": "lesson",
+        "title": "Selamat Datang di Level Kebebasan",
+        "duration": "5 menit",
+        "content": {
+          "heading": "Pengantar Modul Wealth Mastery",
+          "body": [
+            "Selamat datang di tahap akhir perjalanan finansialmu: WEALTH MASTERY & FINANCIAL FREEDOM. Di tahap ini, kita bukan lagi berfokus pada bertahan hidup atau sekadar menabung dari sisa gaji. Fokus utama kita sekarang adalah tentang mempercepat akumulasi kekayaan, meminimalkan kebocoran nilai akibat pajak, dan mendesain portofolio yang dapat membiayai gaya hidup impianmu sepenuhnya secara pasif tanpa harus bekerja lagi.",
+            "Banyak orang mengira bahwa menjadi kaya adalah tujuan akhir. Namun, bagi para master finansial, kekayaan hanyalah bahan bakar untuk mencapai tujuan yang sesungguhnya: Kebebasan Waktu (Time Freedom). Uang sejati bukan sekadar angka di rekening bank, melainkan seberapa besar kendali yang kamu miliki atas kalendermu sendiri—kapan kamu bangun, dengan siapa kamu bekerja, dan di mana kamu menghabiskan sisa harimu.",
+            "Modul ini dirancang khusus untuk mereka yang sudah memiliki fondasi arus kas yang kuat dan portofolio investasi dasar. Kita akan membedah strategi tingkat lanjut seperti prinsip fundamental gerakan FIRE (Financial Independence, Retire Early), simulasi penarikan dana aman (Safe Withdrawal Rate) dengan The 4% Rule, hingga teknik merotasi dan melindungi aset dari gerusan krisis ekonomi dan inflasi jangka panjang."
+          ]
+        },
+        "quiz": {
+          "title": "Quiz Intro",
+          "questions": [
+            {
+              "question": "Apa tujuan utama dari mengumpulkan kekayaan pada tahap Wealth Mastery?",
+              "options": [
+                "Membeli barang mewah",
+                "Mendapatkan kebebasan waktu",
+                "Pamer ke teman",
+                "Koleksi mobil"
+              ],
+              "correctAnswer": 1
+            }
+          ]
+        }
+      }
+    ],
+    "finalQuiz": {
+      "id": "c3-l0-checkpoint",
+      "title": "Siap Meraih Kebebasan?",
+      "questionCount": 1,
+      "duration": "1 menit",
+      "description": "Konfirmasi kesiapan mental memasuki tahap advanced.",
+      "questions": [
+        {
+          "question": "Apa tujuan utama dari mengumpulkan kekayaan pada tahap Wealth Mastery?",
+          "options": [
+            "Membeli barang mewah sebanyak-banyaknya",
+            "Mendapatkan kebebasan waktu dan kendali atas hidup",
+            "Pamer saldo rekening ke teman-teman",
+            "Menjadi kolektor mobil sport"
+          ],
+          "correctAnswer": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "level-1",
+    "title": "STRATEGI FINANSIAL MENUJU FREEDOM",
+    "description": "Pelajari matematika dasar dari kebebasan finansial dan bagaimana mencapainya lebih cepat dari usia pensiun normal.",
+    "items": [
+      {
+        "id": "c3-l1-video",
+        "type": "video",
+        "title": "Video: Konsep FIRE & The 4% Rule",
+        "duration": "12 menit",
+        "videoId": "Eq1iKCWQn4U",
+        "description": "Penjelasan mendalam tentang bagaimana gerakan FIRE bekerja dan perhitungan matematis di balik angka kebebasan finansialmu.",
+        "transcript": [
+          {
+            "time": "00:00",
+            "text": "Selamat datang kembali. Hari ini kita akan membahas sebuah konsep yang merevolusi cara pandang kita tentang masa pensiun: Gerakan FIRE."
+          },
+          {
+            "time": "03:15",
+            "text": "FIRE singkatan dari Financial Independence, Retire Early. Intinya adalah bagaimana kita bisa berhenti bekerja untuk uang jauh sebelum usia 60 tahun."
+          },
+          {
+            "time": "06:40",
+            "text": "Kunci utama untuk mencapai FIRE adalah tingkat tabungan yang ekstrem (savings rate) dan The 4% Rule dari Trinity Study."
+          },
+          {
+            "time": "09:50",
+            "text": "Dengan The 4% Rule, kamu hanya perlu mengumpulkan investasi sebesar 25 kali lipat pengeluaran tahunanmu untuk bisa pensiun."
+          }
+        ],
+        "content": {
+          "heading": "Membedah Gerakan FIRE (Financial Independence, Retire Early)",
+          "body": [
+            "Gerakan FIRE (Financial Independence, Retire Early) telah mengubah paradigma tradisional tentang siklus bekerja-dan-pensiun. Jika masyarakat pada umumnya percaya bahwa pensiun adalah sebuah usia (biasanya 55-65 tahun), pengikut gerakan FIRE membuktikan bahwa pensiun sebenarnya adalah sebuah angka matematis—yaitu ketika hasil investasi pasifmu sudah bisa menutupi seluruh biaya hidupmu secara berkelanjutan tanpa menggerus modal pokok.",
+            "Prinsip utama yang membedakan pengikut FIRE dengan perencana keuangan tradisional adalah Tingkat Tabungan Ekstrem (Extreme Savings Rate). Sementara standar ahli keuangan menyarankan menabung 10-20% dari penghasilan, penganut FIRE agresif menabung antara 50% hingga 70% dari pendapatan mereka. Semakin besar persentase gaji yang bisa kamu tabung dan investasikan setiap bulan, semakin sedikit pula persentase tahun kerja yang harus kamu lalui sebelum mencapai kemerdekaan finansial.",
+            "Ada beberapa variasi gaya hidup dalam gerakan FIRE yang bisa disesuaikan dengan preferensi masing-masing. 'Lean FIRE' ditujukan bagi mereka yang rela hidup sangat hemat pasca-pensiun dengan budget minimalis. 'Fat FIRE' adalah kebalikannya, di mana seseorang mengumpulkan portofolio jumbo agar bisa pensiun dengan gaya hidup mewah dan leluasa. Sementara 'Barista FIRE' adalah titik tengah—seseorang memiliki investasi yang menutupi kebutuhan pokok, namun ia memilih bekerja paruh waktu (misalnya di kedai kopi) sekadar untuk mendapat asuransi kesehatan atau sekadar mencari kesibukan bersosialisasi."
+          ]
+        },
+        "quiz": {
+          "title": "Quiz Pemahaman FIRE",
+          "questions": [
+            {
+              "question": "Menurut gerakan FIRE, pensiun bukanlah sebuah rentang usia, melainkan...",
+              "options": [
+                "Sebuah angka finansial dari hasil investasi pasif",
+                "Keputusan dari perusahaan tempat bekerja",
+                "Status setelah memiliki rumah lunas",
+                "Saat anak-anak sudah lulus kuliah"
+              ],
+              "correctAnswer": 0
+            }
+          ]
+        }
+      },
+      {
+        "id": "c3-l1-1",
+        "type": "lesson",
+        "title": "The 4% Rule & Safe Withdrawal Rate",
+        "duration": "15 menit",
+        "content": {
+          "heading": "Matematika Pensiun: Aturan 4% (The 4% Rule)",
+          "body": [
+            "Pertanyaan terbesar bagi siapa pun yang ingin mencapai kebebasan finansial adalah: 'Berapa persisnya jumlah uang yang saya butuhkan agar tidak pernah kehabisan dana seumur hidup?' Jawabannya ditemukan dalam The Trinity Study—sebuah riset legendaris dari Trinity University yang menelurkan prinsip 'The 4% Rule' atau Aturan 4 Persen.",
+            "The 4% Rule adalah panduan Safe Withdrawal Rate (Tingkat Penarikan Aman). Aturan ini menyatakan bahwa jika kamu memiliki portofolio investasi campuran (biasanya 50-75% saham dan sisanya obligasi), kamu dapat menarik 4% dari total nilai portofolio tersebut di tahun pertama pensiun, lalu menyesuaikan penarikan di tahun-tahun berikutnya mengikuti inflasi. Berdasarkan data historis bursa saham AS selama puluhan tahun, portofolio dengan penarikan konstan 4% memiliki peluang lebih dari 95% untuk bertahan tanpa habis selama minimal 30 tahun.",
+            "Cara menghitung Target Angka Kebebasan (FIRE Number) sangatlah mudah: Ambil estimasi pengeluaran tahunan kamu pasca-pensiun, lalu kalikan dengan angka 25. Angka pengali 25 ini berasal dari kebalikan angka 4% (100 dibagi 4 = 25). Sebagai contoh, jika kamu berencana pensiun dengan gaya hidup yang membutuhkan biaya Rp10 juta per bulan (atau Rp120 juta per tahun), maka target portofolio investasi yang harus kamu kumpulkan adalah Rp120 juta dikali 25, yaitu Rp3 Miliar.",
+            "Namun, penting untuk dicatat bahwa The 4% Rule bukanlah hukum fisika mutlak, melainkan sekadar asumsi panduan historis. Inflasi yang tidak terkendali, crash pasar saham yang berkepanjangan pada tahun-tahun awal pensiun (Sequence of Returns Risk), atau perubahan kebijakan perpajakan dapat mengubah perhitungan tersebut. Oleh karena itu, investor yang konservatif sering kali memodifikasi aturan ini menjadi The 3% atau The 3.5% Rule dengan mengalikan pengeluaran tahunan sebesar 30 hingga 33 kali lipat demi keamanan ekstra."
+          ]
+        },
+        "quiz": {
+          "title": "Quiz The 4% Rule",
+          "questions": [
+            {
+              "question": "Jika pengeluaran hidup tahunanmu adalah Rp200 juta, berapakah target investasi yang dibutuhkan menurut The 4% Rule (dikali 25)?",
+              "options": [
+                "Rp2 Miliar",
+                "Rp4 Miliar",
+                "Rp5 Miliar",
+                "Rp10 Miliar"
+              ],
+              "correctAnswer": 2
+            }
+          ]
+        }
+      }
+    ],
+    "finalQuiz": {
+      "id": "c3-l1-checkpoint",
+      "title": "Checkpoint Level 1: Strategi Freedom",
+      "questionCount": 5,
+      "duration": "5 menit",
+      "description": "Tes pemahamanmu tentang The 4% Rule dan konsep dasar FIRE.",
+      "questions": [
+        {
+          "question": "Apa yang menjadi fokus utama dalam gerakan FIRE (Financial Independence, Retire Early)?",
+          "options": [
+            "Menghabiskan uang selagi muda dan kuat",
+            "Tingkat tabungan ekstrem untuk mengumpulkan aset yang menghasilkan pendapatan pasif",
+            "Mendapatkan pekerjaan dengan gaji tertinggi dan jabatan direktur",
+            "Menghindari pembayaran pajak sama sekali"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Apa itu The 4% Rule yang berasal dari The Trinity Study?",
+          "options": [
+            "Aturan wajib memotong 4% gaji untuk dana darurat",
+            "Target keuntungan minimal 4% per bulan dari trading saham harian",
+            "Tingkat penarikan aman dari portofolio investasi setiap tahun agar dana tidak habis saat pensiun",
+            "Pajak 4% untuk setiap penarikan tunai"
+          ],
+          "correctAnswer": 2
+        },
+        {
+          "question": "Jika kamu ingin pensiun dengan biaya hidup Rp 5 juta per bulan (Rp 60 juta/tahun), berapakah FIRE Number-mu menurut rumus The 4% Rule (kali 25)?",
+          "options": [
+            "Rp 600 Juta",
+            "Rp 1,5 Miliar",
+            "Rp 2 Miliar",
+            "Rp 3 Miliar"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Apa perbedaan mendasar antara 'Lean FIRE' dan 'Fat FIRE'?",
+          "options": [
+            "Lean FIRE untuk hidup minimalis super hemat, Fat FIRE untuk pensiun dengan gaya hidup mewah",
+            "Lean FIRE berinvestasi di obligasi, Fat FIRE berinvestasi di saham berisiko tinggi",
+            "Lean FIRE pensiun muda, Fat FIRE pensiun di usia tua",
+            "Lean FIRE tidak bayar pajak, Fat FIRE bayar pajak mahal"
+          ],
+          "correctAnswer": 0
+        },
+        {
+          "question": "Mengapa investor konservatif kadang memilih menggunakan The 3% Rule (pengali 33x) alih-alih The 4% Rule?",
+          "options": [
+            "Karena mereka ingin cepat kaya mendadak",
+            "Untuk mengantisipasi risiko crash pasar saham yang parah dan lonjakan inflasi ekstrem di masa pensiun",
+            "Karena aturan 4% dilarang oleh pemerintah",
+            "Supaya bank memberikan bunga lebih tinggi"
+          ],
+          "correctAnswer": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "level-2",
+    "title": "OPTIMALISASI ASET & PROTEKSI KEKAYAAN",
+    "description": "Strategi tingkat lanjut untuk menyusun ulang portofolio, meminimalkan pajak investasi, dan merencanakan warisan aset ke generasi berikutnya.",
+    "items": [
+      {
+        "id": "c3-l2-1",
+        "type": "lesson",
+        "title": "Portfolio Rebalancing & Asset Allocation",
+        "duration": "15 menit",
+        "content": {
+          "heading": "Seni Menyusun Ulang Portofolio (Portfolio Rebalancing)",
+          "body": [
+            "Berinvestasi bukan sekadar membeli aset dan membiarkannya selamanya. Di tingkat mahir, kamu harus menguasai Portfolio Rebalancing. Rebalancing adalah tindakan menyesuaikan kembali bobot kelas aset dalam portofoliomu agar sesuai dengan target profil risiko aslimu. Seiring berjalannya waktu dan fluktuasi pasar, persentase aset saham, obligasi, dan kasmu pasti akan melenceng dari rencana awal.",
+            "Bayangkan portofolio awalmu berisi 70% Saham dan 30% Obligasi. Setelah satu tahun terjadi fenomena bull market saham yang luar biasa, porsi Sahammu melonjak tajam nilainya sehingga kini portofoliomu menjadi 85% Saham dan 15% Obligasi. Walau terlihat menguntungkan, komposisi baru ini sangat berbahaya karena profil risikomu jauh melampaui toleransi awal. Jika tiba-tiba terjadi market crash, kerugianmu akan jauh lebih dalam.",
+            "Tindakan rebalancing memaksa kamu melakukan strategi klasik: 'Beli saat murah, Jual saat mahal' secara otomatis tanpa melibatkan emosi. Pada contoh di atas, kamu akan secara mekanis menjual sebagian porsi saham yang sedang 'mahal' untuk ditukar (dibelikan) ke obligasi yang sedang 'murah', hingga komposisi kembali ke 70/30. Siklus ini biasanya dilakukan secara berkala—misalnya sekali setiap tahun—atau ketika terjadi deviasi batas persentase tertentu, misal bergeser lebih dari 5%.",
+            "Selain mengurangi risiko paparan aset yang sedang 'bubble' (gelembung nilai), rebalancing menjaga disiplin mental. Banyak investor pemula gagal karena mereka justru panik membeli lebih banyak saham saat pasar sedang di puncak euforia tertinggi (FOMO) dan ketakutan menjual saat harga sedang diskon besar di titik terendahnya. Sistem rebalancing membalikkan perilaku psikologis yang merusak tersebut menjadi mekanisme matematis yang terstruktur."
+          ]
+        },
+        "quiz": {
+          "title": "Quiz Portfolio Rebalancing",
+          "questions": [
+            {
+              "question": "Apa manfaat utama dari melakukan Portfolio Rebalancing secara berkala?",
+              "options": [
+                "Menjamin keuntungan maksimal 100% setiap tahun",
+                "Mengembalikan komposisi aset ke profil risiko awal dan memaksa kita disiplin 'jual mahal, beli murah'",
+                "Menghindari kewajiban pelaporan pajak tahunan",
+                "Meningkatkan beban biaya transaksi di bursa efek"
+              ],
+              "correctAnswer": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "c3-l2-2",
+        "type": "lesson",
+        "title": "Tax Efficiency & Tax-Loss Harvesting",
+        "duration": "14 menit",
+        "content": {
+          "heading": "Efisiensi Pajak: Rahasia Keuntungan Maksimal",
+          "body": [
+            "Dalam Wealth Mastery, fokus bergeser dari sekadar mencari 'Return of Investment' (imbal hasil kotor) menjadi 'After-Tax Return' (imbal hasil bersih setelah dipotong pajak dan biaya). Pajak investasi sering kali menjadi komponen 'invisible leak' (kebocoran halus) terbesar yang menghambat keajaiban bunga majemuk bagi investor berskala besar. Investor yang cerdas selalu memikirkan lokasi penempatan asetnya secara strategis berdasarkan efisiensi perpajakan.",
+            "Setiap instrumen investasi diperlakukan berbeda oleh otoritas pajak. Di Indonesia, misalnya, dividen saham biasanya dikenakan pajak final 10%, namun bisa dibebaskan dari pajak jika dividen tersebut diinvestasikan kembali (reinvested) ke instrumen tertentu di dalam negeri selama jangka waktu yang ditetapkan. Demikian pula dengan Reksadana yang bebas dari pajak final karena pajaknya sudah diselesaikan di tingkat Manajer Investasi, menjadikannya pilihan kendaraaan yang sangat efisien secara pajak untuk jangka panjang.",
+            "Teknik lanjutan yang sering digunakan investor institusi adalah 'Tax-Loss Harvesting' (memanen kerugian pajak). Teknik ini melibatkan penjualan sengaja atas aset investasi yang sedang mengalami posisi rugi (floating loss) untuk merealisasikan kerugian modal tersebut. Tujuannya adalah menggunakan kerugian yang direalisasikan tersebut untuk mengimbangi (offset) pajak atas keuntungan dari penjualan investasi saham lain yang berkinerja baik, sehingga pada akhirnya dapat menurunkan total tagihan pajak tahunan secara legal.",
+            "Selain pajak, meminimalkan frekuensi transaksi (turnover rate) juga krusial. Strategi 'Buy and Hold' jangka panjang tidak hanya membiarkan keajaiban compounding bekerja tanpa hambatan, tapi juga sangat efisien. Setiap kali kamu melakukan trading jual-beli, kamu menggerus persentase keuntunganmu dengan membayar biaya broker, komisi bursa, dan berpotensi memicu kejadian kena pajak (taxable event). Menjadi investor pasif (lazy investor) ironisnya sering kali membuahkan pundi-pundi bersih yang jauh lebih besar."
+          ]
+        },
+        "quiz": {
+          "title": "Quiz Tax Efficiency",
+          "questions": [
+            {
+              "question": "Mengapa instrumen Reksadana dianggap menguntungkan dari sisi efisiensi pajak di Indonesia?",
+              "options": [
+                "Karena manajer investasi tidak pernah rugi",
+                "Karena keuntungan dari reksadana bukan merupakan objek pajak penghasilan final bagi investor ritel",
+                "Karena pemerintah mensubsidi reksadana dengan APBN",
+                "Karena tidak perlu dilaporkan di SPT sama sekali"
+              ],
+              "correctAnswer": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "c3-l2-3",
+        "type": "lesson",
+        "title": "Legacy & Estate Planning",
+        "duration": "18 menit",
+        "content": {
+          "heading": "Perencanaan Warisan: Membangun Dinasti Finansial",
+          "body": [
+            "Puncak tertinggi dari literasi keuangan bukan sekadar mengumpulkan kekayaan agar tidak habis semasa hidup, tetapi juga memikirkan bagaimana aset tersebut didistribusikan secara adil, efisien, dan lancar kepada generasi penerus. Inilah esensi dari Estate Planning atau Perencanaan Warisan. Tanpa perencanaan warisan yang matang, aset bernilai miliaran bisa berubah menjadi petaka perebutan harta, sengketa keluarga yang panjang, atau habis tergerus biaya pengacara dan sengketa pengadilan.",
+            "Instrumen paling dasar namun paling sering diabaikan adalah Surat Wasiat (Will). Melalui surat wasiat yang dilegalisasi oleh notaris, kamu memiliki kendali penuh untuk menunjuk siapa yang berhak mewarisi aset spesifik apa, porsinya berapa, dan siapa sosok wali (executor) yang akan mengeksekusi kehendak tersebut. Menulis wasiat selagi sehat pikiran bukan tanda mengundang maut, melainkan bentuk kasih sayang paling nyata agar keluarga yang ditinggalkan tidak perlu berkonflik.",
+            "Selain wasiat, instrumen perlindungan kekayaan (wealth protection) yang ampuh untuk estate planning adalah Asuransi Jiwa. Berbeda dengan aset fisik seperti rumah atau tanah yang sering kali sulit dibagi rata dan memakan waktu lama untuk dijual dengan harga wajar (illiquid), asuransi jiwa memberikan uang tunai dalam jumlah besar (Uang Pertanggungan) yang sangat likuid dan instan cair ke rekening penerima manfaat yang ditunjuk. Uang ini bisa digunakan ahli waris untuk melunasi sisa hutang pewaris atau membiayai biaya administrasi balik nama aset fisik.",
+            "Pada tingkat portofolio keluarga ultra-kaya (High Net Worth Individuals), estate planning sering kali melibatkan pembentukan Trust Fund (Dana Amanat) atau Yayasan Keluarga. Struktur hukum ini melindungi aset dari potensi penyitaan kreditur di masa depan atau dari pewaris yang dianggap belum cakap secara mental mengelola uang besar. Dengan Trust Fund, aset akan dikelola secara profesional oleh wali amanat yang akan mencairkan dananya sedikit demi sedikit kepada pewaris hanya untuk keperluan pendidikan atau biaya medis."
+          ]
+        },
+        "quiz": {
+          "title": "Quiz Estate Planning",
+          "questions": [
+            {
+              "question": "Mengapa Asuransi Jiwa sering digunakan sebagai instrumen kunci dalam Perencanaan Warisan (Estate Planning)?",
+              "options": [
+                "Karena premi asuransi tidak perlu dibayar",
+                "Karena pencairan uang pertanggungannya sangat likuid, cepat, dan jelas penerima manfaatnya",
+                "Karena perusahaan asuransi mengelola warisan berupa tanah",
+                "Karena bisa menghindari semua pajak bumi dan bangunan"
+              ],
+              "correctAnswer": 1
+            }
+          ]
+        }
+      }
+    ],
+    "finalQuiz": {
+      "id": "c3-l2-checkpoint",
+      "title": "Checkpoint Level 2: Advanced Mastery",
+      "questionCount": 5,
+      "duration": "5 menit",
+      "description": "Tes pemahamanmu tentang pengelolaan aset lanjutan dan pewarisan.",
+      "questions": [
+        {
+          "question": "Apa yang akan terjadi jika seorang investor membiarkan portofolionya selama bertahun-tahun tanpa pernah melakukan Rebalancing?",
+          "options": [
+            "Keuntungannya akan selalu maksimal 100%",
+            "Profil risiko portofolionya akan menyimpang dari rencana awal, seringkali menjadi jauh lebih berisiko tinggi saat pasar saham sedang bullish",
+            "Portofolio akan otomatis berubah menjadi deposito",
+            "Otoritas bursa efek akan membekukan rekeningnya"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Bagaimana cara kerja dasar Portfolio Rebalancing secara mekanis saat pasar saham sedang naik tinggi (bullish)?",
+          "options": [
+            "Meminjam uang ke bank untuk membeli saham lebih banyak",
+            "Menjual aset saham yang porsinya membengkak (jual mahal) dan menggunakan uangnya untuk membeli obligasi/aset konservatif (beli murah) agar rasio seimbang kembali",
+            "Mencairkan seluruh aset menjadi uang tunai dan berhenti investasi",
+            "Mengalihkan seluruh tabungan ke mata uang kripto yang sedang viral"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Dalam konteks efisiensi pajak, istilah 'Tax-Loss Harvesting' merujuk pada strategi apa?",
+          "options": [
+            "Sengaja telat membayar pajak tahunan agar dikenakan denda",
+            "Menjual investasi yang sedang rugi untuk merealisasikan kerugian pajak, yang kemudian digunakan untuk mengimbangi pajak atas keuntungan investasi saham lain",
+            "Memalsukan dokumen laporan keuangan untuk menghindari pajak final",
+            "Menghindari membeli reksadana karena pajaknya terlalu tinggi"
+          ],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Mengapa aset properti (rumah/tanah) seringkali dianggap menantang untuk diwariskan secara adil dibandingkan uang tunai?",
+          "options": [
+            "Karena properti sifatnya illiquid (tidak mudah/cepat dijual menjadi uang tunai dengan harga wajar) dan sulit dibagi secara fisik",
+            "Karena rumah tidak bisa dipindahkan lokasinya",
+            "Karena harga properti selalu turun setiap tahun tanpa terkecuali",
+            "Karena notaris tidak menerima pendaftaran rumah"
+          ],
+          "correctAnswer": 0
+        },
+        {
+          "question": "Apa fungsi utama dari pembentukan struktur hukum Trust Fund (Dana Amanat) bagi keluarga kaya?",
+          "options": [
+            "Untuk menghindari kewajiban pajak PPN saat berbelanja harian",
+            "Melindungi aset besar agar dikelola profesional dan pencairannya diatur secara ketat (misal hanya untuk pendidikan anak) sehingga tidak cepat dihabiskan",
+            "Untuk mencuci uang hasil kegiatan ilegal secara instan",
+            "Untuk memanipulasi laporan harga saham di bursa efek global"
+          ],
+          "correctAnswer": 1
+        }
+      ]
+    }
+  }
+]

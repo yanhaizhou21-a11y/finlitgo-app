@@ -8,3 +8,12 @@ node_modules/
 # (Add any other client-specific ignores here, like build folders)
 /client/build/
 /client/dist/
+#firebase thing
+firebase.json
+firebase.js
+#private
+finlintgo.sdk
+test-gemini.mjs
+supabase_setup.sql
+database_setup.sql
+et --hard HEAD@{1}
