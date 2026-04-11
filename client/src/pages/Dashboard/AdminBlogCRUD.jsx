@@ -102,41 +102,42 @@ export default function AdminBlogCRUD() {
   const [sortOrder, setSortOrder] = useState('latest'); // 'latest' | 'oldest'
   const [toasts, setToasts] = useState([]);
 
-  // ── Load data from Supabase ──
-  const fetchBlogs = useCallback(async () => {
-  setLoading(true);
-
-  const { data, error, status, statusText } = await supabase
-    .from('blogs')
-    .select('*');
-
-  console.log("STATUS:", status, statusText);
-  console.log("DATA:", data);
-  console.log("ERROR CODE:", error?.code);
-  console.log("ERROR MESSAGE:", error?.message);
-  console.log("ERROR DETAILS:", error?.details);
-  console.log("ERROR HINT:", error?.hint);
-
-  if (error) {
-    pushToast('Failed to fetch data', 'error');
-  } else {
-    const normalisedData = data.map(normaliseBlog);
-    setBlogs(normalisedData);
-  }
-
-  setLoading(false);
-}, []);
-
-  useEffect(() => {
-    fetchBlogs();
-  }, [fetchBlogs]);
-
   // ── Toast helper ──
   const pushToast = useCallback((message, type = 'success') => {
     const id = Date.now();
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3000);
   }, []);
+
+  // ── Load data from Supabase (FIXED: only runs once) ──
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      setLoading(true);
+      
+      const { data, error, status, statusText } = await supabase
+        .from('blogs')
+        .select('*');
+
+      console.log("STATUS:", status, statusText);
+      console.log("DATA:", data);
+      console.log("ERROR CODE:", error?.code);
+      console.log("ERROR MESSAGE:", error?.message);
+      console.log("ERROR DETAILS:", error?.details);
+      console.log("ERROR HINT:", error?.hint);
+
+      if (error) {
+        pushToast('Failed to fetch data', 'error');
+      } else if (data) {
+        const normalisedData = data.map(normaliseBlog);
+        setBlogs(normalisedData);
+        console.log(`✅ ${data.length} posts loaded successfully`);
+      }
+
+      setLoading(false);
+    };
+
+    fetchBlogs();
+  }, []); // ← Empty dependency array = runs only once when component mounts
 
   // ── Filtered / searched / sorted list (memoised) ──
   const displayedBlogs = useMemo(() => {
@@ -190,30 +191,48 @@ export default function AdminBlogCRUD() {
     setForm(EMPTY_FORM);
   }, []);
 
-  // ── CREATE operation ──
-  const handleCreate = useCallback(async () => {
-   const { error } = await supabase
-  .from('blogs')
-  .insert([{
-    title: form.title,
-    content: form.content,
-    category: form.category,
-    image: form.image,
-    thumbnail_url: form.image,
-    time_to_read: form.timeToRead,
-  }])
+  // ── Helper to refresh data ──
+  const refreshBlogs = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('blogs')
+      .select('*');
 
     if (error) {
-      console.error(error);
+      pushToast('Failed to refresh data', 'error');
+    } else if (data) {
+      const normalisedData = data.map(normaliseBlog);
+      setBlogs(normalisedData);
+    }
+    setLoading(false);
+  }, [pushToast]);
+
+  // ── CREATE operation (FIXED: added missing fields) ──
+  const handleCreate = useCallback(async () => {
+    const { error } = await supabase
+      .from('blogs')
+      .insert([{
+        title: form.title,
+        excerpt: form.excerpt,
+        content: form.content,
+        category: form.category,
+        author: form.author,
+        image: form.image,
+        thumbnail_url: form.image,
+        time_to_read: form.timeToRead,
+      }]);
+
+    if (error) {
+      console.error('Create error:', error);
       pushToast('Failed to create post', 'error');
     } else {
-      pushToast('Post created!');
-      fetchBlogs();
+      pushToast('Post created successfully!');
+      await refreshBlogs();
       closeModal();
     }
-  }, [form, fetchBlogs, pushToast, closeModal]);
+  }, [form, refreshBlogs, pushToast, closeModal]);
 
-  // ── UPDATE operation ──
+  // ── UPDATE operation (FIXED: properly handles all fields) ──
   const handleUpdate = useCallback(async () => {
     const { error } = await supabase
       .from('blogs')
@@ -230,14 +249,14 @@ export default function AdminBlogCRUD() {
       .eq('id', editingBlog.id);
 
     if (error) {
-      console.error(error);
+      console.error('Update error:', error);
       pushToast('Failed to update post', 'error');
     } else {
-      pushToast('Post updated!');
-      fetchBlogs();
+      pushToast('Post updated successfully!');
+      await refreshBlogs();
       closeModal();
     }
-  }, [form, editingBlog, fetchBlogs, pushToast, closeModal]);
+  }, [form, editingBlog, refreshBlogs, pushToast, closeModal]);
 
   // ── Save (Create or Update) ──
   const handleSave = useCallback(() => {
@@ -262,14 +281,14 @@ export default function AdminBlogCRUD() {
       .eq('id', deleteConfirm);
 
     if (error) {
-      console.error(error);
+      console.error('Delete error:', error);
       pushToast('Failed to delete post', 'error');
     } else {
-      pushToast('Post deleted!');
-      fetchBlogs();
+      pushToast('Post deleted successfully!');
+      await refreshBlogs();
     }
     setDeleteConfirm(null);
-  }, [deleteConfirm, fetchBlogs, pushToast]);
+  }, [deleteConfirm, refreshBlogs, pushToast]);
 
   // ─────────────────────────────────────────
   // JSX — structure and className unchanged
@@ -335,7 +354,7 @@ export default function AdminBlogCRUD() {
                   <th className="p-4">Category</th>
                   <th className="p-4">Date</th>
                   <th className="p-4 text-right">Actions</th>
-                 </tr>
+                </tr>
               </thead>
               <tbody>
                 {displayedBlogs.map((blog, i) => (
@@ -360,13 +379,13 @@ export default function AdminBlogCRUD() {
                           <p className="text-xs text-zinc-500 mt-0.5 line-clamp-1 max-w-[250px]">{blog.excerpt}</p>
                         </div>
                       </div>
-                     </td>
+                    </td>
                     <td className="p-4 text-zinc-300 text-sm">{blog.author}</td>
                     <td className="p-4">
                       <span className="text-xs px-2 py-1 rounded-full bg-violet-500/10 text-violet-400 font-mono">
                         {blog.category}
                       </span>
-                     </td>
+                    </td>
                     <td className="p-4 text-zinc-400 text-sm font-mono">{blog.date}</td>
                     <td className="p-4">
                       <div className="flex items-center justify-end gap-2">
@@ -383,7 +402,7 @@ export default function AdminBlogCRUD() {
                           <IconTrash size={16} />
                         </button>
                       </div>
-                     </td>
+                    </td>
                   </motion.tr>
                 ))}
               </tbody>
@@ -565,6 +584,3 @@ export default function AdminBlogCRUD() {
     </div>
   );
 }
-
-
-console.log("SUPABASE INSTANCE:", supabase)
