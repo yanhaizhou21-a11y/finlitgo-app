@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IconWallet, IconTrendingUp, IconTrendingDown, IconPlus, IconTarget, IconTrash, IconX, IconCash, IconLoader2 } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
+import { IconWallet, IconTrendingUp, IconTrendingDown, IconPlus, IconTarget, IconTrash, IconX, IconCash, IconLoader2, IconRobot, IconChartBar, IconChartPie } from '@tabler/icons-react';
 
 import { supabase } from '../../services/supabase';
 import { useAuth } from '../../store/AuthContext';
@@ -27,6 +28,7 @@ function normalizeTransaction(tx) {
 export default function FinancialPage() {
   const { user } = useAuth();
   const userId = user?.id || null;
+  const navigate = useNavigate();
 
   const [transactions, setTransactions] = useState([]);
   const [goals, setGoals] = useState([]);
@@ -254,18 +256,43 @@ export default function FinancialPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-end mb-4">
-        <div>
-          <h2 className="text-2xl font-bold font-orbitron">Financial Dashboard</h2>
-          <p className="text-sm text-zinc-500 mt-1">Detailed breakdown of your finances.</p>
+      <div className="flex flex-col gap-3 mb-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold font-orbitron">Financial Dashboard</h2>
+            <p className="text-sm text-zinc-500 mt-1">Detailed breakdown of your finances.</p>
+          </div>
+          <div className="flex gap-3">
+            <button onClick={() => setShowGoalModal(true)} className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-white font-medium text-sm rounded-xl hover:bg-zinc-700 transition-colors border border-zinc-700">
+              <IconTarget size={18} /> Add Goal
+            </button>
+            <button onClick={() => setShowCashflowModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-purple-400 text-white font-bold uppercase tracking-wider text-sm rounded-xl hover:shadow-[0_4px_20px_rgba(124,58,237,0.4)] transition-all hover:-translate-y-0.5">
+              <IconCash size={18} /> Add Cashflow
+            </button>
+          </div>
         </div>
-        <div className="flex gap-3">
-          <button onClick={() => setShowGoalModal(true)} className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-white font-medium text-sm rounded-xl hover:bg-zinc-700 transition-colors border border-zinc-700">
-            <IconTarget size={18} /> Add Goal
-          </button>
-          <button onClick={() => setShowCashflowModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-purple-400 text-white font-bold uppercase tracking-wider text-sm rounded-xl hover:shadow-[0_4px_20px_rgba(124,58,237,0.4)] transition-all hover:-translate-y-0.5">
-            <IconCash size={18} /> Add Cashflow
-          </button>
+
+        {/* AI Analyze Quick-Action Row */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-mono uppercase tracking-widest mr-1">
+            <IconRobot size={14} className="text-violet-400" />
+            <span>AI Analyze:</span>
+          </div>
+          {[
+            { label: 'Cash Flow',  intent: 'analyze_cashflow', icon: <IconChartBar size={14} />,  color: 'text-green-400 border-green-500/30 hover:bg-green-500/10' },
+            { label: 'Expenses',   intent: 'analyze_expenses', icon: <IconChartPie size={14} />,  color: 'text-orange-400 border-orange-500/30 hover:bg-orange-500/10' },
+            { label: 'Revenue',    intent: 'analyze_revenue',  icon: <IconTrendingUp size={14} />, color: 'text-blue-400 border-blue-500/30 hover:bg-blue-500/10' },
+            { label: 'Budget',     intent: 'analyze_budget',   icon: <IconWallet size={14} />,    color: 'text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/10' },
+          ].map(btn => (
+            <button
+              key={btn.intent}
+              onClick={() => navigate(`/ai-assist?intent=${btn.intent}`)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border bg-transparent text-xs font-medium transition-all hover:-translate-y-0.5 ${btn.color}`}
+            >
+              {btn.icon}
+              {btn.label}
+            </button>
+          ))}
         </div>
       </div>
 
