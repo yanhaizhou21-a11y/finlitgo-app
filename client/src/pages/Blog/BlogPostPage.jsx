@@ -1,35 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { IconArrowLeft, IconBrandTwitter, IconBrandLinkedin, IconLink, IconClock, IconBookmark, IconHeart, IconShare } from '@tabler/icons-react';
+import { IconArrowLeft, IconClock, IconBookmark, IconHeart, IconShare } from '@tabler/icons-react';
 import { useNavigate, useParams } from 'react-router-dom';
-
-function getBlogData(postId) {
-  const STORAGE_KEY = 'finlitgo_blogs';
-  const saved = localStorage.getItem(STORAGE_KEY);
-  const blogs = saved ? JSON.parse(saved) : [];
-  return blogs.find(b => String(b.id) === String(postId));
-}
+import { supabase } from '@/services/supabase';
 
 export default function BlogPostPage() {
-  const { postId } = useParams(); // Ambil ID dari URL
+  const { postId } = useParams();
   const navigate = useNavigate();
 
-  // Missing States
+  const [blog, setBlog] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
 
-  const blogData = getBlogData(postId);
+  useEffect(() => {
+    const fetchBlog = async () => {
+      setLoading(true);
 
-  // Fallback
-  const blog = blogData || {
-    title: 'How to Build an Emergency Fund in 6 Months',
-    author: 'Admin FinlitGo',
-    date: 'Oct 12, 2026',
-    timeToRead: '4 min read',
-    category: 'Foundation',
-    image: 'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=1600&q=80',
-    content: `An emergency fund is a financial safety net designed to cover unexpected expenses such as medical bills, urgent car repairs, or sudden job loss.\n\n### Why is an Emergency Fund Critical?\nLife is unpredictable. Having liquid cash readily available gives you peace of mind.\n\n### Step 1: Set a Realistic Goal\nStart small. Aim for one month of essential expenses.\n\n### Step 2: Automate Your Savings\nSet up an automatic transfer from your checking to a dedicated high-yield savings account.\n\n### Step 3: Trim the Fat\nReview your last three months of bank statements.`
-  };
+      const { data, error } = await supabase
+        .from('blogs')
+        .select('*')
+        .eq('id', postId)
+        .single();
+
+      if (error || !data) {
+        setNotFound(true);
+      } else {
+        setBlog({
+          ...data,
+          image: data.image || data.thumbnail_url || '',
+          timeToRead: data.time_to_read || '5 min read',
+          date: new Date(data.created_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit' }),
+        });
+      }
+
+      setLoading(false);
+      window.scrollTo(0, 0);
+    };
+
+    fetchBlog();
+  }, [postId]);
+
+  // ── Loading state ──
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+        <p className="text-zinc-500 animate-pulse">Loading article...</p>
+      </div>
+    );
+  }
+
+  // ── Not found state ──
+  if (notFound || !blog) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Blog not found</h2>
+          <button
+            onClick={() => navigate('/blog')}
+            className="text-violet-400 hover:text-violet-300 flex items-center gap-2 mx-auto"
+          >
+            <IconArrowLeft size={18} /> Back to Blog
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
@@ -44,7 +81,7 @@ export default function BlogPostPage() {
 
         {/* Back Button */}
         <button
-          onClick={() => navigate("/blog")}
+          onClick={() => navigate('/blog')}
           className="absolute top-6 left-6 z-20 flex items-center gap-2 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full text-white hover:bg-violet-600 transition-all"
         >
           <IconArrowLeft size={20} />
@@ -56,9 +93,7 @@ export default function BlogPostPage() {
           <button
             onClick={() => setIsSaved(!isSaved)}
             className={`p-2 rounded-full backdrop-blur-sm transition-all ${
-              isSaved
-                ? "bg-violet-600 text-white"
-                : "bg-black/50 text-white hover:bg-violet-600"
+              isSaved ? 'bg-violet-600 text-white' : 'bg-black/50 text-white hover:bg-violet-600'
             }`}
           >
             <IconBookmark size={20} />
@@ -66,9 +101,7 @@ export default function BlogPostPage() {
           <button
             onClick={() => setIsLiked(!isLiked)}
             className={`p-2 rounded-full backdrop-blur-sm transition-all ${
-              isLiked
-                ? "bg-red-500 text-white"
-                : "bg-black/50 text-white hover:bg-red-500"
+              isLiked ? 'bg-red-500 text-white' : 'bg-black/50 text-white hover:bg-red-500'
             }`}
           >
             <IconHeart size={20} />
@@ -78,7 +111,8 @@ export default function BlogPostPage() {
               if (navigator.share) {
                 navigator.share({ title: blog.title, url: window.location.href });
               } else {
-                alert("Share this article!");
+                navigator.clipboard.writeText(window.location.href);
+                alert('Link copied!');
               }
             }}
             className="p-2 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-violet-600 transition-all"
@@ -144,9 +178,11 @@ export default function BlogPostPage() {
           <div className="mt-12 pt-8 border-t border-zinc-800">
             <h3 className="text-xl font-bold mb-4">Tags</h3>
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-zinc-800 rounded-full text-sm text-zinc-300">
-                {blog.category}
-              </span>
+              {blog.category && (
+                <span className="px-3 py-1 bg-zinc-800 rounded-full text-sm text-zinc-300">
+                  {blog.category}
+                </span>
+              )}
               <span className="px-3 py-1 bg-zinc-800 rounded-full text-sm text-zinc-300">
                 Personal Finance
               </span>
@@ -159,14 +195,14 @@ export default function BlogPostPage() {
           {/* Navigation */}
           <div className="mt-12 flex justify-between">
             <button
-              onClick={() => navigate("/blog")}
+              onClick={() => navigate('/blog')}
               className="flex items-center gap-2 text-zinc-400 hover:text-violet-400 transition-colors"
             >
               <IconArrowLeft size={20} />
               All Articles
             </button>
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="text-zinc-400 hover:text-violet-400 transition-colors"
             >
               Back to Top ↑
@@ -176,4 +212,4 @@ export default function BlogPostPage() {
       </article>
     </div>
   );
-}
+}  
