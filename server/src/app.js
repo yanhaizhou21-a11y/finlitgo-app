@@ -5,20 +5,14 @@ import passport from 'passport'
 import dotenv from 'dotenv'
 import { initPassport } from './config/passport.js'
 import authRoutes from './routes/authRoutes.js'
-import chatRoutes from './routes/chatRoutes.js' // your existing routes
+import chatRoutes from './routes/chatRoutes.js'
+import blogRoutes from './routes/blogRoutes.js'
+import classRoutes from './routes/classRoutes.js'
 import notFound from './middleware/notFound.js'
 import errorHandler from './middleware/errorHandler.js'
 
-<<<<<<< HEAD
 dotenv.config()
 initPassport()
-=======
-const chatRoutes = require('./routes/chatRoutes');
-const blogRoutes = require('./routes/blogRoutes');
-const classRoutes = require('./routes/classRoutes');
-const notFound = require('./middleware/notFound');
-const errorHandler = require('./middleware/errorHandler');
->>>>>>> auth-backend
 
 const app = express()
 
@@ -38,15 +32,11 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'Hello from your Express API!' })
 })
 
-<<<<<<< HEAD
 // Routes
 app.use('/api/auth', authRoutes)
-app.use('/api/chat', chatRoutes) // your existing chat routes
-=======
-app.use('/api/chat', chatRoutes);
-app.use('/api/blogs', blogRoutes);
-app.use('/api/classes', classRoutes);
->>>>>>> auth-backend
+app.use('/api/chat', chatRoutes)
+app.use('/api/blogs', blogRoutes)
+app.use('/api/classes', classRoutes)
 
 app.use(notFound)
 app.use(errorHandler)
