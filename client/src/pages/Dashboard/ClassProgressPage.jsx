@@ -25,6 +25,8 @@ export default function ClassProgressPage() {
         ]);
 
         const progressRows = progressRes.error ? [] : (progressRes.data || []);
+
+        // Also check localStorage for local progress
         const byClass = new Map();
         for (const row of progressRows) {
           byClass.set(row.class_id, (byClass.get(row.class_id) || 0) + 1);
@@ -40,7 +42,24 @@ export default function ClassProgressPage() {
           }
           if (totalItems === 0) totalItems = 1;
 
-          const completedCount = byClass.get(cls.id) || 0;
+          let completedCount = byClass.get(cls.id) || 0;
+
+          // Merge local storage progress for this class if any
+          try {
+            const localKey = `finlitgo_progress_${user.id}_class_${cls.id}`;
+            const localData = localStorage.getItem(localKey);
+            if (localData) {
+              const localSet = new Set(JSON.parse(localData));
+              // Don't double count if we have local items but they aren't in DB yet
+              // Assuming total local progress > DB progress
+              if (localSet.size > completedCount) {
+                completedCount = localSet.size;
+              }
+            }
+          } catch(e) {
+            console.error("Error reading local progress", e);
+          }
+
           const progressPercent = Math.min(100, Math.round((completedCount / totalItems) * 100));
 
           let status = 'Not Started';

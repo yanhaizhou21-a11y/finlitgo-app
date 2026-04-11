@@ -44,6 +44,10 @@ export default function ClassPage() {
     setLoading(true);
     try {
       const data = await fetchClassesFromDb();
+      if (data?.length) {
+        // Sort classes to ensure correct order
+        data.sort((a, b) => a.id - b.id);
+      }
       setClasses(data?.length ? data : getStaticClassesFallback());
     } catch (e) {
       console.error('Failed to fetch classes:', e);

@@ -44,7 +44,22 @@ export default function OverviewPage() {
         // Pastikan tidak 0 untuk menghindari division by zero
         if (totalItems === 0) totalItems = 1;
 
-        const completedCount = byClass.get(cls.id) || 0;
+        let completedCount = byClass.get(cls.id) || 0;
+
+        // Fallback to local storage if local has more progress than DB
+        try {
+          const localKey = `finlitgo_progress_${user.id}_class_${cls.id}`;
+          const localData = localStorage.getItem(localKey);
+          if (localData) {
+            const localSet = new Set(JSON.parse(localData));
+            if (localSet.size > completedCount) {
+              completedCount = localSet.size;
+            }
+          }
+        } catch(e) {
+          console.error("Error reading local progress", e);
+        }
+
         const progress = Math.min(100, Math.round((completedCount / totalItems) * 100));
         return { id: cls.id, title: cls.title, category: cls.category, totalItems, completedCount, progress };
       });

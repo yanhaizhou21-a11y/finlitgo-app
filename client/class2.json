@@ -1,131 +1,205 @@
 [
   {
-    "id": "level-1",
-    "title": "Fondasi Hutang & Psikolgi Fintech",
-    "description": "Pahami kenapa kita berhutang dan bagaimana ekosistem fintech bekerja.",
+    "id": "level-0",
+    "title": "Pengantar Modul Investasi",
+    "description": "Selamat datang di tahap kedua perjalanan finansialmu. Setelah menguasai manajemen arus kas, kini saatnya belajar bagaimana cara membuat uang bekerja untukmu melalui investasi yang terukur.",
     "items": [
       {
-        "id": "c2-l1-video",
-        "type": "video",
-        "title": "Video: Bahaya Paylater yang Nggak Kamu Sadari",
-        "duration": "10 menit",
-        "videoId": "xDxKg3B1MeU",
-        "description": "Simak penjelasan lengkap tentang cara kerja Paylater, potensi jebakan hutang, dan bagaimana menghindarinya.",
-        "transcript": [
-          {
-            "time": "00:00",
-            "text": "Siapa di sini yang pernah pakai Paylater? Mari kita bongkar sisi gelap Paylater."
-          },
-          {
-            "time": "02:30",
-            "text": "Perusahaan fintech untung dari bunga 2-5% per bulan. Denda harian bisa 1%."
-          },
-          {
-            "time": "05:00",
-            "text": "Paylater menghilangkan \"Pain of Paying\", membuat otak tidak merasa kehilangan uang saat checkout."
-          },
-          {
-            "time": "09:00",
-            "text": "Solusinya: hapus fitur Paylater dan gunakan metode Snowball/Avalanche."
-          }
-        ]
-      },
+        "id": "c2-l0-1",
+        "type": "lesson",
+        "title": "Selamat Datang di Dunia Investasi",
+        "duration": "3 menit",
+        "content": {
+          "heading": "Transisi dari Penabung menjadi Investor",
+          "body": [
+            "Selamat! Kamu telah berhasil melewati dasar-dasar manajemen uang. Namun, menabung saja tidak cukup untuk mencapai kebebasan finansial jangka panjang karena adanya inflasi yang terus menggerus nilai mata uang.",
+            "Di Class 2 ini, kita akan beralih dari strategi 'bertahan' (saving) ke strategi 'menyerang' (investing). Kita akan belajar bagaimana memilih aset yang tepat, mengelola risiko, dan memahami mekanisme pasar modal tanpa harus merasa terintimidasi oleh grafik yang rumit."
+          ]
+        }
+      }
+    ],
+    "finalQuiz": {
+      "id": "c2-l0-checkpoint",
+      "title": "Siap Menanam Aset?",
+      "questionCount": 1,
+      "duration": "1 menit",
+      "description": "Konfirmasi kesiapan mental untuk mulai berinvestasi.",
+      "questions": [
+        {
+          "question": "Apakah kamu memahami bahwa investasi melibatkan risiko namun diperlukan untuk melawan inflasi?",
+          "options": [
+            "Belum paham",
+            "Ya, saya siap belajar!",
+            "Saya ingin kaya instan",
+            "Tidak tahu"
+          ],
+          "correctAnswer": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "level-1",
+    "title": "PENGENALAN PASAR MODAL & PROFIL RISIKO",
+    "description": "Membangun Mesin Uang dari Nol: Strategi Menanam untuk Memanen",
+    "items": [
       {
         "id": "c2-l1-1",
-        "type": "lesson",
-        "title": "Apa itu Hutang? (Good vs Bad Debt)",
-        "duration": "8 menit",
+        "type": "video",
+        "title": "Apa Itu Investasi & Kenapa Harus Mulai Sekarang?",
+        "duration": "10 menit",
+        "videoId": "I81xqr8HzBE",
+        "description": "Video pembelajaran tentang konsep dasar investasi.",
+        "transcript": [
+          { "time": "00:00", "text": "Mulai belajar investasi." },
+          { "time": "01:00", "text": "Investasi melawan inflasi." }
+        ],
         "content": {
-          "heading": "Hutang: Alat atau Beban?",
+          "heading": "Investasi: Kendaraan Menuju Kebebasan Finansial",
           "body": [
-            "Good Debt: Pinjaman untuk aset produktif (KPR, Modal Usaha).",
-            "Bad Debt: Pinjaman untuk konsumsi/gaya hidup (Paylater nongkrong)."
+            "Investasi bukan sekadar tren, melainkan kebutuhan logis untuk menjaga masa depan. Mengapa harus sekarang? Karena dalam investasi, waktu adalah aset yang lebih berharga daripada jumlah uang itu sendiri.",
+            "Bayangkan kamu menanam pohon jati. Jika menanam sekarang, 20 tahun lagi kamu bisa memanennya. Jika menunda besok, panenmu pun tertunda. Investasi bekerja dengan prinsip yang sama: menunda kesenangan jangka pendek demi keamanan jangka panjang.",
+            "Tanpa investasi, kamu dipaksa untuk terus bekerja menukar waktu dengan uang selamanya. Dengan investasi, kamu sedang membangun 'mesin' yang suatu saat nanti akan bekerja untukmu, memberikan penghasilan pasif bahkan saat kamu tidur.",
+            "Memulai sekarang dengan nominal kecil jauh lebih baik daripada memulai nanti dengan nominal besar namun kehilangan momentum pertumbuhan bunga berbunga (compounding interest)."
+          ]
+        },
+        "quiz": {
+          "id": "c2-l1-q1",
+          "title": "Quiz Evaluasi: Konsep Dasar",
+          "questions": [
+            {
+              "question": "Apa alasan paling logis mengapa investasi harus dimulai sedini mungkin?",
+              "options": [
+                "Agar bisa pamer ke teman",
+                "Memanfaatkan momentum waktu untuk pertumbuhan aset yang maksimal",
+                "Karena harga barang pasti akan turun",
+                "Agar cepat bisa berhenti bekerja bulan depan"
+              ],
+              "correctAnswer": 1
+            }
           ]
         }
       },
       {
-        "id": "c2-l1-quiz",
-        "type": "in-lesson-quiz",
-        "title": "Quiz Dasar Hutang",
-        "questions": [
-          {
-            "question": "Hutang produktif disebut...",
-            "options": [
-              "Bad Debt",
-              "Good Debt",
-              "Social Debt",
-              "Quick Debt"
-            ],
-            "correctAnswer": 1
-          },
-          {
-            "question": "Denda harian fintech legal rata-rata...",
-            "options": [
-              "0.01%",
-              "1%",
-              "10%",
-              "50%"
-            ],
-            "correctAnswer": 1
-          }
-        ]
+        "id": "c2-l1-2",
+        "type": "video",
+        "title": "Mengenal High Risk High Return vs Low Risk Low Return",
+        "duration": "12 menit",
+        "videoId": "W1zCbDTlndw",
+        "description": "Video tentang profil risiko dalam investasi.",
+        "transcript": [
+          { "time": "00:00", "text": "Tidak ada makan siang gratis di investasi." },
+          { "time": "02:00", "text": "High risk, high return." }
+        ],
+        "content": {
+          "heading": "Hukum Alam Investasi & Manajemen Risiko",
+          "body": [
+            "Dalam dunia finansial, tidak ada yang namanya 'Makan Siang Gratis'. Setiap potensi keuntungan selalu berbanding lurus dengan risiko yang menyertainya. Prinsip fundamental ini dikenal dengan istilah Risk-Return Trade-off, yang berarti semakin tinggi potensi imbal hasil yang diharapkan, semakin besar pula risiko kerugian yang harus siap ditanggung oleh seorang investor.",
+            "High Risk, High Return: Instrumen seperti Saham, Cryptocurrency, atau instrumen derivatif lainnya memiliki potensi untuk melipatgandakan modal hingga ratusan persen dalam waktu yang relatif singkat. Namun, fluktuasi harga yang sangat liar juga membawa risiko kehilangan sebagian besar atau bahkan seluruh modal investasi awal. Instrumen ini membutuhkan analisis mendalam dan mental baja.",
+            "Low Risk, Low Return: Di sisi spektrum yang lain, instrumen seperti Deposito Bank, Surat Berharga Negara (SBN), atau Reksa Dana Pasar Uang menawarkan tingkat keamanan yang sangat tinggi. Risiko kehilangan modal hampir tidak ada, namun sebagai kompensasinya, tingkat imbal hasil (return) yang diberikan cenderung konservatif dan seringkali hanya sedikit di atas tingkat inflasi tahunan.",
+            "Kunci sukses bagi seorang investor pemula bukanlah pada upaya untuk sepenuhnya menghindari risiko, melainkan pada kemampuan untuk MENGELOLA risiko tersebut. Hal ini dapat dicapai dengan memahami toleransi risiko pribadi, menyusun portofolio yang terdiversifikasi dengan baik, dan menyesuaikan pilihan instrumen investasi dengan tujuan serta jangka waktu keuangan yang telah ditetapkan."
+          ]
+        },
+        "quiz": {
+          "id": "c2-l1-q2",
+          "title": "Quiz Evaluasi: Risk-Reward Ratio",
+          "questions": [
+            {
+              "question": "Jika ada tawaran investasi dengan profit 50% per bulan tanpa risiko sama sekali, tindakan paling bijak adalah...",
+              "options": [
+                "Langsung jual aset untuk ikut bergabung",
+                "Mengajak teman sebanyak-banyaknya",
+                "Waspada karena itu indikasi investasi bodong (Scam)",
+                "Diam-diam ikut sedikit saja"
+              ],
+              "correctAnswer": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "c2-l1-3",
+        "type": "video",
+        "title": "Analisis Profil Risiko Pribadi",
+        "duration": "10 menit",
+        "videoId": "RqSNdMimt9E",
+        "description": "Video analisis profil risiko.",
+        "transcript": [
+          { "time": "00:00", "text": "Pahami dirimu sendiri." },
+          { "time": "03:00", "text": "Konservatif, moderat, atau agresif?" }
+        ],
+        "content": {
+          "heading": "Menemukan Gaya Investasimu",
+          "body": [
+            "Profil risiko investasi pada hakikatnya ditentukan oleh perpaduan berbagai elemen hidupmu: Usia biologis dan kematangan emosi, Tingkat Tanggungan Finansial, Kapasitas Penghasilan, serta kondisi Psikologis dasar saat menghadapi ketidakpastian finansial.",
+            "Usaha untuk sekadar meniru atau 'menjiplak' portofolio investasi orang lain, betapapun suksesnya orang tersebut, sangat tidak direkomendasikan karena kondisi fundamental, tujuan hidup, serta durasi investasi setiap individu sangatlah unik dan bervariasi.",
+            "1. PROFIL KONSERVATIF: Investor dengan tipe ini lebih mengutamakan kelestarian dan keamanan modal utamanya daripada mengejar tingkat pengembalian yang eksponensial. Mereka menghindari volatilitas tajam dan sangat cocok untuk dana yang direncanakan akan dipakai dalam waktu dekat (1-2 tahun), seperti dana darurat, DP rumah, atau biaya pendidikan anak.",
+            "2. PROFIL MODERAT: Merupakan titik tengah, di mana investor memiliki kesiapan mental untuk menerima sejumlah fluktuasi jangka pendek demi meraih pertumbuhan aset yang lebih berarti dalam jangka waktu menengah (3-5 tahun). Mereka seringkali mendiversifikasi dan menyeimbangkan alokasi portofolio mereka, memadukan stabilitas obligasi/pendapatan tetap dengan porsi pertumbuhan dari pasar saham.",
+            "3. PROFIL AGRESIF: Investor berani yang secara sadar siap mengambil risiko kehilangan porsi yang signifikan dari modal demi mengejar imbal hasil yang jauh di atas rata-rata pasar dalam jangka panjang. Mereka fokus pada pertumbuhan modal maksimal, tidak mudah panik saat terjadi koreksi pasar (market crash), dan idealnya memegang investasi untuk kurun waktu di atas 5-10 tahun sebelum dicairkan."
+          ]
+        },
+        "quiz": {
+          "id": "c2-l1-q3",
+          "title": "Quiz Evaluasi: Profil Risiko",
+          "questions": [
+            {
+              "question": "Seorang investor agresif biasanya mengalokasikan sebagian besar dananya pada...",
+              "options": [
+                "Tabungan bank biasa",
+                "Emas murni",
+                "Instrumen pertumbuhan seperti Saham atau Bisnis",
+                "Sembako"
+              ],
+              "correctAnswer": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "c2-l1-v1",
+        "type": "video",
+        "title": "Panduan Jenis Investasi di Indonesia",
+        "duration": "10 menit",
+        "videoId": "jXay0-Vj0Wc",
+        "description": "Penjelasan mendalam mengenai kaitan profil risiko dengan instrumen real di pasar modal Indonesia.",
+        "transcript": [
+          { "time": "00:00", "text": "Mari kita bedah instrumen dari yang paling aman hingga paling berisiko." },
+          { "time": "05:00", "text": "Jangan pernah beli saham jika dana daruratmu belum terkumpul!" }
+        ],
+        "content": {
+          "heading": "Jenis Investasi Populer",
+          "body": [
+            "Memahami berbagai instrumen investasi di Indonesia bukan sekadar soal tahu nama, namun mengenali secara mendalam karakteristik risiko dan imbal hasil dari masing-masing pilihan. Instrumen investasi ibarat alat pertukangan: kamu harus memilih alat yang tepat untuk pekerjaan yang spesifik.",
+            "Di pasar modal, rentang instrumen investasi membentang dari spektrum risiko terendah hingga spektrum risiko ekstrem. Mulai dari tabungan tradisional dan deposito berjangka di bank, yang memberikan kepastian pokok dan bunga meskipun dengan persentase pertumbuhan yang sangat konservatif (seringkali sulit mengalahkan laju inflasi jangka panjang).",
+            "Meningkat pada spektrum risiko menengah, terdapat Surat Berharga Negara (SBN) seperti ORI dan SR, lalu berbagai jenis Reksa Dana. Reksa Dana Pasar Uang (RDPU) cocok untuk pemula dan horizon investasi singkat, sedangkan Reksa Dana Pendapatan Tetap dan Campuran memberikan opsi untuk risiko moderat hingga agresif tanpa harus mengelola secara langsung.",
+            "Terakhir, di ranah risiko tinggi, terdapat instrumen seperti Saham (kepemilikan langsung di perusahaan publik) dan Cryptocurrency. Instrumen ini menawarkan potensi pengembalian modal yang masif secara historis, namun juga volatilitas harian yang menguji mentalitas dan disiplin setiap investor. Pilihlah dan diversifikasikan porsi kekayaan yang akan dialokasikan sesuai dengan kapasitas mental (toleransi risiko) serta jangka waktu tujuan finansialmu."
+          ]
+        },
+        "quiz": {
+          "id": "c2-l1-q4",
+          "title": "Quiz Evaluasi: Jenis Investasi",
+          "questions": [
+            {
+              "question": "Instrumen investasi mana yang paling berisiko?",
+              "options": [
+                "Deposito",
+                "Saham",
+                "Reksa Dana Pasar Uang",
+                "Obligasi"
+              ],
+              "correctAnswer": 1
+            }
+          ]
+        }
       }
     ],
     "finalQuiz": {
       "id": "c2-l1-checkpoint",
-      "title": "Checkpoint Level 1: Fondasi Hutang",
-      "questionCount": 5,
-      "duration": "5 menit",
-      "description": "Tes pemahaman dasar tentang jenis hutang dan bahaya pinjol.",
+      "title": "Ujian Kelayakan Modul 1",
       "questions": [
         {
-          "question": "Manakah yang termasuk Good Debt?",
-          "options": [
-            "Paylater skincare",
-            "KPR Rumah",
-            "Cicilan HP",
-            "Kasbon jajan"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Fintech legal diawasi oleh...",
-          "options": [
-            "OJK",
-            "WHO",
-            "KPK",
-            "PBB"
-          ],
-          "correctAnswer": 0
-        },
-        {
-          "question": "Pain of Paying adalah...",
-          "options": [
-            "Rasa sakit saat denda",
-            "Rasa sakit saat mengeluarkan uang",
-            "Rasa lapar",
-            "Rasa malas"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Batas aman cicilan bulanan adalah...",
-          "options": [
-            "10%",
-            "30%",
-            "50%",
-            "70%"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Langkah pertama menghindari jebakan Paylater...",
-          "options": [
-            "Pinjam lagi",
-            "Hapus fitur di aplikasi",
-            "Ganti HP",
-            "Abaikan"
-          ],
+          "question": "Manakah yang merupakan efek dari Compound Interest?",
+          "options": ["Bunga tetap tiap bulan", "Bunga yang dihitung dari total modal awal plus bunga sebelumnya", "Potongan pajak tahunan", "Pembagian dividen"],
           "correctAnswer": 1
         }
       ]
@@ -133,260 +207,231 @@
   },
   {
     "id": "level-2",
-    "title": "Manajemen & Strategi Pelunasan",
-    "description": "Kelola hutangmu dan temukan jalan keluar tercepat untuk bebas hutang.",
+    "title": "STRATEGI REKSA DANA & SAHAM UNTUK PEMULA",
+    "description": "Melangkah lebih jauh dengan instrumen pasar modal yang populer.",
     "items": [
       {
         "id": "c2-l2-1",
         "type": "lesson",
-        "title": "Batas Aman Hutang (DSR)",
-        "duration": "7 menit",
+        "title": "Cara Kerja Reksa Dana: Biarkan Ahli yang Bekerja",
+        "duration": "15 menit",
         "content": {
-          "heading": "Debt Service Ratio (DSR)",
+          "heading": "Memahami Manajer Investasi & Diversifikasi Otomatis",
           "body": [
-            "Maksimal total cicilan adalah 30% dari pemasukan.",
-            "Gaji Rp 5jt? Max cicilan Rp 1.5jt."
+            "Bagi pemula, Reksa Dana adalah pintu gerbang emas ke dunia investasi pasar modal yang lebih kompleks. Instrumen ini dirancang sebagai wadah pengumpulan dana dari ribuan masyarakat (pemodal) untuk selanjutnya dikelola secara kolektif dan sangat profesional. Ini merupakan solusi ideal bagi investor yang tidak punya cukup waktu, keahlian khusus, maupun modal miliaran untuk menganalisa dan melakukan diversifikasi pasar secara mandiri.",
+            "Dana yang terkumpul dalam sebuah Reksa Dana akan dipercayakan kepada tim ahli yang disebut Manajer Investasi (MI). MI bertugas menyusun strategi, memantau pergerakan pasar, melakukan riset mendalam, serta membeli, menjual, atau menahan instrumen investasi tersebut (seperti deposito, obligasi, dan saham) demi kepentingan bersama para investor yang menanamkan modal.",
+            "Salah satu keunggulan terbesar Reksa Dana adalah fitur 'Diversifikasi Otomatis'. Uang yang kamu setorkan—sekecil apa pun itu—akan disebarkan ke puluhan bahkan ratusan aset yang berbeda. Praktik ini secara signifikan mengurangi risiko sistematis; artinya, jika satu atau dua perusahaan yang menjadi portofolio MI mengalami kerugian, nilai investasimu tidak langsung amblas karena tertutup oleh keuntungan dari puluhan perusahaan lainnya yang sedang mencatat performa positif.",
+            "Secara umum, terdapat empat jenis Reksa Dana yang paling lazim di Indonesia. Pertama, Pasar Uang (paling aman, likuiditas tinggi). Kedua, Pendapatan Tetap (investasi mayoritas di obligasi pemerintah/korporasi dengan potensi return menengah). Ketiga, Campuran (memadukan saham dan obligasi secara dinamis untuk menyeimbangkan risiko). Dan keempat, Reksa Dana Saham, yang paling fluktuatif dalam jangka pendek namun memberikan potensi pertumbuhan terbesar dalam horizon waktu lebih dari lima hingga sepuluh tahun."
+          ]
+        },
+        "quiz": {
+          "id": "c2-l2-q1",
+          "title": "Quiz Evaluasi: Reksa Dana",
+          "questions": [
+            {
+              "question": "Keuntungan utama investasi di Reksa Dana bagi pemula adalah...",
+              "options": [
+                "Tidak butuh modal besar dan dikelola ahli",
+                "Pasti untung 100%",
+                "Bisa ditarik tunai di ATM mana saja",
+                "Mendapatkan gaji bulanan dari MI"
+              ],
+              "correctAnswer": 0
+            }
           ]
         }
       },
       {
         "id": "c2-l2-2",
         "type": "lesson",
-        "title": "Strategi Snowball & Avalanche",
-        "duration": "9 menit",
+        "title": "Memahami Saham: Menjadi Pemilik Perusahaan",
+        "duration": "15 menit",
         "content": {
-          "heading": "Dua Strategi Pelunasan",
+          "heading": "Mekanisme Kepemilikan & Cara Mendapatkan Untung",
           "body": [
-            "Snowball: Fokus hutang terkecil (psikologis).",
-            "Avalanche: Fokus bunga tertinggi (matematis)."
+            "Memiliki saham secara esensial bukan sekadar membeli grafik atau tebak-tebakan pergerakan garis yang abstrak. Saham adalah dokumen hukum dan bukti sah dari selembar kepemilikan sebuah perusahaan di dunia nyata (sektor rill).",
+            "Ketika kamu memutuskan untuk membeli saham emiten seperti PT Telkom, Bank BCA, atau perusahaan lain, secara legal kamu telah diakui sebagai salah satu pemilik korporasi raksasa tersebut, meskipun dalam persentase yang sangat kecil dibandingkan dengan pendirinya. Sebagai pemilik modal, kamu mendelegasikan hak pengelolaan penuh kepada jajaran direksi dan manajemen untuk menjalankan bisnis serta menghasilkan keuntungan di masa depan.",
+            "Terdapat dua cara mendasar bagaimana seorang investor saham dapat mencetak cuan dari investasi yang dilakukannya di pasar modal:",
+            "1. CAPITAL GAIN (Keuntungan Modal/Kenaikan Harga): Ini terjadi ketika kamu membeli saham pada harga yang dinilai murah (undervalued), dan kelak menjualnya kembali di pasar saat harganya telah melambung tinggi karena ekspektasi positif terhadap prospek bisnis masa depan perusahaan (contoh: kamu membelinya dengan harga Rp 1.000 per lembar, lalu melepasnya di angka Rp 1.500 per lembar, mendapatkan selisih keuntungan yang disebut Capital Gain).",
+            "2. DIVIDEN: Ini adalah mekanisme pembagian jatah laba tunai perusahaan yang langsung disalurkan masuk ke Rekening Dana Nasabah (RDN). Perusahaan-perusahaan besar, stabil, dan telah menghasilkan arus kas positif secara teratur biasanya mendistribusikan dividen kepada para pemegang saham 1 hingga 2 kali dalam setahun, sebagai bentuk apresiasi atas kepercayaan dan kesetiaan mereka dalam menyuntikkan dana di korporasi tersebut."
+          ]
+        },
+        "quiz": {
+          "id": "c2-l2-q2",
+          "title": "Quiz Evaluasi: Keuntungan Saham",
+          "questions": [
+            {
+              "question": "Jika kamu membeli saham untuk disimpan dalam 10 tahun dan mengharapkan bagi hasil laba, kamu fokus pada...",
+              "options": [
+                "Trading harian",
+                "Capital Gain",
+                "Dividen",
+                "Undian berhadiah"
+              ],
+              "correctAnswer": 2
+            }
           ]
         }
       },
       {
-        "id": "c2-l2-quiz",
-        "type": "in-lesson-quiz",
-        "title": "Quiz Pelunasan",
-        "questions": [
-          {
-            "question": "Metode fokus bunga tertinggi adalah...",
-            "options": [
-              "Snowball",
-              "Avalanche",
-              "Waterfall",
-              "Lightning"
-            ],
-            "correctAnswer": 1
-          },
-          {
-            "question": "DSR aman maksimal adalah...",
-            "options": [
-              "10%",
-              "30%",
-              "50%",
-              "80%"
-            ],
-            "correctAnswer": 1
-          }
-        ]
+        "id": "c2-l2-v1",
+        "type": "video",
+        "title": "Praktik Aplikasi: Cara Beli Saham Pertama",
+        "duration": "12 menit",
+        "videoId": "p3105777443",
+        "description": "Langkah demi langkah mendaftar RDN dan melakukan transaksi beli pertama di aplikasi sekuritas.",
+        "transcript": [
+          { "time": "00:00", "text": "Siapkan KTP kamu, kita akan daftar Rekening Dana Nasabah (RDN)." }
+        ],
+        "content": {
+          "heading": "Langkah Awal Beli Saham",
+          "body": [
+            "Langkah pertama yang esensial dalam perjalanan investasi sahammu adalah melakukan pembukaan rekening khusus. Proses pendaftaran ini bukan untuk membuka tabungan bank biasa, melainkan membuat akun di sebuah perusahaan sekuritas, yang dinamakan Rekening Dana Nasabah (RDN).",
+            "Rekening ini dirancang secara eksklusif untuk menampung seluruh aktivitas jual beli dan transaksi, mulai dari penyetoran modal awal (top-up) hingga menampung hasil dividen tunai perusahaan, sehingga terpisah dengan dana operasional hidupmu. Pilihan perusahaan sekuritas di Indonesia sangatlah beragam, carilah pialang dengan platform digital terpercaya, layanan nasabah proaktif, dan komisi transaksi yang bersaing (fee broker).",
+            "Setelah akun dan RDN-mu berhasil disetujui serta terisi saldo, saatnya mulai masuk ke bursa pasar modal (IHSG). Gunakan fitur analitik dan grafik di aplikasi tradingmu untuk mulai melihat-lihat harga-harga perusahaan idaman. Lakukan seleksi instrumen secara matang, bukan sekadar ikut tren musiman. Ingat, berinvestasilah hanya dengan modal (uang dingin) yang rela tidak kamu tarik dalam jangka waktu minimal 3 hingga 5 tahun.",
+            "Saat melakukan pembelian saham pertama kali, belilah setidaknya satu lot (100 lembar saham). Jangan panik apabila di hari-hari awal, portofolio terlihat merah atau turun sedikit akibat volatilitas wajar dari bid and offer pasar harian. Pertahankan orientasimu sebagai pemilik bisnis jangka panjang yang sedang memantau pertumbuhan modal dan keuntungan korporasinya."
+          ]
+        },
+        "quiz": {
+          "id": "c2-l2-q3",
+          "title": "Quiz Evaluasi: Beli Saham",
+          "questions": [
+            {
+              "question": "Langkah pertama sebelum membeli saham adalah...",
+              "options": [
+                "Membuka Rekening Dana Nasabah (RDN)",
+                "Minta saran teman",
+                "Pinjam uang ke bank",
+                "Beli aplikasi trading berbayar"
+              ],
+              "correctAnswer": 0
+            }
+          ]
+        }
       }
     ],
     "finalQuiz": {
       "id": "c2-l2-checkpoint",
-      "title": "Checkpoint Level 2: Manajemen Hutang",
-      "questionCount": 5,
-      "duration": "5 menit",
-      "description": "Gunakan strategi Snowball atau Avalanche untuk keluar dari hutang.",
+      "title": "Checkpoint Modul 2: Pasar Modal",
       "questions": [
         {
-          "question": "Keunggulan Snowball adalah...",
-          "options": [
-            "Hemat bunga",
-            "Momentum psikologis",
-            "Paling cepat",
-            "Gratis pajak"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Avalanche fokus pada...",
-          "options": [
-            "Hutang lama",
-            "Bunga tinggi",
-            "Bank galak",
-            "Hutang kecil"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Apa itu DSR?",
-          "options": [
-            "Bunga bank",
-            "Rasio cicilan vs pendapatan",
-            "Pajak fintech",
-            "Simpanan"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Gaji Rp 10jt, max cicilan aman?",
-          "options": [
-            "Rp 1jt",
-            "Rp 3jt",
-            "Rp 5jt",
-            "Rp 7jt"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Kenapa \"gali lubang tutup lubang\" bahaya?",
-          "options": [
-            "Capek",
-            "Spiral bunga menumpuk",
-            "Dilarang",
-            "Pusing"
-          ],
-          "correctAnswer": 1
+          "question": "Apa itu RDN?",
+          "options": ["Rekening Dana Nasabah untuk menampung dana investasi", "Rekening Dana Nikah", "Rumah Dengan Nyaman", "Rencana Dana Nasional"],
+          "correctAnswer": 0
         }
       ]
     }
   },
   {
     "id": "level-3",
-    "title": "Reputasi Finansial (Skor Kredit)",
-    "description": "Jaga rapot keuanganmu agar masa depanmu (KPR, dll) terjamin.",
+    "title": "MANAJEMEN PORTOFOLIO & PSIKOLOGI INVESTOR",
+    "description": "Menjaga dan mengoptimalkan asetmu untuk masa depan.",
     "items": [
       {
         "id": "c2-l3-1",
         "type": "lesson",
-        "title": "Memahami SLIK OJK (BI Checking)",
-        "duration": "8 menit",
+        "title": "Diversifikasi: Jangan Taruh Telur dalam Satu Keranjang",
+        "duration": "12 menit",
         "content": {
-          "heading": "Rapot Keuanganmu",
+          "heading": "Alokasi Aset & Mitigasi Risiko",
           "body": [
-            "Catatan seluruh riwayat kreditmu di lembaga keuangan.",
-            "Kol-1 (Lancar) sampai Kol-5 (Macet)."
+            "Diversifikasi investasi adalah nyawa dan inti dari seluruh manajemen risiko pasar modal. Sederhananya, ini seperti pepatah kuno: 'Jangan meletakkan semua telurmu ke dalam keranjang yang sama'. Mengapa ini krusial? Jika kamu menanamkan seluruh tabungan investasimu (all-in) di satu saham pada sektor yang sangat rentan (misalnya teknologi tinggi yang tidak menghasilkan arus kas), dan perusahaan tersebut tiba-tiba terpuruk akibat perubahan model bisnis atau skandal hukum, seluruh hartamu akan tersapu bersih tanpa sisa.",
+            "Solusi paling logis untuk bertahan dalam ketidakpastian adalah dengan mengalokasikan dan membagi asetmu secara cerdas ke sektor dan kendaraan investasi yang berbeda. Misalnya: jika sebagian modal ditanam pada Saham Sektor Perbankan, sebagian lainnya di Logam Mulia (Emas Fisik atau Digital), dan sisanya dijaga dengan instrumen aman seperti Deposito atau Reksa Dana Pasar Uang (RDPU). Ini bertujuan untuk mencapai stabilitas keseimbangan aset.",
+            "Tujuannya adalah ketika satu atau sebagian besar kelas aset portofoliomu terkoreksi dalam (merah), portofolio investasi yang lain tetap solid atau mencatatkan kenaikan (hijau), sehingga nilai total kekayaanmu tetap stabil dan tidak hancur lebur saat dihantam fluktuasi tajam (market crash/resesi). Ini seperti jaring pengaman agar emosimu tetap netral dan bisa bertahan (survive) di pasar modal.",
+            "Kendati demikian, penting untuk diingat bahwa diversifikasi secara serampangan atau berlebihan juga berpotensi negatif bagi kinerja investasimu. Hal tersebut akan mendilusi atau melemahkan tingkat pengembalian modal maksimum. Daripada mencoba memiliki 50 instrumen yang tidak kamu pahami fundamentalnya sama sekali, jauh lebih baik memilih dan berkonsentrasi pada maksimal 5 hingga 8 instrumen, dari berbagai instrumen (misalnya: saham blue chip, SBN pemerintah, P2P Lending stabil), di mana seluruh kinerjanya bisa dipantau secara seksama."
+          ]
+        },
+        "quiz": {
+          "id": "c2-l3-q1",
+          "title": "Quiz Evaluasi: Diversifikasi",
+          "questions": [
+            {
+              "question": "Manakah contoh diversifikasi yang paling tepat?",
+              "options": [
+                "Membeli 10 saham di sektor yang sama",
+                "Membeli saham perbankan, emas, dan deposito",
+                "Menaruh semua uang di satu kripto yang sedang viral",
+                "Menabung di 5 bank berbeda"
+              ],
+              "correctAnswer": 1
+            }
           ]
         }
       },
       {
         "id": "c2-l3-2",
         "type": "lesson",
-        "title": "Dampak Telat Bayar Paylater",
-        "duration": "7 menit",
+        "title": "Menghindari Fear of Missing Out (FOMO)",
+        "duration": "10 menit",
         "content": {
-          "heading": "Paylater Tercatat di OJK",
+          "heading": "Disiplin Emosi dalam Berinvestasi",
           "body": [
-            "Catatan buruk di OJK bisa menghalangi KPR.",
-            "Satu-satunya cara pulih: Lunasi dan tunggu 1-2 tahun."
+            "Psikologi perilaku investor menjadi tantangan psikis terberat dalam berinvestasi yang dapat meruntuhkan logika dan menguras isi tabungan: yaitu FOMO (Fear of Missing Out). Sifat impulsif yang dirasakan saat ketakutan luar biasa 'tertinggal' dari tren atau momen keuntungan. Akibat fobia ini, para investor (khususnya pemula/ritel) akan terburu-buru melakukan eksekusi tanpa riset fundamental sama sekali pada harga tinggi atau puncak valuasi.",
+            "FOMO seringkali menjadi mesin pencetak kerugian pertama paling masif dan merusak, yang menghapus kepercayaan diri seseorang ketika harga pasar anjlok tak lama setelah dibeli. Mengingat sebagian besar grafik aset digerakkan langsung oleh kombinasi emosional massa investor: antara Keserakahan (Greed) ketika valuasi melambung tidak wajar, dan Ketakutan Ekstrem (Fear) saat pasar diguncang isu negatif. ",
+            "Aksi serakah saat orang lain (massa) secara agresif berbondong-bondong meraup profit pada aset tidak likuid menjadi lampu kuning tanda aset tersebut berada pada level sangat fluktuatif (overvalued) serta berbahaya untuk dimasuki.",
+            "Strategi ampuh untuk memerangi dan membentengi diri dari sindrom FOMO adalah komitmen dan keyakinan memiliki Investment Plan atau Trading Plan yang logis dan objektif. Sebelum memencet tombol transaksi, kamu wajib mencatat dan menetapkan beberapa indikator dasar di awal: apa argumen logismu untuk membelinya (fundamental bisnis atau analisis grafik), persentase target keuntungan rasional, serta titik cut-loss atau batas maksimal kerugian (misal 5% atau 10%) yang sanggup kamu relakan."
+          ]
+        },
+        "quiz": {
+          "id": "c2-l3-q2",
+          "title": "Quiz Evaluasi: Psikologi",
+          "questions": [
+            {
+              "question": "Apa yang sebaiknya dilakukan saat melihat sebuah koin digital naik 500% dalam sehari dan semua orang membicarakannya?",
+              "options": [
+                "Langsung ikut beli supaya tidak ketinggalan",
+                "Tetap tenang, cek fundamental, dan abaikan jika tidak masuk dalam rencana awal",
+                "Pinjam uang teman untuk mengejar harga",
+                "Menjual seluruh portofolio aman untuk dipindahkan ke sana"
+              ],
+              "correctAnswer": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "c2-l3-v1",
+        "type": "video",
+        "title": "Mentalitas Investor Juara",
+        "duration": "15 menit",
+        "videoId": "p3105777443",
+        "description": "Cara mengelola emosi dan tetap disiplin pada rencana investasi meskipun pasar sedang bergejolak.",
+        "transcript": [
+          { "time": "00:00", "text": "Jangan biarkan emosi mengatur jarimu di tombol beli/jual." }
+        ],
+        "content": {
+          "heading": "Disiplin Mental Investor",
+          "body": [
+            "Menjadi seorang investor bukan melulu persoalan matematika, kalkulasi rasio keuangan, atau kemampuan memprediksi pergerakan arah pasar saham (IHSG). Di atas segalanya, kunci utama kesuksesan jangka panjang terletak pada penguasaan psikologi serta kedisiplinan dan kematangan mental. Berapa kali seorang pakar mampu bertahan dengan tenang (stay rational) di tengah gejolak kepanikan bursa akibat rilis data ekonomi yang mengecewakan atau pecahnya suatu konflik bersenjata global, itulah yang menentukan kualitasnya.",
+            "Sebuah portofolio akan diuji saat 'Bear Market' (fase pesimisme dan jatuhnya indeks selama kurun waktu yang panjang), mentalitas investor juara adalah untuk tetap disiplin dan fokus menjalankan rencana serta proses investasinya. Sikap objektif dalam merespons pasar yang sedang koreksi (merah) membuat mereka enggan untuk terburu-buru melepas atau mengeksekusi asetnya pada posisi merugi (loss) sebelum fundamental dasar perusahaannya benar-benar terancam, dan malah melihatnya sebagai diskon pasar (opportunity) bagi kepemilikan saham tambahan dengan harga lebih murah.",
+            "Para investor berpengalaman ini juga tahu persis kapan waktu terbaik menaikkan porsi alokasi investasi, rebalancing, kapan harus sabar memegang uang tunai (cash is king), dan kapan harus keluar, daripada sekadar mencerna isu-isu yang dikabarkan grup WhatsApp/Telegram saham tanpa verifikasi silang (cross-checking) dan tidak rasional. Disiplin psikis seperti mengesampingkan godaan investasi bodong/money-game (skema cepat kaya) akan membangun pilar-pilar kebebasan finansial bagi masa pensiunmu."
+          ]
+        },
+        "quiz": {
+          "id": "c2-l3-q3",
+          "title": "Quiz Evaluasi: Mentalitas",
+          "questions": [
+            {
+              "question": "Sikap yang paling penting bagi investor adalah...",
+              "options": [
+                "Cepat panik",
+                "Disiplin emosi dan tenang",
+                "Selalu ikut tren",
+                "Beli dan lupakan selamanya tanpa evaluasi"
+              ],
+              "correctAnswer": 1
+            }
           ]
         }
       }
     ],
     "finalQuiz": {
-      "id": "c2-checkpoint",
-      "title": "Final Quiz Modul 2: Hutang & Kredit",
-      "questionCount": 10,
-      "duration": "10 menit",
-      "description": "Uji pemahaman akhir tentang hutang, manajemen, dan reputasi kreditmu.",
+      "id": "c2-l3-checkpoint",
+      "title": "Ujian Akhir: Master Investasi Pemula",
       "questions": [
         {
-          "question": "Hutang konsumsi disebut...",
-          "options": [
-            "Good Debt",
-            "Bad Debt",
-            "Easy Debt",
-            "No Debt"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Data SLIK dikelola oleh...",
-          "options": [
-            "BI",
-            "OJK",
-            "KPK",
-            "Polisi"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Avalanche fokus pada...",
-          "options": [
-            "Hutang kecil",
-            "Bunga tinggi",
-            "Tempo",
-            "Bank"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Kol-5 berarti...",
-          "options": [
-            "Lancar",
-            "Macet",
-            "Baru",
-            "Pending"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "DSR aman adalah...",
-          "options": [
-            "20%",
-            "30%",
-            "50%",
-            "80%"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Paylater termasuk bad debt jika...",
-          "options": [
-            "Untuk modal",
-            "Untuk tiket konser impulsif",
-            "Gratis",
-            "Bunga nol"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Snowball memberikan...",
-          "options": [
-            "Hemat bunga",
-            "Momentum psikologis",
-            "Proses otomatis",
-            "Hadiah"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "OJK mengawasi...",
-          "options": [
-            "RT",
-            "Fintech & Bank",
-            "Pasar",
-            "Kantin"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Slik OJK mencatat...",
-          "options": [
-            "Followers",
-            "Riwayat Kredit",
-            "Nilai Kuliah",
-            "Belanja"
-          ],
-          "correctAnswer": 1
-        },
-        {
-          "question": "Cara bebas hutang...",
-          "options": [
-            "Boros",
-            "Pangkas gaya hidup & bayar",
-            "Abaikan",
-            "Ganti HP"
-          ],
+          "question": "Apa itu Bear Market?",
+          "options": ["Pasar yang sedang bullish/naik tajam", "Pasar yang sedang lesu/turun berkepanjangan", "Pasar tempat menjual hewan buas", "Pasar modal khusus untuk institusi besar"],
           "correctAnswer": 1
         }
       ]

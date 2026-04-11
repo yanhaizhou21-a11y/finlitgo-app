@@ -129,7 +129,11 @@ export default function ClassDetailPage() {
 
       if (user?.id) {
         const done = await fetchClassProgress(user.id, cls.id);
-        setCompleted(new Set([...done].map((id) => `chapter-${id}`)));
+        const serverCompleted = new Set([...done].map((id) => `chapter-${id}`));
+        setCompleted(prev => {
+          const merged = new Set([...prev, ...serverCompleted]);
+          return merged;
+        });
       }
       setLoading(false);
       return;
@@ -277,8 +281,12 @@ export default function ClassDetailPage() {
     });
     
     // Sync with backend if logged in
-    if (isDbClass && user?.id && classData?.id && itemId.startsWith('chapter-')) {
-      const chapterId = String(itemId).replace('chapter-', '');
+    if (isDbClass && user?.id && classData?.id) {
+      // Handle both "chapter-1" format and "c1-l1-1" format
+      let chapterId = String(itemId);
+      if (chapterId.startsWith('chapter-')) {
+        chapterId = chapterId.replace('chapter-', '');
+      }
       try {
         await markChapterComplete({ userId: user.id, classId: classData.id, chapterId });
       } catch (error) {

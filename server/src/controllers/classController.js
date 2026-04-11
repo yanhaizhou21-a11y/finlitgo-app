@@ -7,7 +7,7 @@ exports.getAllClasses = async (req, res) => {
     const { data: classes, error: classError } = await supabase
       .from('classes')
       .select('*')
-      .order('created_at', { ascending: true });
+      .order('id', { ascending: true });
 
     if (classError) throw classError;
 

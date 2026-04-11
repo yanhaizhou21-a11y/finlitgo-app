@@ -4,7 +4,7 @@ export async function fetchClasses() {
   const { data, error } = await supabase
     .from('classes')
     .select('*, class_chapters(*), class_quizzes(*)')
-    .order('created_at', { ascending: false });
+    .order('id', { ascending: true });
   if (error) throw error;
   return data || [];
 }
