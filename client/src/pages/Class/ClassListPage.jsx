@@ -19,7 +19,7 @@ export default function ClassListPage() {
 
   const fetchClasses = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/classes');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/classes`);
       const json = await res.json();
       
       if (json.success && json.data.classes) {
