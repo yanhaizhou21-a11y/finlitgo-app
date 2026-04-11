@@ -34,7 +34,16 @@ export default function OverviewPage() {
       for (const row of progressRows) byClass.set(row.class_id, (byClass.get(row.class_id) || 0) + 1);
 
       const progressCards = (classes || []).slice(0, 3).map((cls) => {
-        const totalItems = (cls.class_chapters || []).length || 1;
+        let totalItems = 1;
+        if (cls.levels_data) {
+           const parsed = typeof cls.levels_data === 'string' ? JSON.parse(cls.levels_data) : cls.levels_data;
+           totalItems = parsed.reduce((acc, level) => acc + (level.items ? level.items.length : 0), 0);
+        } else {
+           totalItems = (cls.class_chapters || []).length || 1;
+        }
+        // Pastikan tidak 0 untuk menghindari division by zero
+        if (totalItems === 0) totalItems = 1;
+
         const completedCount = byClass.get(cls.id) || 0;
         const progress = Math.min(100, Math.round((completedCount / totalItems) * 100));
         return { id: cls.id, title: cls.title, category: cls.category, totalItems, completedCount, progress };

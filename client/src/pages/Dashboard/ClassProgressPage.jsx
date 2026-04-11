@@ -1,10 +1,79 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { IconSchool } from '@tabler/icons-react';
+import { useAuth } from '../../store/AuthContext';
+import { supabase } from '../../services/supabase';
+import { fetchClasses } from '../../services/classService';
 
 export default function ClassProgressPage() {
-  // Mock course progress data
-  const courseProgress = [];
+  const { user } = useAuth();
+  const [courseProgress, setCourseProgress] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!user?.id) {
+        setCourseProgress([]);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const [classes, progressRes] = await Promise.all([
+          fetchClasses(),
+          supabase.from('class_progress').select('class_id, chapter_id').eq('user_id', user.id),
+        ]);
+
+        const progressRows = progressRes.error ? [] : (progressRes.data || []);
+        const byClass = new Map();
+        for (const row of progressRows) {
+          byClass.set(row.class_id, (byClass.get(row.class_id) || 0) + 1);
+        }
+
+        const formattedProgress = (classes || []).map((cls) => {
+          let totalItems = 1;
+          if (cls.levels_data) {
+            const parsed = typeof cls.levels_data === 'string' ? JSON.parse(cls.levels_data) : cls.levels_data;
+            totalItems = parsed.reduce((acc, level) => acc + (level.items ? level.items.length : 0), 0);
+          } else {
+            totalItems = (cls.class_chapters || []).length || 1;
+          }
+          if (totalItems === 0) totalItems = 1;
+
+          const completedCount = byClass.get(cls.id) || 0;
+          const progressPercent = Math.min(100, Math.round((completedCount / totalItems) * 100));
+
+          let status = 'Not Started';
+          if (progressPercent === 100) status = 'Completed';
+          else if (progressPercent > 0) status = 'In Progress';
+
+          return {
+            id: cls.id,
+            title: cls.title,
+            lesson: cls.category || 'General',
+            status,
+            progress: progressPercent,
+            completedLessons: completedCount,
+            lessons: totalItems,
+          };
+        });
+
+        // Tampilkan hanya yang sudah dimulai atau semua kelas?
+        // Lebih baik tampilkan kelas yang progress > 0
+        setCourseProgress(formattedProgress.filter(c => c.progress > 0));
+      } catch (err) {
+        console.error('Failed to fetch class progress:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProgress();
+  }, [user?.id]);
+
+  if (loading) {
+    return <div className="text-zinc-400 text-center py-10">Loading progress...</div>;
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -15,13 +84,13 @@ export default function ClassProgressPage() {
       </div>
 
       {/* Warning Banner */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="bg-amber-500/10 border border-amber-500/30 text-amber-600 px-4 py-3 rounded-lg flex items-center gap-3 text-sm"
+        className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-4 py-3 rounded-lg flex items-center gap-3 text-sm"
       >
         <span className="text-lg">ℹ️</span>
-        <span>Please note that <strong>this dashboard doesn't update in real-time</strong>.</span>
+        <span>This dashboard shows your real-time learning progress.</span>
       </motion.div>
 
       {/* Modules Section */}
