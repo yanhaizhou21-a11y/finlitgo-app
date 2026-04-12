@@ -8,7 +8,13 @@
 
 **FinLitGo** is an education and money-management web app designed for the Gen-Z demographic. It combines gamified financial literacy (classes, blog, AI assistant) with a personal finance dashboard backed by a real database.
 
+<<<<<<< HEAD
+- **Git**: `https://git-scm.com/`
+- **Node.js (LTS recommended)**: `https://nodejs.org/` (Node 20+ recommended)
+- **Package manager**: npm (comes with Node)
+=======
 ### Anggota Tim Capstone
+>>>>>>> auth-backend
 
 | No | ID Cohort | Nama | Email | Asal Sekolah |
 |---|---|---|---|---|
@@ -156,11 +162,11 @@ Create `client/.env` (copy from `.env.example` and extend):
 
 ```env
 VITE_SUPABASE_URL=YOUR_URL
-VITE_SUPABASE_ANON_KEY=YOUR_KEY
+VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=YOUR_KEY
 VITE_GROQ_API_KEY=YOUR_GROQ_API_KEY
-VITE_API_URL=http://localhost:5000
 ```
 
+<<<<<<< HEAD
 Required for auth:
 
 - `CLIENT_URL` (example: `http://localhost:5173`)
@@ -168,13 +174,11 @@ Required for auth:
 - `GOOGLE_CLIENT_SECRET`
 - `JWT_SECRET`
 
+### Install dependencies (from project root)
+=======
 ### Server (`server/.env` or root `.env`)
 ```env
 PORT=5000
-CLIENT_URL=http://localhost:5173
-GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID
-GOOGLE_CLIENT_SECRET=YOUR_GOOGLE_CLIENT_SECRET
-JWT_SECRET=YOUR_JWT_SECRET
 ```
 
 > **Never commit `.env` files.** Only `.env.example` is tracked.
@@ -191,6 +195,7 @@ cd Capstone-Dicoding
 ```
 
 ### 2. Install all dependencies (from project root)
+>>>>>>> auth-backend
 
 ```bash
 npm install

@@ -4,7 +4,6 @@ import { IconFlame, IconBook2, IconClock, IconChevronRight } from '@tabler/icons
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
 import { CLASS_META, CLASS_LEVELS } from '../../data/classContent';
-import { getApiBaseUrl } from '../../services/authservice';
 
 
 const COURSE_IMAGES = {
@@ -20,7 +19,7 @@ export default function ClassListPage() {
 
   const fetchClasses = async () => {
     try {
-      const apiUrl = getApiBaseUrl();
+      const apiUrl = import.meta.env.VITE_API_URL || '';
       const res = await fetch(`${apiUrl}/api/classes`);
       const json = await res.json();
       

@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { supabase } from '../../services/supabase';
 import InputField from './InputField';
 import GoogleButton from './GoogleButton';
-import { getClientBaseUrl } from '../../services/authservice';
 
 const SignIn = ({ onToggle, onSuccess }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -46,7 +45,7 @@ const SignIn = ({ onToggle, onSuccess }) => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: { 
-          redirectTo: `${getClientBaseUrl()}/dashboard`
+          redirectTo: window.location.origin + '/dashboard' 
         }
       });
       if (error) throw error;

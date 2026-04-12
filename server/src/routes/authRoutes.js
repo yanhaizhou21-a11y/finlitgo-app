@@ -6,7 +6,7 @@ import { requireAuth } from '../middleware/authMiddleware.js'
 const router = express.Router()
 
 // Fallback if CLIENT_URL is not set
-const getClientUrl = () => process.env.CLIENT_URL?.split(',')[0]?.trim() || process.env.FRONTEND_URL?.split(',')[0]?.trim() || '';
+const getClientUrl = () => process.env.CLIENT_URL || '';
 
 // Redirect user to Google
 router.get('/google', passport.authenticate('google', {
@@ -17,9 +17,7 @@ router.get('/google', passport.authenticate('google', {
 // Google redirects back here
 router.get('/google/callback',
   (req, res, next) => {
-    const clientUrl = getClientUrl()
-    const failureRedirect = clientUrl ? `${clientUrl}/login` : '/login'
-    passport.authenticate('google', { session: false, failureRedirect })(req, res, next);
+    passport.authenticate('google', { session: false, failureRedirect: `${getClientUrl()}/login` })(req, res, next);
   },
   googleCallback
 )
