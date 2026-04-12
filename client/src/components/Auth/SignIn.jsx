@@ -44,8 +44,9 @@ const SignIn = ({ onToggle, onSuccess }) => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        // Uncomment and specify this if we want to redirect to a specific URL after OAuth:
-        // options: { redirectTo: window.location.origin + '/dashboard' }
+        options: { 
+          redirectTo: window.location.origin + '/dashboard' 
+        }
       });
       if (error) throw error;
       // Note: signInWithOAuth redirects the user, so onSuccess might not be called immediately here.
