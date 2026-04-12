@@ -19,7 +19,7 @@ const SignIn = ({ onToggle, onSuccess }) => {
     setError(null);
     try {
       console.log('[DEBUG] Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
-      console.log('[DEBUG] Supabase Key (first 20 chars):', import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY?.slice(0, 20));
+      console.log('[DEBUG] Supabase Key (first 20 chars):', import.meta.env.VITE_SUPABASE_ANON_KEY?.slice(0, 20));
       console.log('[DEBUG] Attempting login with email:', formData.email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
