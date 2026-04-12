@@ -1,3 +1,2 @@
-// Backward-compatible entrypoint.
-// Prefer running `node server.js` (or `npm run dev`) instead.
-import './server.js'
+import app from './src/app.js';
+export default app;

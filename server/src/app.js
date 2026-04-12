@@ -16,8 +16,19 @@ initPassport()
 
 const app = express()
 
+// Allow multiple origins in production (e.g., the vercel domain)
+const allowedOrigins = process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',') : [];
+
 app.use(cors({
-  origin: process.env.CLIENT_URL, // e.g. http://localhost:5173
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1 && process.env.NODE_ENV === 'production' && !origin.includes('vercel.app')) {
+      var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true               // allow cookies
 }))
 app.use(cookieParser())
