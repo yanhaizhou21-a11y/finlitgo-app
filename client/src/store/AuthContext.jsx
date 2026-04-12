@@ -3,6 +3,17 @@ import { supabase } from '../services/supabase';
 
 const AuthContext = createContext(null);
 
+const clearAuthHashFromUrl = () => {
+  if (typeof window === 'undefined') return;
+  if (!window.location.hash) return;
+
+  const hash = window.location.hash.toLowerCase();
+  if (!hash.includes('access_token=') && !hash.includes('refresh_token=')) return;
+
+  const cleanUrl = `${window.location.pathname}${window.location.search}`;
+  window.history.replaceState({}, document.title, cleanUrl);
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -12,12 +23,14 @@ export const AuthProvider = ({ children }) => {
     // Check active session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) clearAuthHashFromUrl();
       if (!session?.user) setLoading(false);
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) clearAuthHashFromUrl();
       if (!session?.user) {
          setProfile(null);
          setLoading(false);
