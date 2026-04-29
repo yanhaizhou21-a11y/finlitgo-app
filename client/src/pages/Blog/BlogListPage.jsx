@@ -11,7 +11,7 @@ export default function BlogListPage() {
       id: 1,
       title: "How to Build an Emergency Fund in 6 Months",
       excerpt:
-        "An emergency fund is a financial safety net designed to cover unexpected expenses...",
+        "An emergency f   und is a financial safety net designed to cover unexpected expenses...",
       author: "Admin FinlitGo",
       date: "Oct 12",
       timeToRead: "4 min read",

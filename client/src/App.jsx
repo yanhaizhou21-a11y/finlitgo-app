@@ -38,11 +38,11 @@ import Footer from './components/layout/Footer';
 function PublicLayout({ children }) {
   const { pathname } = useLocation();
   const useLearningGradient = pathname.startsWith('/class') || pathname.startsWith('/blog');
-  const showFooter = !(pathname.startsWith('/class/') && pathname !== '/class');
+  const showFooter = !(pathname.startsWith('/class/') && pathname !== '/class') && pathname !== '/blog';
   const navbarVariant = pathname.startsWith('/class/') ? 'learning' : 'default';
 
   return (
-    <div className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0a] text-white flex flex-col font-sans">
+    <div className="relative w-full min-h-screen bg-[#0a0a0a] text-white flex flex-col font-sans">
       {useLearningGradient && (
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,#06070c_0%,#090b14_22%,#0a0a0a_52%,#0a0a0a_100%)]" />
@@ -52,9 +52,9 @@ function PublicLayout({ children }) {
         </div>
       )}
       <Navbar variant={navbarVariant} />
-      <div className="relative z-10 flex-1 pt-[80px]">{children}</div>
+      <div className="relative flex-1 pt-[80px]">{children}</div>
       {showFooter && (
-        <div className="relative z-10">
+        <div className="relative">
           <Footer />
         </div>
       )}
