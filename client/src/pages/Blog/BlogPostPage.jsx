@@ -1,8 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { IconArrowLeft, IconClock, IconBookmark, IconHeart, IconShare, IconEye, IconMessage, IconUser } from '@tabler/icons-react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '@/services/supabase';
+import React, { useState, useEffect, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  IconArrowLeft,
+  IconClock,
+  IconBookmark,
+  IconHeart,
+  IconShare,
+  IconEye,
+  IconMessage,
+  IconUser,
+} from "@tabler/icons-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { supabase } from "@/services/supabase";
 
 export default function BlogPostPage() {
   const { postId } = useParams();
@@ -18,7 +27,7 @@ export default function BlogPostPage() {
 
   const { scrollYProgress } = useScroll({
     target: targetRef,
-    offset: ["start start", "end start"]
+    offset: ["start start", "end start"],
   });
   const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.2]);
   const imageOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.5]);
@@ -27,9 +36,9 @@ export default function BlogPostPage() {
     const fetchBlog = async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from('blogs')
-        .select('*')
-        .eq('id', postId)
+        .from("blogs")
+        .select("*")
+        .eq("id", postId)
         .single();
 
       if (error || !data) {
@@ -37,9 +46,16 @@ export default function BlogPostPage() {
       } else {
         setBlog({
           ...data,
-          image: data.image || data.thumbnail_url || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2340&auto=format',
-          timeToRead: data.time_to_read || '5 min read',
-          date: new Date(data.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+          image:
+            data.image ||
+            data.thumbnail_url ||
+            "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2340&auto=format",
+          timeToRead: data.time_to_read || "5 min read",
+          date: new Date(data.created_at).toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          }),
         });
       }
       setLoading(false);
@@ -52,8 +68,8 @@ export default function BlogPostPage() {
       const progress = (window.scrollY / total) * 100;
       setScrollProgress(progress);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [postId]);
 
   // Loading State
@@ -77,10 +93,14 @@ export default function BlogPostPage() {
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <div className="text-center max-w-md px-6">
           <div className="text-5xl mb-4 opacity-50">404</div>
-          <h2 className="text-xl font-semibold text-white mb-2">Article Not Found</h2>
-          <p className="text-zinc-500 text-sm mb-6">The article you're looking for doesn't exist.</p>
+          <h2 className="text-xl font-semibold text-white mb-2">
+            Article Not Found
+          </h2>
+          <p className="text-zinc-500 text-sm mb-6">
+            The article you're looking for doesn't exist.
+          </p>
           <button
-            onClick={() => navigate('/blog')}
+            onClick={() => navigate("/blog")}
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-violet-600 border border-white/10 rounded-lg text-white text-sm transition-all"
           >
             <IconArrowLeft size={16} /> Back to Blog
@@ -93,18 +113,19 @@ export default function BlogPostPage() {
   // MAIN RETURN - TEKS DI TENGAH IMAGE
   return (
     <div ref={targetRef} className="min-h-screen bg-transparent text-white">
-      
       {/* SCROLL PROGRESS BAR */}
       <div className="fixed top-0 left-0 right-0 h-0.5 z-50">
-        <div 
+        <div
           className="h-full bg-violet-500"
-          style={{ width: `${scrollProgress}%`, transition: 'width 0.1s ease-out' }}
+          style={{
+            width: `${scrollProgress}%`,
+            transition: "width 0.1s ease-out",
+          }}
         />
       </div>
 
       {/* HERO SECTION - TEKS TENGAH */}
       <div className="relative h-[70vh] md:h-[75vh] lg:h-[80vh] overflow-hidden">
-        
         {/* BACKGROUND IMAGE dengan PARALLAX */}
         <motion.div
           className="absolute inset-0 z-0"
@@ -122,8 +143,8 @@ export default function BlogPostPage() {
 
         {/* BACK BUTTON - Posisi Absolute kiri atas */}
         <button
-          onClick={() => navigate('/blog')}
-          className="absolute top-6 left-6 z-20 flex items-center gap-2 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full text-white text-xs hover:bg-violet-600/80 transition-all duration-300 border border-white/10"
+          onClick={() => navigate("/blog")}
+          className="absolute top-12 left-6 z-30 flex items-center gap-2 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full text-white text-xs hover:bg-violet-600/80 transition-all duration-300 border border-white/10"
         >
           <IconArrowLeft size={14} />
           <span className="hidden sm:inline">Back</span>
@@ -134,7 +155,7 @@ export default function BlogPostPage() {
           <button
             onClick={() => setIsSaved(!isSaved)}
             className={`p-1.5 rounded-full backdrop-blur-md transition-all duration-300 border border-white/10 ${
-              isSaved ? 'bg-violet-600' : 'bg-black/50 hover:bg-violet-600/70'
+              isSaved ? "bg-violet-600" : "bg-black/50 hover:bg-violet-600/70"
             }`}
           >
             <IconBookmark size={14} />
@@ -142,18 +163,21 @@ export default function BlogPostPage() {
           <button
             onClick={() => setIsLiked(!isLiked)}
             className={`p-1.5 rounded-full backdrop-blur-md transition-all duration-300 border border-white/10 ${
-              isLiked ? 'bg-red-500' : 'bg-black/50 hover:bg-red-500/70'
+              isLiked ? "bg-red-500" : "bg-black/50 hover:bg-red-500/70"
             }`}
           >
-            <IconHeart size={14} className={isLiked ? 'fill-current' : ''} />
+            <IconHeart size={14} className={isLiked ? "fill-current" : ""} />
           </button>
           <button
             onClick={() => {
               if (navigator.share) {
-                navigator.share({ title: blog.title, url: window.location.href });
+                navigator.share({
+                  title: blog.title,
+                  url: window.location.href,
+                });
               } else {
                 navigator.clipboard.writeText(window.location.href);
-                alert('Link copied!');
+                alert("Link copied!");
               }
             }}
             className="p-1.5 rounded-full bg-black/50 backdrop-blur-md hover:bg-violet-600/70 transition-all duration-300 border border-white/10"
@@ -171,7 +195,7 @@ export default function BlogPostPage() {
             transition={{ delay: 0.2 }}
           >
             <span className="inline-block px-3 py-1 bg-violet-600/90 backdrop-blur-sm rounded-full text-xs font-medium uppercase tracking-wider text-white mb-4 shadow-lg">
-              {blog.category || 'FOUNDATION'}
+              {blog.category || "FOUNDATION"}
             </span>
           </motion.div>
 
@@ -194,7 +218,7 @@ export default function BlogPostPage() {
           >
             <div className="flex items-center gap-2">
               <IconUser size={14} />
-              <span>{blog.author || 'FinLitGo'}</span>
+              <span>{blog.author || "FinLitGo"}</span>
             </div>
             <span className="w-1 h-1 rounded-full bg-white/30"></span>
             <div className="flex items-center gap-2">
@@ -208,7 +232,6 @@ export default function BlogPostPage() {
       {/* CONTENT SECTION */}
       <article className="relative z-20 -mt-10 pb-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          
           {/* MAIN CARD */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -217,7 +240,6 @@ export default function BlogPostPage() {
             className="bg-[#0f0f0f]/80 backdrop-blur-sm rounded-2xl border border-white/5 shadow-xl overflow-hidden"
           >
             <div className="p-6 md:p-8 lg:p-10">
-              
               {/* AUTHOR & METADATA DETAIL */}
               <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-6 border-b border-white/10">
                 <div className="flex items-center gap-3">
@@ -225,7 +247,9 @@ export default function BlogPostPage() {
                     <IconUser size={18} className="text-violet-400" />
                   </div>
                   <div>
-                    <p className="font-medium text-white text-sm">{blog.author || 'FinLitGo'}</p>
+                    <p className="font-medium text-white text-sm">
+                      {blog.author || "FinLitGo"}
+                    </p>
                     <div className="flex items-center gap-2 text-xs text-zinc-500 mt-0.5">
                       <span>{blog.date}</span>
                       <span className="w-1 h-1 rounded-full bg-zinc-600"></span>
@@ -241,7 +265,7 @@ export default function BlogPostPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
                   <IconMessage size={12} className="text-zinc-500" />
                   <span className="text-xs text-zinc-400">Discuss</span>

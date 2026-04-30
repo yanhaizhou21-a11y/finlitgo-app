@@ -52,7 +52,7 @@ function PublicLayout({ children }) {
         </div>
       )}
       <Navbar variant={navbarVariant} />
-      <div className="relative flex-1 pt-[80px]">{children}</div>
+      <div className="">{children}</div>
       {showFooter && (
         <div className="relative">
           <Footer />
