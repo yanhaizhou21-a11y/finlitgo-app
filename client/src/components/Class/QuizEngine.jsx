@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+import React, { useState } from 'react';
+=======
 import React, { useState, useEffect, useMemo } from 'react';
+>>>>>>> auth-backend
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconX, IconCheck, IconTarget } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
@@ -6,11 +10,29 @@ import { recordStudyActivity } from '../../utils/streak';
 
 export default function QuizEngine({ questions, onComplete }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+<<<<<<< HEAD
+  const [selectedOption, setSelectedOption] = useState(null);
+=======
   const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
+>>>>>>> auth-backend
   const [status, setStatus] = useState('idle'); // 'idle', 'correct', 'incorrect'
   const [score, setScore] = useState(0);
   const navigate = useNavigate();
 
+<<<<<<< HEAD
+  const currentQ = questions[currentIndex];
+  const progress = ((currentIndex) / questions.length) * 100;
+
+  const handleSelect = (idx) => {
+    if (status !== 'idle') return;
+    setSelectedOption(idx);
+  };
+
+  const checkAnswer = () => {
+    if (selectedOption === null) return;
+    
+    if (selectedOption === currentQ.correctAnswer) {
+=======
   // Randomize questions and options on mount
   const randomizedQuestions = useMemo(() => {
     return questions.map(q => {
@@ -43,6 +65,7 @@ export default function QuizEngine({ questions, onComplete }) {
     if (selectedOptionIndex === null) return;
 
     if (selectedOptionIndex === currentQ.correctAnswer) {
+>>>>>>> auth-backend
       setStatus('correct');
       setScore(prev => prev + 1);
       recordStudyActivity();
@@ -52,6 +75,16 @@ export default function QuizEngine({ questions, onComplete }) {
   };
 
   const handleNext = () => {
+<<<<<<< HEAD
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(curr => curr + 1);
+      setSelectedOption(null);
+      setStatus('idle');
+    } else {
+      // Quiz complete — pass score back
+      const finalScore = score + (status === 'correct' ? 0 : 0); // score already updated
+      onComplete(finalScore, questions.length);
+=======
     if (currentIndex < randomizedQuestions.length - 1) {
       setCurrentIndex(curr => curr + 1);
       setSelectedOptionIndex(null);
@@ -60,6 +93,7 @@ export default function QuizEngine({ questions, onComplete }) {
       // Quiz complete — pass score back
       const finalScore = score + (status === 'correct' ? 1 : 0); // Need to add 1 if current answer was correct since state update might not have propagated
       onComplete(finalScore, randomizedQuestions.length);
+>>>>>>> auth-backend
     }
   };
 
@@ -100,7 +134,8 @@ export default function QuizEngine({ questions, onComplete }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
               {currentQ.options.map((opt, idx) => {
-                const isSelected = selectedOptionIndex === idx;
+<<<<<<< HEAD
+                const isSelected = selectedOption === idx;
                 const isCorrect = status === 'correct' && isSelected;
                 const isWrong = status === 'incorrect' && isSelected;
                 const showCorrect = status === 'incorrect' && idx === currentQ.correctAnswer;
@@ -152,6 +187,15 @@ export default function QuizEngine({ questions, onComplete }) {
               </motion.div>
             )}
           </div>
+<<<<<<< HEAD
+          
+          <button 
+            onClick={status === 'idle' ? checkAnswer : handleNext}
+            disabled={selectedOption === null}
+            className={`w-40 h-14 rounded-2xl font-bold uppercase tracking-widest text-lg transition-all ${
+              selectedOption === null 
+                ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed' 
+=======
 
           <button
             onClick={status === 'idle' ? checkAnswer : handleNext}
@@ -159,6 +203,7 @@ export default function QuizEngine({ questions, onComplete }) {
             className={`w-40 h-14 rounded-2xl font-bold uppercase tracking-widest text-lg transition-all ${
               selectedOptionIndex === null
                 ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+>>>>>>> auth-backend
                 : status === 'idle'                   ? 'bg-gradient-to-r from-violet-600 to-purple-400 text-white hover:shadow-[0_0_20px_rgba(124,58,237,0.3)]'
                   : status === 'correct'
                     ? 'bg-green-500 text-black shadow-[0_0_20px_rgba(34,197,94,0.3)]'
