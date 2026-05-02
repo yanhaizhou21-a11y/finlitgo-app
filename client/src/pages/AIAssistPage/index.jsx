@@ -9,5 +9,7 @@ export default function AIAssistPage() {
         AI Assist Page
       </div>
     </div>
+    
   );
 }
+

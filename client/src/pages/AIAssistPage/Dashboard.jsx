@@ -505,3 +505,5 @@ export default function AIAssistPage() {
     </div>
   );
 }
+
+
