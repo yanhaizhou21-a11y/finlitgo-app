@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PrismaticBurst from '../../components/Background/PrismaticBurst';
 import AuthContainer from '../../components/Auth/AuthContainer';
 
@@ -43,15 +44,16 @@ const AuthPage = () => {
       {/* Right Column (Form Area) */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 relative overflow-y-auto">
         
-        {/* Logo/Brand at top-center */}
-        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 flex items-center justify-center gap-2 text-xl font-semibold">
-           <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-           </svg>
-           Cogie
-        </div>
+        {/* Back Button */}
+        <Link 
+          to="/" 
+          className="absolute top-12 left-8 md:left-12 flex items-center gap-2 text-gray-400 hover:text-black transition-colors z-20 font-exo"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span className="font-medium text-sm">Back</span>
+        </Link>
 
         <div className="w-full max-w-md mt-16 lg:mt-0">
           <AuthContainer />

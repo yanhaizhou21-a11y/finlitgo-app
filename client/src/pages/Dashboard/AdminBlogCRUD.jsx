@@ -1,63 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconPlus, IconEdit, IconTrash, IconX, IconArticle } from '@tabler/icons-react';
+import { supabase } from "@/services/supabase";
 
 // ─────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────
-const STORAGE_KEY = 'finlitgo_blogs';
-
-const DEFAULT_BLOGS = [
-  {
-    id: 1,
-    title: 'How to Build an Emergency Fund in 6 Months',
-    excerpt: 'An emergency fund is a financial safety net designed to cover unexpected expenses...',
-    author: 'Admin FinlitGo',
-    date: 'Oct 12',
-    timeToRead: '4 min read',
-    category: 'Foundation',
-    image: 'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=800&q=80',
-    content:
-      'An emergency fund is a financial safety net designed to cover unexpected expenses such as medical bills, urgent car repairs, or sudden job loss.\n\n### Why is an Emergency Fund Critical?\nLife is unpredictable. Having liquid cash readily available gives you peace of mind.\n\n### Step 1: Set a Realistic Goal\nStart small. Aim for one month of essential expenses.',
-  },
-  {
-    id: 2,
-    title: "Understanding Crypto: A Beginner's Guide",
-    excerpt: 'Cryptocurrency has taken the financial world by storm, but what exactly is it?',
-    author: 'Doctor Solking',
-    date: 'Oct 10',
-    timeToRead: '8 min read',
-    category: 'Advanced',
-    image: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=800&q=80',
-    content:
-      'Cryptocurrency has taken the financial world by storm.\n\n### What is Crypto?\nA digital or virtual currency that uses cryptography for security.\n\n### How to Start?\nBegin with established coins like Bitcoin or Ethereum.',
-  },
-  {
-    id: 3,
-    title: 'The 50/30/20 Rule Explained',
-    excerpt: "Budgeting doesn't have to be complicated. Learn how the 50/30/20 rule can simplify your finances.",
-    author: 'Admin FinlitGo',
-    date: 'Oct 05',
-    timeToRead: '5 min read',
-    category: 'Foundation',
-    image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=80',
-    content:
-      'The 50/30/20 rule is a simple budgeting framework.\n\n### 50% Needs\nEssential expenses like rent, groceries, and utilities.\n\n### 30% Wants\nNon-essentials like dining out and entertainment.\n\n### 20% Savings\nSavings and debt repayment.',
-  },
-  {
-    id: 4,
-    title: 'Why You Need to Start Investing Early',
-    excerpt: 'Compound interest is the eighth wonder of the world. Find out why starting early is crucial.',
-    author: 'Snickers',
-    date: 'Sep 28',
-    timeToRead: '6 min read',
-    category: 'Growth',
-    image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
-    content:
-      "Compound interest is powerful.\n\n### The Power of Time\nThe earlier you start, the more your money grows.\n\n### Start Small\nYou don't need millions to begin investing.",
-  },
-];
-
 const EMPTY_FORM = {
   title: '',
   excerpt: '',
@@ -69,28 +17,6 @@ const EMPTY_FORM = {
 };
 
 const CATEGORIES = ['All', 'Foundation', 'Growth', 'Advanced'];
-
-// ─────────────────────────────────────────
-// Storage helpers
-// ─────────────────────────────────────────
-const getBlogs = () => {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch {
-    // corrupted data — fall through to defaults
-  }
-  return DEFAULT_BLOGS;
-};
-
-const saveBlogs = (blogs) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(blogs));
-    return true;
-  } catch {
-    return false;
-  }
-};
 
 // ─────────────────────────────────────────
 // Validation helpers
@@ -124,6 +50,7 @@ const normaliseBlog = (blog) => ({
   ...blog,
   image: blog.image || blog.thumbnail_url || '',
   timeToRead: blog.timeToRead || blog.time_to_read || '5 min read',
+  date: blog.date || formatDate(new Date(blog.created_at)),
 });
 
 // ─────────────────────────────────────────
@@ -175,12 +102,6 @@ export default function AdminBlogCRUD() {
   const [sortOrder, setSortOrder] = useState('latest'); // 'latest' | 'oldest'
   const [toasts, setToasts] = useState([]);
 
-  // ── Load from localStorage once on mount ──
-  useEffect(() => {
-    setBlogs(getBlogs());
-    setLoading(false);
-  }, []);
-
   // ── Toast helper ──
   const pushToast = useCallback((message, type = 'success') => {
     const id = Date.now();
@@ -188,19 +109,35 @@ export default function AdminBlogCRUD() {
     setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3000);
   }, []);
 
-  // ── Persist + update state atomically ──
-  const persistBlogs = useCallback(
-    (updated) => {
-      const ok = saveBlogs(updated);
-      if (ok) {
-        setBlogs(updated);
-      } else {
-        pushToast('Failed to save. Storage might be full.', 'error');
+  // ── Load data from Supabase (FIXED: only runs once) ──
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      setLoading(true);
+      
+      const { data, error, status, statusText } = await supabase
+        .from('blogs')
+        .select('*');
+
+      console.log("STATUS:", status, statusText);
+      console.log("DATA:", data);
+      console.log("ERROR CODE:", error?.code);
+      console.log("ERROR MESSAGE:", error?.message);
+      console.log("ERROR DETAILS:", error?.details);
+      console.log("ERROR HINT:", error?.hint);
+
+      if (error) {
+        pushToast('Failed to fetch data', 'error');
+      } else if (data) {
+        const normalisedData = data.map(normaliseBlog);
+        setBlogs(normalisedData);
+        console.log(`✅ ${data.length} posts loaded successfully`);
       }
-      return ok;
-    },
-    [pushToast]
-  );
+
+      setLoading(false);
+    };
+
+    fetchBlogs();
+  }, []); // ← Empty dependency array = runs only once when component mounts
 
   // ── Filtered / searched / sorted list (memoised) ──
   const displayedBlogs = useMemo(() => {
@@ -215,9 +152,13 @@ export default function AdminBlogCRUD() {
       result = result.filter((b) => b.category === filterCategory);
     }
 
-    result.sort((a, b) =>
-      sortOrder === 'latest' ? b.id - a.id : a.id - b.id
-    );
+    result.sort((a, b) => {
+      if (sortOrder === 'latest') {
+        return new Date(b.created_at) - new Date(a.created_at);
+      } else {
+        return new Date(a.created_at) - new Date(b.created_at);
+      }
+    });
 
     return result;
   }, [blogs, search, filterCategory, sortOrder]);
@@ -234,7 +175,7 @@ export default function AdminBlogCRUD() {
     setEditingBlog(n);
     setForm({
       title: n.title,
-      excerpt: n.excerpt,
+      excerpt: n.excerpt || '',
       author: n.author,
       category: n.category,
       image: n.image,
@@ -250,7 +191,74 @@ export default function AdminBlogCRUD() {
     setForm(EMPTY_FORM);
   }, []);
 
-  // ── CRUD operations ──
+  // ── Helper to refresh data ──
+  const refreshBlogs = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('blogs')
+      .select('*');
+
+    if (error) {
+      pushToast('Failed to refresh data', 'error');
+    } else if (data) {
+      const normalisedData = data.map(normaliseBlog);
+      setBlogs(normalisedData);
+    }
+    setLoading(false);
+  }, [pushToast]);
+
+  // ── CREATE operation (FIXED: added missing fields) ──
+  const handleCreate = useCallback(async () => {
+    const { error } = await supabase
+      .from('blogs')
+      .insert([{
+        title: form.title,
+        excerpt: form.excerpt,
+        content: form.content,
+        category: form.category,
+        author: form.author,
+        image: form.image,
+        thumbnail_url: form.image,
+        time_to_read: form.timeToRead,
+      }]);
+
+    if (error) {
+      console.error('Create error:', error);
+      pushToast('Failed to create post', 'error');
+    } else {
+      pushToast('Post created successfully!');
+      await refreshBlogs();
+      closeModal();
+    }
+  }, [form, refreshBlogs, pushToast, closeModal]);
+
+  // ── UPDATE operation (FIXED: properly handles all fields) ──
+  const handleUpdate = useCallback(async () => {
+    const { error } = await supabase
+      .from('blogs')
+      .update({
+        title: form.title,
+        excerpt: form.excerpt,
+        content: form.content,
+        category: form.category,
+        author: form.author,
+        image: form.image,
+        thumbnail_url: form.image,
+        time_to_read: form.timeToRead,
+      })
+      .eq('id', editingBlog.id);
+
+    if (error) {
+      console.error('Update error:', error);
+      pushToast('Failed to update post', 'error');
+    } else {
+      pushToast('Post updated successfully!');
+      await refreshBlogs();
+      closeModal();
+    }
+  }, [form, editingBlog, refreshBlogs, pushToast, closeModal]);
+
+  // ── Save (Create or Update) ──
   const handleSave = useCallback(() => {
     const error = validateForm(form);
     if (error) {
@@ -258,46 +266,29 @@ export default function AdminBlogCRUD() {
       return;
     }
 
-    let updatedBlogs;
-
     if (editingBlog) {
-      // Merge: keep all original fields, only override form fields
-      updatedBlogs = blogs.map((b) =>
-        b.id === editingBlog.id ? { ...b, ...form } : b
-      );
+      handleUpdate();
     } else {
-      const newPost = {
-        ...form,
-        id: Date.now(),
-        date: formatDate(),
-      };
-      updatedBlogs = [newPost, ...blogs];
+      handleCreate();
     }
+  }, [form, editingBlog, handleUpdate, handleCreate, pushToast]);
 
-    const ok = persistBlogs(updatedBlogs);
-    if (ok) {
-      pushToast(editingBlog ? 'Post updated!' : 'Post published!');
-      closeModal();
+  // ── DELETE operation ──
+  const handleDelete = useCallback(async () => {
+    const { error } = await supabase
+      .from('blogs')
+      .delete()
+      .eq('id', deleteConfirm);
+
+    if (error) {
+      console.error('Delete error:', error);
+      pushToast('Failed to delete post', 'error');
+    } else {
+      pushToast('Post deleted successfully!');
+      await refreshBlogs();
     }
-  }, [form, editingBlog, blogs, persistBlogs, pushToast, closeModal]);
-
-  const handleDelete = useCallback(
-    (id) => {
-      const target = blogs.find((b) => b.id === id);
-      if (!target) {
-        pushToast('Post not found.', 'error');
-        setDeleteConfirm(null);
-        return;
-      }
-      const updatedBlogs = blogs.filter((b) => b.id !== id);
-      const ok = persistBlogs(updatedBlogs);
-      if (ok) {
-        pushToast('Post deleted.');
-        setDeleteConfirm(null);
-      }
-    },
-    [blogs, persistBlogs, pushToast]
-  );
+    setDeleteConfirm(null);
+  }, [deleteConfirm, refreshBlogs, pushToast]);
 
   // ─────────────────────────────────────────
   // JSX — structure and className unchanged
@@ -458,7 +449,7 @@ export default function AdminBlogCRUD() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => handleDelete(deleteConfirm)}
+                  onClick={handleDelete}
                   className="flex-1 py-2.5 bg-red-500 text-white rounded-xl hover:bg-red-400 transition-colors text-sm font-medium"
                 >
                   Delete

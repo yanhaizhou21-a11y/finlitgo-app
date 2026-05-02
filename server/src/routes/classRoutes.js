@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const classController = require('../controllers/classController');
+import * as classController from '../controllers/classController.js';
 
 // GET all classes
 router.get('/', classController.getAllClasses);
@@ -16,4 +16,4 @@ router.post('/', classController.createClass);
 router.put('/:id', classController.updateClass);
 router.delete('/:id', classController.deleteClass);
 
-module.exports = router;
+export default router;

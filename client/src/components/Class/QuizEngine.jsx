@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconX, IconCheck, IconTarget } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
@@ -6,23 +6,43 @@ import { recordStudyActivity } from '../../utils/streak';
 
 export default function QuizEngine({ questions, onComplete }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
   const [status, setStatus] = useState('idle'); // 'idle', 'correct', 'incorrect'
   const [score, setScore] = useState(0);
   const navigate = useNavigate();
 
-  const currentQ = questions[currentIndex];
-  const progress = ((currentIndex) / questions.length) * 100;
+  // Randomize questions and options on mount
+  const randomizedQuestions = useMemo(() => {
+    return questions.map(q => {
+      // Create array of objects with original index and text
+      const optionsWithIndices = q.options.map((opt, idx) => ({ text: opt, originalIndex: idx }));
+
+      // Shuffle options
+      const shuffledOptions = [...optionsWithIndices].sort(() => Math.random() - 0.5);
+
+      // Find new index of correct answer
+      const newCorrectIndex = shuffledOptions.findIndex(opt => opt.originalIndex === q.correctAnswer);
+
+      return {
+        ...q,
+        options: shuffledOptions.map(opt => opt.text),
+        correctAnswer: newCorrectIndex
+      };
+    }).sort(() => Math.random() - 0.5); // Optional: shuffle questions too
+  }, [questions]);
+
+  const currentQ = randomizedQuestions[currentIndex];
+  const progress = ((currentIndex) / randomizedQuestions.length) * 100;
 
   const handleSelect = (idx) => {
     if (status !== 'idle') return;
-    setSelectedOption(idx);
+    setSelectedOptionIndex(idx);
   };
 
   const checkAnswer = () => {
-    if (selectedOption === null) return;
-    
-    if (selectedOption === currentQ.correctAnswer) {
+    if (selectedOptionIndex === null) return;
+
+    if (selectedOptionIndex === currentQ.correctAnswer) {
       setStatus('correct');
       setScore(prev => prev + 1);
       recordStudyActivity();
@@ -32,14 +52,14 @@ export default function QuizEngine({ questions, onComplete }) {
   };
 
   const handleNext = () => {
-    if (currentIndex < questions.length - 1) {
+    if (currentIndex < randomizedQuestions.length - 1) {
       setCurrentIndex(curr => curr + 1);
-      setSelectedOption(null);
+      setSelectedOptionIndex(null);
       setStatus('idle');
     } else {
       // Quiz complete — pass score back
-      const finalScore = score + (status === 'correct' ? 0 : 0); // score already updated
-      onComplete(finalScore, questions.length);
+      const finalScore = score + (status === 'correct' ? 1 : 0); // Need to add 1 if current answer was correct since state update might not have propagated
+      onComplete(finalScore, randomizedQuestions.length);
     }
   };
 
@@ -80,13 +100,13 @@ export default function QuizEngine({ questions, onComplete }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
               {currentQ.options.map((opt, idx) => {
-                const isSelected = selectedOption === idx;
+                const isSelected = selectedOptionIndex === idx;
                 const isCorrect = status === 'correct' && isSelected;
                 const isWrong = status === 'incorrect' && isSelected;
                 const showCorrect = status === 'incorrect' && idx === currentQ.correctAnswer;
-                
+
                 let cardStyle = "bg-[#1A1A1A] border-zinc-700 hover:bg-zinc-800";
-                
+
                 if (isSelected && status === 'idle') {
                   cardStyle = "bg-violet-500/10 border-violet-500 text-violet-400";
                 } else if (isCorrect || showCorrect) {
@@ -132,13 +152,13 @@ export default function QuizEngine({ questions, onComplete }) {
               </motion.div>
             )}
           </div>
-          
-          <button 
+
+          <button
             onClick={status === 'idle' ? checkAnswer : handleNext}
-            disabled={selectedOption === null}
+            disabled={selectedOptionIndex === null}
             className={`w-40 h-14 rounded-2xl font-bold uppercase tracking-widest text-lg transition-all ${
-              selectedOption === null 
-                ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed' 
+              selectedOptionIndex === null
+                ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
                 : status === 'idle'                   ? 'bg-gradient-to-r from-violet-600 to-purple-400 text-white hover:shadow-[0_0_20px_rgba(124,58,237,0.3)]'
                   : status === 'correct'
                     ? 'bg-green-500 text-black shadow-[0_0_20px_rgba(34,197,94,0.3)]'

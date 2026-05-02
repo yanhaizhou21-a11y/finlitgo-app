@@ -1,22 +1,61 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { supabase } from '../../services/supabase';
 import InputField from './InputField';
 import GoogleButton from './GoogleButton';
 
-const SignIn = ({ onToggle }) => {
+const SignIn = ({ onToggle, onSuccess }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Signing in with', formData);
+    setLoading(true);
+    setError(null);
+    try {
+      console.log('[DEBUG] Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+      console.log('[DEBUG] Supabase Key (first 20 chars):', import.meta.env.VITE_SUPABASE_ANON_KEY?.slice(0, 20));
+      console.log('[DEBUG] Attempting login with email:', formData.email);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+      
+      console.log('[DEBUG] Supabase response - data:', data, '| error:', error);
+      if (error) throw error;
+
+      onSuccess(data.user);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    alert('Logged in with Google');
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { 
+          redirectTo: window.location.origin + '/dashboard' 
+        }
+      });
+      if (error) throw error;
+      // Note: signInWithOAuth redirects the user, so onSuccess might not be called immediately here.
+      // The logic in AuthContainer needs to handle session restoration.
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -29,7 +68,9 @@ const SignIn = ({ onToggle }) => {
       className="flex flex-col w-full px-2"
     >
       <h2 className="text-4xl font-serif text-black mb-2 text-center md:text-left">Welcome Back</h2>
-      <p className="text-sm text-gray-500 font-light mb-8 text-center md:text-left">Enter your email and password to access your account</p>
+      <p className="text-sm text-gray-500 font-light mb-8 text-center md:text-left font-space">Enter your email and password to access your account</p>
+
+      {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
 
       <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
         <InputField
@@ -54,12 +95,12 @@ const SignIn = ({ onToggle }) => {
               <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black" />
               Remember me
             </label>
-            <a href="#" className="text-sm text-gray-600 hover:text-black font-medium transition-colors" onClick={(e) => e.preventDefault()}>Forgot Password</a>
+            <a href="#" className="text-sm text-gray-600 hover:text-black font-medium transition-colors font-space" onClick={(e) => e.preventDefault()}>Forgot Password</a>
           </div>
         </div>
         
-        <button type="submit" className="mt-4 w-full py-3.5 px-4 bg-black hover:bg-gray-800 text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:-translate-y-0.5 border border-transparent">
-          Sign In
+        <button type="submit" disabled={loading} className="mt-4 w-full py-3.5 px-4 bg-black hover:bg-gray-800 text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:-translate-y-0.5 border border-transparent disabled:opacity-50 disabled:hover:-translate-y-0">
+          {loading ? 'Signing In...' : 'Sign In'}
         </button>
       </form>
 
@@ -69,11 +110,11 @@ const SignIn = ({ onToggle }) => {
         <div className="flex-1 border-b border-gray-200 ml-3"></div>
       </div>
       
-      <GoogleButton onClick={handleGoogleLogin} />
+      <GoogleButton onClick={handleGoogleLogin} disabled={loading} />
 
       <div className="text-center mt-6 text-sm text-gray-500">
         Don't have an account?{' '}
-        <button className="text-black font-semibold hover:underline bg-transparent border-none p-0" onClick={onToggle}>
+        <button type="button" className="text-black font-semibold hover:underline bg-transparent border-none p-0" onClick={onToggle} disabled={loading}>
           Sign Up
         </button>
       </div>

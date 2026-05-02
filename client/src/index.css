@@ -8,6 +8,17 @@
   --font-space: 'Space Grotesk', sans-serif;
   
   --font-sans: 'Inter', sans-serif;
+
+  --color-primary-dark: #121212;
+  --color-panel-dark: #1E1E1E;
+  --color-panel-light: #2A2A2A;
+  --color-accent-green: #CAFF33;
+  --color-accent: #7C3AED;
+  --color-accent-light: #A78BFA;
+  --color-accent-dark: #5B21B6;
+  --color-text-primary: #FFFFFF;
+  --color-text-muted: #888888;
+  --color-danger: #FF4D4D;
 }
 
 @keyframes sweep {
@@ -16,18 +27,26 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth; disabled for Lenis */
+  overflow-x: hidden;
 }
 
 :root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-inter);
   color-scheme: dark;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-orbitron);
 }
 
 body {
   margin: 0;
+  font-family: var(--font-inter);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 #root {
@@ -35,4 +54,21 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* Lenis */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }
