@@ -347,36 +347,35 @@ export default function AIAssistPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col h-[calc(100vh-100px)] max-w-5xl mx-auto py-8 px-4">
+    <div className="flex flex-col min-h-[calc(100dvh-100px)] max-w-5xl mx-auto py-4 sm:py-8 px-3 sm:px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
 
       {/* Header */}
-      <div className="flex justify-between items-center mb-6 px-1">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 px-1 gap-3">
         <div>
-          <h2 className="text-4xl font-bold font-orbitron uppercase tracking-widest text-white">FinLitGo AI</h2>
-          <p className="text-zinc-400 mt-1 text-sm">Your personal financial intelligence assistant.</p>
+          <h2 className="text-2xl sm:text-4xl font-bold font-orbitron uppercase tracking-widest text-white">FinLitGo AI</h2>
+          <p className="text-zinc-400 mt-1 text-xs sm:text-sm">Your personal financial intelligence assistant.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           {/* Data sync status */}
           {dataLoading ? (
-            <div className="flex items-center gap-2 px-3 py-2 bg-[#1A1A1A] border border-zinc-800 rounded-xl text-xs text-zinc-500">
-              <IconLoader2 size={14} className="animate-spin" /><span>Loading data...</span>
+            <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-[#1A1A1A] border border-zinc-800 rounded-xl text-[10px] sm:text-xs text-zinc-500">
+              <IconLoader2 size={14} className="animate-spin" /><span>Loading...</span>
             </div>
           ) : financialContext ? (
-            <div className="flex items-center gap-2 px-3 py-2 bg-green-500/10 border border-green-500/20 rounded-xl text-xs text-green-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /><span>Data synced</span>
+            <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-green-500/10 border border-green-500/20 rounded-xl text-[10px] sm:text-xs text-green-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /><span>Synced</span>
             </div>
           ) : null}
 
           {/* Daily counter */}
-          <div className="px-4 py-2 bg-[#1A1A1A] border border-zinc-800 rounded-xl text-sm font-mono">
-            <span className="text-zinc-400">Limit: </span>
+          <div className="px-3 py-1.5 sm:py-2 bg-[#1A1A1A] border border-zinc-800 rounded-xl text-xs sm:text-sm font-mono">
             <span className={limitReached ? 'text-red-400 font-bold' : 'text-violet-400 font-bold'}>
               {usageCount}/{MAX_DAILY_LIMIT}
             </span>
           </div>
 
-          <button onClick={handleClearChat} className="p-2.5 text-zinc-500 hover:text-red-400 hover:bg-zinc-900 rounded-xl transition-colors border border-zinc-800" title="Clear Chat">
-            <IconTrash size={18} />
+          <button onClick={handleClearChat} className="p-2 text-zinc-500 hover:text-red-400 hover:bg-zinc-900 rounded-xl transition-colors border border-zinc-800" title="Clear Chat">
+            <IconTrash size={16} />
           </button>
         </div>
       </div>
@@ -388,10 +387,10 @@ export default function AIAssistPage() {
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-400 flex items-center justify-center mb-5 shadow-[0_0_40px_rgba(124,58,237,0.35)]">
             <IconRobot size={40} className="text-white" />
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2">
+          <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
             Halo, {user?.user_metadata?.full_name?.split(' ')[0] || 'Learner'} 👋
           </h3>
-          <p className="text-zinc-400 text-center max-w-md mb-10 text-sm leading-relaxed">
+          <p className="text-zinc-400 text-center max-w-md mb-6 sm:mb-10 text-xs sm:text-sm leading-relaxed">
             Saya bisa menganalisis cashflow, pengeluaran, budgeting, dan membantu merencanakan tujuan keuanganmu — semua berdasarkan data real dari dashboard kamu.
           </p>
 
@@ -402,19 +401,20 @@ export default function AIAssistPage() {
               <IconLoader2 size={16} className="animate-spin" /> Memuat data keuangan...
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 w-full max-w-3xl">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3 w-full max-w-3xl">
               {CATEGORIES.map((cat, i) => (
                 <motion.button key={i}
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
                   onClick={() => handleSend(cat.customPrompt || cat.title, cat.intent)}
                   disabled={limitReached}
-                  className={`flex flex-col items-start text-left p-5 border rounded-2xl transition-all group hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed ${cat.color}`}
+                  type="button"
+                  className={`min-h-[92px] sm:min-h-0 flex flex-col items-start text-left p-3.5 sm:p-5 border rounded-2xl transition-all active:scale-[0.98] group hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed ${cat.color}`}
                 >
-                  <div className={`p-3 rounded-xl mb-3 border ${cat.color} group-hover:scale-110 transition-transform`}>
+                  <div className={`p-2 sm:p-3 rounded-xl mb-2 sm:mb-3 border ${cat.color} group-hover:scale-110 transition-transform`}>
                     {cat.icon}
                   </div>
-                  <span className="font-semibold text-sm text-white group-hover:text-violet-300 transition-colors">{cat.title}</span>
-                  <span className="text-[11px] text-zinc-500 mt-0.5">{cat.sub}</span>
+                  <span className="font-semibold text-[11px] sm:text-sm text-white group-hover:text-violet-300 transition-colors leading-snug">{cat.title}</span>
+                  <span className="text-[10px] text-zinc-500 mt-1 line-clamp-2 sm:line-clamp-none">{cat.sub}</span>
                 </motion.button>
               ))}
             </div>
@@ -436,7 +436,7 @@ export default function AIAssistPage() {
                     msg.role === 'user' ? 'bg-zinc-800' : 'bg-gradient-to-br from-violet-600 to-purple-400'}`}>
                     {msg.role === 'user' ? <IconUser size={18} className="text-zinc-400" /> : <IconRobot size={20} className="text-white" />}
                   </div>
-                  <div className={`max-w-[78%] rounded-2xl px-5 py-4 text-sm ${
+                  <div className={`max-w-[85%] sm:max-w-[78%] rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-xs sm:text-sm ${
                     msg.role === 'user'
                       ? 'bg-zinc-800 text-white rounded-tr-sm'
                       : 'bg-zinc-900/80 border border-zinc-800/60 text-zinc-300 rounded-tl-sm'}`}>
@@ -469,7 +469,7 @@ export default function AIAssistPage() {
 
       {/* Input bar */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        className="w-full bg-[#1A1A1A] border-2 border-zinc-800 focus-within:border-violet-500/40 transition-all rounded-3xl p-2 shadow-2xl shrink-0">
+        className="w-full bg-[#1A1A1A] border-2 border-zinc-800 focus-within:border-violet-500/40 transition-all rounded-3xl p-2 shadow-2xl shrink-0 sticky bottom-0 z-10">
         <textarea
           value={prompt}
           onChange={e => setPrompt(e.target.value)}

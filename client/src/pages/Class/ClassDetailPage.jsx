@@ -3,10 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   IconArrowLeft, IconChevronDown, IconChevronRight, IconChevronLeft,
   IconCheck, IconMenu2, IconX, IconBookmark, IconClock, IconTrophy,
-  IconStar, IconPlayerPlay, IconLock, IconLoader2,
+  IconStar, IconPlayerPlay, IconLock, IconLoader2, IconFlame,
 } from '@tabler/icons-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { recordStudyActivity } from '../../utils/streak';
+import { recordStudyActivity, getCurrentStreak, hasStudiedToday } from '../../utils/streak';
 import { CLASS_META, CLASS_LEVELS } from '../../data/classContent';
 import { useAuth } from '../../store/AuthContext';
 import { supabase } from '../../services/supabase';
@@ -56,7 +56,7 @@ function isUuidLike(value) {
 export default function ClassDetailPage() {
   const { moduleId } = useParams();
   const navigate = useNavigate();
-  const { user, refreshProfile } = useAuth();
+  const { user, refreshProfile, profile } = useAuth();
   const [loading, setLoading] = useState(true);
   const [classData, setClassData] = useState(null);
   const [isDbClass, setIsDbClass] = useState(false);
@@ -78,6 +78,8 @@ export default function ClassDetailPage() {
   const [quizHistory, setQuizHistory] = useState(() => loadJSON(quizHistKey(userId, moduleId), {}));
   const [readingProgress, setReadingProgress] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showStreakPopup, setShowStreakPopup] = useState(false);
+  const [streakCount, setStreakCount] = useState(0);
 
   // Quiz flow states
   const [quizLandingData, setQuizLandingData] = useState(null);
@@ -170,7 +172,18 @@ export default function ClassDetailPage() {
     setLoading(false);
   };
 
-  useEffect(() => { recordStudyActivity(); }, []);
+  // Record study + streak popup (opening a class counts as study for the day)
+  useEffect(() => {
+    const wasAlreadyStudied = hasStudiedToday();
+    const count = recordStudyActivity();
+    setStreakCount(count);
+    refreshProfile?.();
+    if (!wasAlreadyStudied && count > 0) {
+      setShowStreakPopup(true);
+      setTimeout(() => setShowStreakPopup(false), 4200);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once per class mount
+  }, []);
 
   // Scroll progress logic ... (keep as is)
   useEffect(() => {
@@ -273,24 +286,19 @@ export default function ClassDetailPage() {
 
   // ── Actions ──
   const markComplete = async (itemId) => {
-    setCompleted(prev => {
+    setCompleted((prev) => {
       const next = new Set(prev);
       next.add(itemId);
-      // saveSet is handled by the useEffect above
       return next;
     });
-    
-    // Sync with backend if logged in
+
     if (isDbClass && user?.id && classData?.id) {
-      // Handle both "chapter-1" format and "c1-l1-1" format
       let chapterId = String(itemId);
-      if (chapterId.startsWith('chapter-')) {
-        chapterId = chapterId.replace('chapter-', '');
-      }
+      if (chapterId.startsWith('chapter-')) chapterId = chapterId.replace('chapter-', '');
       try {
         await markChapterComplete({ userId: user.id, classId: classData.id, chapterId });
       } catch (error) {
-        console.error("Error syncing progress:", error);
+        console.error('Error syncing progress:', error);
       }
     }
   };
@@ -394,14 +402,20 @@ export default function ClassDetailPage() {
     }
   }, [levels, activeItemId]);
 
-  // Navigate within level
-  const goNext = () => {
+  // Navigate within level — auto-open quiz landing when last item done
+  const goNext = async () => {
     if (activeItemIndex < currentLevelItems.length - 1) {
-      markComplete(activeItemId);
+      await markComplete(activeItemId);
       const next = currentLevelItems[activeItemIndex + 1];
       selectItem(next, currentLevel.id);
-    } else {
-      markComplete(activeItemId);
+      return;
+    }
+    await markComplete(activeItemId);
+    if (currentLevel) {
+      setTimeout(() => {
+        const allDone = currentLevel.items.every((i) => completed.has(i.id) || i.id === activeItemId);
+        if (allDone && currentLevel.finalQuiz) openFinalQuizLanding(currentLevel);
+      }, 400);
     }
   };
 
@@ -437,9 +451,40 @@ export default function ClassDetailPage() {
   return (
     <div className="flex min-h-[calc(100vh-80px)] bg-[#0a0a0a] text-white relative">
 
-      {/* Reading Progress */}
-      <div className="fixed top-[80px] left-0 right-0 z-50 h-1 bg-transparent">
-        <motion.div className="h-full bg-gradient-to-r from-violet-600 via-purple-400 to-fuchsia-400" style={{ width:`${readingProgress}%` }} transition={{ duration:0.1 }} />
+      {/* Streak Popup */}
+      <AnimatePresence>
+        {showStreakPopup && (
+          <motion.div
+            initial={{ opacity: 0, y: -60, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -40, scale: 0.9 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"
+          >
+            <div className="bg-gradient-to-br from-orange-500/90 via-amber-500/90 to-yellow-500/90 backdrop-blur-xl border border-orange-400/40 rounded-2xl px-5 sm:px-8 py-4 sm:py-5 shadow-[0_8px_40px_rgba(251,146,60,0.4)] flex items-center gap-3 sm:gap-4 max-w-[min(100%,22rem)]">
+              <div className="text-4xl sm:text-5xl shrink-0" aria-hidden>🔥</div>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                <IconFlame size={28} className="text-white drop-shadow-lg sm:w-8 sm:h-8" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-white/80 text-[10px] sm:text-xs font-semibold uppercase tracking-widest">Streak kamu</p>
+                <p className="text-white text-xl sm:text-2xl font-black font-orbitron">Day {streakCount}</p>
+                <p className="text-white/80 text-[11px] sm:text-xs mt-0.5 leading-snug">
+                  + Points terkumpul: <span className="font-bold text-white">{profile?.points ?? '—'}</span>
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Reading progress — slim neutral bar (no purple strip) */}
+      <div className="fixed top-[80px] left-0 right-0 z-50 h-0.5 bg-zinc-900/90">
+        <motion.div
+          className="h-full bg-emerald-500/90"
+          style={{ width: `${readingProgress}%` }}
+          transition={{ duration: 0.12 }}
+        />
       </div>
 
       {/* Mobile Backdrop */}
@@ -456,7 +501,7 @@ export default function ClassDetailPage() {
           <motion.aside key="sidebar"
             initial={{ width:0, opacity:0 }} animate={{ width:340, opacity:1 }} exit={{ width:0, opacity:0 }}
             transition={{ type:'spring', stiffness:300, damping:30 }}
-            className="shrink-0 overflow-hidden border-r border-zinc-800 bg-[#111111] flex flex-col fixed lg:relative z-40 h-[calc(100vh-80px)]" style={{ overflowY:'auto' }}
+            className="shrink-0 overflow-hidden border-r border-zinc-800 bg-[#111111] flex flex-col fixed lg:relative z-40 h-[calc(100dvh-80px)] max-h-[calc(100dvh-80px)]" style={{ overflowY:'auto' }}
           >
             <div className="w-[340px] flex flex-col h-full min-h-0">
               {/* Sidebar Header */}
@@ -606,7 +651,7 @@ export default function ClassDetailPage() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto" ref={contentRef}>
+        <div className="flex-1 overflow-y-auto overscroll-contain px-0" ref={contentRef}>
           {/* Quiz Landing View */}
           {quizLandingData ? (
             <QuizLanding
@@ -620,7 +665,7 @@ export default function ClassDetailPage() {
             <AnimatePresence mode="wait">
               <motion.div key={activeItemId}
                 initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-10 }}
-                transition={{ duration:0.3 }} className="max-w-3xl mx-auto px-6 py-12"
+                transition={{ duration:0.3 }} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-12"
               >
                 <div className="flex items-center gap-2 text-xs text-zinc-500 font-mono mb-6">
                   <IconBookmark size={12} className="text-violet-400" />
@@ -684,7 +729,7 @@ export default function ClassDetailPage() {
             <AnimatePresence mode="wait">
               <motion.div key={activeItemId}
                 initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-10 }}
-                transition={{ duration:0.3 }} className="max-w-3xl mx-auto px-6 py-12"
+                transition={{ duration:0.3 }} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-12"
               >
                 {/* Breadcrumb */}
                 <div className="flex items-center gap-2 text-xs text-zinc-500 font-mono mb-6">
@@ -741,25 +786,53 @@ export default function ClassDetailPage() {
           )}
         </div>
 
-        {/* Bottom Navigation */}
+        {/* Bottom lesson nav — floating bar, no heavy purple */}
         {activeItem?.type === 'lesson' && !quizLandingData && (
-          <div className="h-20 border-t border-zinc-800 bg-[#0f0f0f] px-6 flex items-center justify-between shrink-0">
-            <button onClick={goPrev} disabled={activeItemIndex <= 0}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeItemIndex > 0 ? 'text-zinc-300 hover:text-white hover:bg-zinc-800' : 'text-zinc-700 cursor-not-allowed'}`}>
-              <IconChevronLeft size={18} /><span className="hidden sm:inline">Sebelumnya</span>
-            </button>
-            <span className="text-xs text-zinc-500 font-mono hidden sm:block">{activeItemIndex+1}/{currentLevelItems.length} materi</span>
-            {activeItemIndex < currentLevelItems.length - 1 ? (
-              <button onClick={goNext}
-                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-violet-600 to-purple-500 text-white font-bold text-sm rounded-xl hover:shadow-[0_4px_20px_rgba(124,58,237,0.4)] transition-all hover:-translate-y-0.5">
-                <span>Selanjutnya</span><IconChevronRight size={18} />
+          <div className="pointer-events-none sticky bottom-0 z-30 flex justify-center px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
+            <div className="pointer-events-auto flex w-full max-w-xl items-center gap-2 rounded-2xl border border-zinc-700/80 bg-zinc-950/95 px-3 py-2.5 shadow-[0_-8px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:gap-4 sm:px-5 sm:py-3">
+              <button
+                type="button"
+                onClick={goPrev}
+                disabled={activeItemIndex <= 0}
+                className={`flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all sm:text-sm ${
+                  activeItemIndex > 0
+                    ? 'text-zinc-200 hover:bg-zinc-800'
+                    : 'cursor-not-allowed text-zinc-600'
+                }`}
+              >
+                <IconChevronLeft size={18} stroke={2} />
+                <span className="hidden sm:inline">Mundur</span>
               </button>
-            ) : (
-              <button onClick={goNext}
-                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-green-600 to-emerald-500 text-white font-bold text-sm rounded-xl hover:shadow-[0_4px_20px_rgba(34,197,94,0.4)] transition-all hover:-translate-y-0.5">
-                <IconCheck size={18} /><span>Selesai</span>
-              </button>
-            )}
+
+              <div className="flex min-w-0 flex-1 flex-col items-center justify-center px-1">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
+                  Materi
+                </span>
+                <span className="font-mono text-xs text-zinc-300 sm:text-sm">
+                  {activeItemIndex + 1} / {currentLevelItems.length}
+                </span>
+              </div>
+
+              {activeItemIndex < currentLevelItems.length - 1 ? (
+                <button
+                  type="button"
+                  onClick={() => void goNext()}
+                  className="flex shrink-0 items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-xs font-bold text-zinc-900 shadow-lg shadow-black/30 transition hover:brightness-110 sm:px-5 sm:text-sm"
+                >
+                  Lanjut
+                  <IconChevronRight size={18} stroke={2} />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => void goNext()}
+                  className="flex shrink-0 items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-xs font-bold text-emerald-950 shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400 sm:px-5 sm:text-sm"
+                >
+                  <IconCheck size={18} stroke={2} />
+                  Selesai
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>

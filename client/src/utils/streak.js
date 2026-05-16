@@ -4,7 +4,10 @@
  * - Streak starts when user studies a module (completes a chapter/quiz)
  * - Consecutive days = streak count
  * - Missing a day resets the streak
+ * - Syncs with Supabase users table
  */
+
+import { supabase } from '../services/supabase';
 
 const STREAK_KEY = 'finlitgo_streak';
 
@@ -26,6 +29,23 @@ function getYesterday() {
   const d = new Date();
   d.setDate(d.getDate() - 1);
   return d.toISOString().split('T')[0];
+}
+
+/**
+ * Sync streak count to Supabase users table (fire-and-forget).
+ */
+async function syncStreakToSupabase(count) {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user?.id) {
+      await supabase
+        .from('users')
+        .update({ streak_count: count })
+        .eq('id', session.user.id);
+    }
+  } catch (err) {
+    console.warn('Streak sync failed:', err);
+  }
 }
 
 /**
@@ -62,6 +82,10 @@ export function recordStudyActivity() {
   }
 
   saveStreakData(data);
+
+  // Sync to Supabase (fire-and-forget)
+  syncStreakToSupabase(data.count);
+
   return data.count;
 }
 
@@ -82,6 +106,7 @@ export function getCurrentStreak() {
   if (data.count > 0) {
     data.count = 0;
     saveStreakData(data);
+    syncStreakToSupabase(0);
   }
   return 0;
 }

@@ -10,8 +10,11 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
-import { useState, useEffect } from "react";
-import { supabase } from "../services/supabase";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { IconLogout } from "@tabler/icons-react";
+import { useAuth } from "../store/AuthContext";
 import logoUrl from "../assets/logo.svg";
 
 type NavbarVariant = "default" | "learning";
@@ -25,44 +28,80 @@ export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVa
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [profileData, setProfileData] = useState<any>(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const { user, profile: profileData, logout } = useAuth();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        supabase.from('users').select('*').eq('id', session.user.id).single()
-          .then(({ data }) => setProfileData(data));
-      } else {
-        setProfileData(null);
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        supabase.from('users').select('*').eq('id', session.user.id).single()
-          .then(({ data }) => setProfileData(data));
-      } else {
-        setProfileData(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const handleLogout = async () => {
-    const isConfirmed = window.confirm("Are you sure you want to log out?");
-    if (!isConfirmed) return;
-
+  const runLogout = async () => {
+    setShowLogoutConfirm(false);
     try {
-      await supabase.auth.signOut();
+      await logout();
       setIsMobileMenuOpen(false);
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Error signing out:", error);
     }
   };
+
+  const logoutModal = (
+    <AnimatePresence>
+      {showLogoutConfirm && (
+        <motion.div
+          className="fixed inset-0 z-[400] flex items-center justify-center p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.button
+            type="button"
+            aria-label="Tutup"
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowLogoutConfirm(false)}
+          />
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="logout-title"
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#14141f] via-[#1a1528] to-[#0f0f14] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
+            initial={{ opacity: 0, scale: 0.94, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+            transition={{ type: "spring", stiffness: 380, damping: 28 }}
+          >
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-500/15 ring-1 ring-violet-400/30">
+              <IconLogout className="text-violet-300" size={28} stroke={1.5} />
+            </div>
+            <h2 id="logout-title" className="text-center text-lg font-bold text-white">
+              Keluar dari FinLitGo?
+            </h2>
+            <p className="mt-2 text-center text-sm text-zinc-400 leading-relaxed">
+              Sesi kamu di perangkat ini akan berakhir. Kamu bisa masuk lagi kapan saja.
+            </p>
+            <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end sm:gap-3">
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirm(false)}
+                className="order-2 w-full rounded-xl border border-zinc-600 bg-zinc-900/80 px-4 py-3 text-sm font-semibold text-zinc-200 transition hover:bg-zinc-800 sm:order-1 sm:w-auto"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={() => void runLogout()}
+                className="order-1 w-full rounded-xl bg-gradient-to-r from-violet-600 to-purple-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110 sm:order-2 sm:w-auto"
+              >
+                Ya, keluar
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   const displayName = profileData?.full_name || profileData?.fullName || user?.user_metadata?.full_name || "User";
   const photoURL = profileData?.avatar_url || profileData?.photoUrl || user?.user_metadata?.avatar_url;
@@ -70,6 +109,7 @@ export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVa
 
   if (variant === "learning") {
     return (
+      <>
       <div className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#0a0a0a]/85 backdrop-blur-xl">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <a href="/" className="flex items-center gap-2 shrink-0">
@@ -107,7 +147,8 @@ export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVa
                 </a>
 
                 <button
-                  onClick={handleLogout}
+                  type="button"
+                  onClick={() => setShowLogoutConfirm(true)}
                   className="px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:text-red-400"
                 >
                   Logout
@@ -129,10 +170,13 @@ export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVa
           </div>
         </div>
       </div>
+      {logoutModal}
+      </>
     );
   }
 
   return (
+    <>
     <div className="relative w-full z-50">
       <Navbar className="bg-transparent border-none">
         {/* Desktop Navigation */}
@@ -162,7 +206,8 @@ export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVa
                 
                 {/* Logout */}
                 <button 
-                  onClick={handleLogout}
+                  type="button"
+                  onClick={() => setShowLogoutConfirm(true)}
                   className="px-3 py-2 text-sm font-medium text-gray-400 hover:text-red-400 transition-colors"
                 >
                   Logout
@@ -226,7 +271,8 @@ export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVa
                   </NavbarButton>
                   
                   <button
-                    onClick={handleLogout}
+                    type="button"
+                    onClick={() => setShowLogoutConfirm(true)}
                     className="w-full text-center py-2 px-4 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg font-medium hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"
                   >
                     Logout
@@ -257,5 +303,7 @@ export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVa
         </MobileNav>
       </Navbar>
     </div>
+    {logoutModal}
+    </>
   );
 }

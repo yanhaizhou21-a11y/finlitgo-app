@@ -10,7 +10,6 @@ import {
 } from '@tabler/icons-react';
 import logoUrl from '../../assets/logo.svg';
 import { useAuth } from '../../store/AuthContext';
-import { supabase } from '../../services/supabase';
 
 const AnimatedNavItem = ({ to, icon: Icon, label }) => {
   return (
@@ -36,12 +35,12 @@ const AnimatedNavItem = ({ to, icon: Icon, label }) => {
 };
 
 export default function Sidebar() {
-  const { user, profile } = useAuth();
+  const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/login');
+    await logout();
+    navigate('/login', { replace: true });
   };
 
   const photoURL = profile?.avatar_url || profile?.photoUrl || user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || user?.email || 'User')}&background=random`;

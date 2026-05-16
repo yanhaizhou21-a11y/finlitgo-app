@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
@@ -17,7 +17,7 @@ import {
 
 function getStaticClassesFallback() {
   return [
-    { id: 1, title: 'THE FINANCIAL BLUEPRINT', category: 'Foundation', description: 'Dari Mindset, Alokasi, hingga Proteksi. Bangun fondasi keuangan yang mustahil runtuh..', chapters: 12, youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', image: 'https://i.pinimg.com/736x/73/2f/cd/732fcd0132b3818c03c01c1d4fb99589.jpg  x', quizzes: [
+    { id: 1, title: 'THE FINANCIAL BLUEPRINT', category: 'Foundation', description: 'Dari Mindset, Alokasi, hingga Proteksi. Bangun fondasi keuangan yang mustahil runtuh..', chapters: 12, youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', image: 'https://i.pinimg.com/736x/73/2f/cd/732fcd0132b3818c03c01c1d4fb99589.jpg', quizzes: [
       { question: 'What percentage of income should go to Needs in the 50/30/20 rule?', options: ['20%', '30%', '50%', '10%'], correctAnswer: 2 },
       { question: 'Which is considered a "Want"?', options: ['Rent', 'Groceries', 'Dining Out', 'Electricity'], correctAnswer: 2 }
     ]},
@@ -36,11 +36,7 @@ export default function ClassPage() {
   
   const streak = profile?.streak_count || 0;
 
-  useEffect(() => {
-    fetchClasses();
-  }, []);
-
-  const fetchClasses = async () => {
+  const fetchClasses = useCallback(async () => {
     setLoading(true);
     try {
       const data = await fetchClassesFromDb();
@@ -55,8 +51,22 @@ export default function ClassPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
+  useEffect(() => {
+    fetchClasses();
+  }, [fetchClasses]);
+
+  const categoryFilters = useMemo(() => {
+    const fromDb = [...new Set(classes.map((c) => String(c.category || '').trim()).filter(Boolean))];
+    return ['All', ...fromDb.sort((a, b) => a.localeCompare(b))];
+  }, [classes]);
+
+  useEffect(() => {
+    if (activeFilter !== 'All' && !categoryFilters.includes(activeFilter)) {
+      setActiveFilter('All');
+    }
+  }, [categoryFilters, activeFilter]);
 
   const handleClassClick = (course) => {
     if (!user) {
@@ -66,12 +76,26 @@ export default function ClassPage() {
     navigate(`/class/${course.id}`);
   };
 
-  const filters = ['All', 'Foundation', 'Growth', 'Advanced'];
   const filteredClasses = classes.filter(cls => {
-    const matchFilter = activeFilter === 'All' || cls.category === activeFilter;
+    const cat = String(cls.category || '').trim().toLowerCase();
+    const matchFilter =
+      activeFilter === 'All' || cat === activeFilter.toLowerCase();
     const matchSearch = cls.title.toLowerCase().includes(search.toLowerCase());
     return matchFilter && matchSearch;
   });
+
+  const chapterLabel = (course) => {
+    const n = course.class_chapters?.length ?? course.chapters;
+    if (typeof n === 'number' && n >= 0) return `${n} bab`;
+    try {
+      if (course.levels_data) {
+        const lv = typeof course.levels_data === 'string' ? JSON.parse(course.levels_data) : course.levels_data;
+        const items = Array.isArray(lv) ? lv.reduce((acc, L) => acc + (L.items?.length || 0), 0) : 0;
+        if (items) return `${items} materi`;
+      }
+    } catch { /* ignore */ }
+    return 'Modul';
+  };
 
   // Get streak message
   const streakMessage = useMemo(() => {
@@ -148,7 +172,7 @@ export default function ClassPage() {
             <IconBook2 className="text-violet-400" /> Learning Paths
           </h2>
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {filters.map(f => (
+            {categoryFilters.map(f => (
               <button 
                 key={f}
                 onClick={() => setActiveFilter(f)}
@@ -220,7 +244,7 @@ export default function ClassPage() {
                     
                     {/* Meta Info */}
                     <div className="flex items-center gap-4 text-xs text-zinc-500 font-mono mb-4">
-                      <span className="flex items-center gap-1"><IconBook2 size={12} /> 3 Level</span>
+                      <span className="flex items-center gap-1"><IconBook2 size={12} /> {chapterLabel(course)}</span>
                       {meta && (
                         <span className="flex items-center gap-1"><IconClock size={12} /> {meta.totalTime}</span>
                       )}

@@ -13,6 +13,9 @@ import { useAuth } from "../../store/AuthContext";
 import { supabase } from "@/services/supabase";
 import Footer from "../../components/layout/Footer";
 
+const BLOG_IMG_FALLBACK =
+  "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&q=80";
+
 export default function BlogPage() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
@@ -20,21 +23,27 @@ export default function BlogPage() {
   const [visibleCount, setVisibleCount] = useState(3);
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
 
   const streak = profile?.streak_count || 0;
 
   useEffect(() => {
     const fetchBlogs = async () => {
+      setLoading(true);
+      setLoadError(null);
       const { data, error } = await supabase
         .from("blogs")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (!error && data) {
+      if (error) {
+        setLoadError(error.message || "Tidak bisa memuat artikel.");
+        setBlogs([]);
+      } else if (data) {
         setBlogs(
           data.map((b) => ({
             ...b,
-            image: b.image || b.thumbnail_url || "",
+            image: (b.image || b.thumbnail_url || "").trim() || BLOG_IMG_FALLBACK,
             timeToRead: b.time_to_read || "5 min read",
             date: new Date(b.created_at).toLocaleDateString("en-US", {
               month: "short",
@@ -84,6 +93,16 @@ export default function BlogPage() {
         </div>
 
         <div className="relative z-10 flex flex-col w-full">
+          {loadError && (
+            <div className="relative z-20 mx-auto max-w-3xl px-4 pt-6">
+              <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+                <strong className="font-semibold">Gagal memuat blog:</strong> {loadError}
+                <span className="block mt-1 text-xs text-amber-200/80">
+                  Jika Anda admin: cek Supabase → Table Editor → blogs (RLS harus mengizinkan SELECT untuk role yang dipakai).
+                </span>
+              </div>
+            </div>
+          )}
           {/* Hero Section - identical to ClassPage */}
           <section className="relative z-10 w-full overflow-hidden bg-[#0a0a0a] px-6 py-24">
             <div className="relative z-10 max-w-6xl mx-auto text-center">
@@ -179,7 +198,7 @@ export default function BlogPage() {
               >
                 <div className="w-full md:w-1/2 h-64 md:h-full overflow-hidden relative">
                   <img
-                    src={featured.image}
+                    src={featured.image || BLOG_IMG_FALLBACK}
                     alt={featured.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-70 group-hover:opacity-90"
                   />
@@ -326,8 +345,10 @@ export default function BlogPage() {
                 className="text-center py-16 text-zinc-500"
               >
                 <IconSearch size={48} className="mx-auto mb-4 text-zinc-600" />
-                <p className="text-lg">
-                  No articles found matching your search.
+                <p className="text-lg text-white">
+                  {!loadError && blogs.length === 0 && !search.trim()
+                    ? "Belum ada artikel. Tambahkan dari Dashboard → Manage Blog."
+                    : "Tidak ada artikel yang cocok dengan pencarian."}
                 </p>
               </motion.div>
             )}

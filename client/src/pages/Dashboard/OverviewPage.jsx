@@ -3,29 +3,29 @@ import { motion } from 'framer-motion';
 import { IconFlame, IconBook2, IconArticle, IconChevronRight, IconTrophy } from '@tabler/icons-react';
 import { useAuth } from '../../store/AuthContext';
 import { supabase } from '../../services/supabase';
-import { fetchClasses, fetchUserQuizResults } from '../../services/classService';
+import { fetchClasses } from '../../services/classService';
+import { getCurrentStreak } from '../../utils/streak';
 
 export default function OverviewPage() {
   const { user, profile } = useAuth();
   const [myClasses, setMyClasses] = useState([]);
-  const [recentQuizzes, setRecentQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const streakCount = profile?.streak_count || 0;
+  // Use local streak as fallback when profile streak is 0
+  const localStreak = getCurrentStreak();
+  const streakCount = Math.max(profile?.streak_count || 0, localStreak);
   const points = profile?.points || 0;
 
   const refreshProgress = async () => {
     if (!user?.id) {
       setMyClasses([]);
-      setRecentQuizzes([]);
       setLoading(false);
       return;
     }
 
     try {
-      const [classes, quizRows, progressRes] = await Promise.all([
+      const [classes, progressRes] = await Promise.all([
         fetchClasses(),
-        fetchUserQuizResults(user.id),
         supabase.from('class_progress').select('class_id, chapter_id').eq('user_id', user.id),
       ]);
 
@@ -65,7 +65,6 @@ export default function OverviewPage() {
       });
 
       setMyClasses(progressCards);
-      setRecentQuizzes((quizRows || []).slice(0, 5));
     } catch (err) {
       console.error('Overview sync error:', err);
     } finally {
@@ -197,36 +196,6 @@ export default function OverviewPage() {
             </motion.div>
           ))}
         </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-[#1E1E1E] border border-zinc-800 rounded-2xl p-6"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-medium text-white flex items-center gap-2">
-            <IconTrophy className="text-yellow-400" /> Recent Quiz Activity
-          </h3>
-        </div>
-        {recentQuizzes.length === 0 ? (
-          <p className="text-sm text-zinc-500 text-center py-4">No quiz attempts yet.</p>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {recentQuizzes.map((q) => (
-              <div key={q.id} className="flex items-center justify-between p-4 bg-zinc-900 border border-zinc-800 rounded-xl">
-                <div>
-                  <p className="text-sm text-white font-medium">{q?.classes?.title || 'Class Quiz'}</p>
-                  <p className="text-xs text-zinc-500 font-mono mt-1">Score: {q.score}/{q.total} • {q.percentage}%</p>
-                </div>
-                <span className={`text-xs font-bold px-2 py-1 rounded-full border ${q.passed ? 'bg-green-500/10 text-green-400 border-green-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'}`}>
-                  {q.passed ? 'PASS' : 'FAIL'}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
       </motion.div>
 
       {/* Blog Reading History */}
