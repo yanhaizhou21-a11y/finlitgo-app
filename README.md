@@ -11,6 +11,11 @@
 - **Git**: `https://git-scm.com/`
 - **Node.js (LTS recommended)**: `https://nodejs.org/` (Node 20+ recommended)
 - **Package manager**: npm (comes with Node)
+<<<<<<< HEAD
+
+### Anggota Tim Capstonee
+=======
+>>>>>>> 5f0bde020a9ee19f165b61cf0a674d1c9162817b
 
 ### Anggota Tim Capstone
 

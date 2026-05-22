@@ -10,7 +10,8 @@ import {
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../store/AuthContext";
-import { supabase } from "@/services/supabase";
+// import { supabase } from "@/services/supabase"; // DISABLING SUPABASE FOR NOW
+import { getFallbackBlogs } from "../../data/fallbackBlogs";
 import Footer from "../../components/layout/Footer";
 
 export default function BlogPage() {
@@ -25,24 +26,16 @@ export default function BlogPage() {
 
   useEffect(() => {
     const fetchBlogs = async () => {
-      const { data, error } = await supabase
-        .from("blogs")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (!error && data) {
-        setBlogs(
-          data.map((b) => ({
-            ...b,
-            image: b.image || b.thumbnail_url || "",
-            timeToRead: b.time_to_read || "5 min read",
-            date: new Date(b.created_at).toLocaleDateString("en-US", {
-              month: "short",
-              day: "2-digit",
-            }),
-          })),
-        );
-      }
+      // FORCE USE LOCAL FALLBACK DATA
+      const data = getFallbackBlogs();
+      setBlogs(
+        data.map((b) => ({
+          ...b,
+          image: b.image || b.thumbnail_url || "",
+          timeToRead: b.timeToRead || "5 min read",
+          date: b.date || "Oct 10",
+        })),
+      );
       setLoading(false);
     };
     fetchBlogs();
