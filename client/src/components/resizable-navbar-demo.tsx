@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { IconLogout } from "@tabler/icons-react";
 import { useAuth } from "../store/AuthContext";
 import logoUrl from "../assets/logo.svg";
+import ThemeToggle from "./ui/ThemeToggle";
 
 type NavbarVariant = "default" | "learning";
 
@@ -130,6 +131,9 @@ export default function NavbarDemo({
           </nav>
 
           <div className="flex items-center gap-3 shrink-0">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {user ? (
               <>
                 <div className="hidden items-center gap-2 sm:flex">
@@ -157,7 +161,6 @@ export default function NavbarDemo({
                 >
                   Logout
                 </button>
-                {/* {ThemeToggleButton} */}
               </>
             ) : (
               <>
@@ -190,6 +193,9 @@ export default function NavbarDemo({
           <NavItems items={navItems} />
           
           <div className="relative z-20 flex shrink-0 items-center gap-3">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {user ? (
               <div className="flex items-center gap-3">
                 {/* Profile Avatar */}
@@ -222,7 +228,6 @@ export default function NavbarDemo({
               <>
                 <NavbarButton variant="secondary" href="/login">Login</NavbarButton>
                 <NavbarButton variant="primary" href="/register">Sign Up</NavbarButton>
-                {/* {ThemeToggleButton} */}
               </>
             )}
           </div>
@@ -253,8 +258,8 @@ export default function NavbarDemo({
               </a>
             ))}
 
-            <div className="w-full px-2">
-              {/* {ThemeToggleButton} */}
+            <div className="w-full px-2 flex justify-start">
+              <ThemeToggle />
             </div>
             
             <div className="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800 flex w-full flex-col gap-4">

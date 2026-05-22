@@ -22,14 +22,14 @@ const AnimatedNavItem = ({ to, icon: Icon, label }) => {
         `relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl mb-4 transition-all duration-300 group ${
           isActive 
             ? 'bg-gradient-to-br from-violet-600 to-purple-400 text-white shadow-lg shadow-violet-500/30' 
-            : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+            : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800'
         }`
       }
       title={label}
     >
       <Icon size={24} stroke={1.5} />
       {/* Tooltip */}
-      <span className="absolute left-16 px-2 py-1 bg-zinc-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+      <span className="absolute left-16 px-2 py-1 bg-zinc-900 dark:bg-zinc-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
         {label}
       </span>
     </NavLink>
@@ -53,11 +53,11 @@ export default function AdminSidebar() {
     <motion.aside 
       initial={{ x: -100 }}
       animate={{ x: 0 }}
-      className="w-20 min-h-screen bg-[var(--color-primary-dark)] flex flex-col items-center py-6 border-r border-zinc-800 shrink-0 sticky top-0"
+      className="w-20 min-h-screen bg-white dark:bg-[var(--color-primary-dark)] flex flex-col items-center py-6 border-r border-zinc-200 dark:border-zinc-800 shrink-0 sticky top-0 transition-colors duration-300"
     >
       {/* Logo → Landing Page */}
       <div 
-        className="mb-10 w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-zinc-900 border border-violet-500/30 cursor-pointer hover:border-violet-400 transition-colors hover:shadow-[0_0_12px_rgba(124,58,237,0.3)]"
+        className="mb-10 w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-violet-500/30 cursor-pointer hover:border-violet-400 transition-colors hover:shadow-[0_0_12px_rgba(124,58,237,0.3)]"
         onClick={() => navigate('/')}
         title="Go to Home"
       >
@@ -66,13 +66,13 @@ export default function AdminSidebar() {
 
       <nav className="flex-1 flex flex-col items-center gap-2 w-full">
         <AnimatedNavItem to="/dashboard" icon={IconLayoutDashboard} label="Admin Overview" />
-        <div className="w-8 h-px bg-zinc-800 my-2" />
+        <div className="w-8 h-px bg-zinc-200 dark:bg-zinc-800 my-2" />
         
         {/* Admin CRUD Section */}
         <AnimatedNavItem to="/dashboard/manage-classes" icon={IconSchool} label="Manage Classes" />
         <AnimatedNavItem to="/dashboard/manage-blog" icon={IconWriting} label="Manage Blog" />
         
-        <div className="w-8 h-px bg-zinc-800 my-2" />
+        <div className="w-8 h-px bg-zinc-200 dark:bg-zinc-800 my-2" />
         <AnimatedNavItem to="/dashboard/finance" icon={IconChartBar} label="Financial" />
         <AnimatedNavItem to="/dashboard/history" icon={IconHistory} label="History" />
       </nav>
@@ -87,13 +87,13 @@ export default function AdminSidebar() {
           className="relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl text-zinc-500 hover:text-red-500 hover:bg-red-500/10 transition-all duration-300 group"
         >
           <IconLogout size={22} stroke={1.5} />
-          <span className="absolute left-16 px-2 py-1 bg-zinc-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+          <span className="absolute left-16 px-2 py-1 bg-zinc-900 dark:bg-zinc-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
             Logout
           </span>
         </button>
 
         {/* Avatar */}
-        <div className="relative w-10 h-10 rounded-full border-2 border-violet-500/30 overflow-hidden hover:border-violet-400 transition-colors mt-1 group cursor-pointer bg-zinc-900" onClick={() => navigate('/dashboard/settings')}>
+        <div className="relative w-10 h-10 rounded-full border-2 border-zinc-200 dark:border-violet-500/30 overflow-hidden hover:border-violet-400 transition-colors mt-1 group cursor-pointer bg-zinc-50 dark:bg-zinc-900" onClick={() => navigate('/dashboard/settings')}>
           {photoURL ? (
             <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
           ) : (
@@ -101,7 +101,7 @@ export default function AdminSidebar() {
               <span className="text-xs font-black text-white">{initial}</span>
             </div>
           )}
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-violet-500 to-purple-400 rounded-full border-2 border-[var(--color-primary-dark)] flex items-center justify-center" title="Admin">
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-violet-500 to-purple-400 rounded-full border-2 border-white dark:border-[var(--color-primary-dark)] flex items-center justify-center" title="Admin">
             <span className="text-[6px] font-black text-white">A</span>
           </div>
         </div>

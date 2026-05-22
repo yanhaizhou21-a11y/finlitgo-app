@@ -11,7 +11,7 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import { useNavigate, useParams } from "react-router-dom";
-// import { supabase } from "@/services/supabase"; // DISABLING SUPABASE FOR NOW
+import { supabase } from "../../services/supabase";
 import { getFallbackBlogs } from "../../data/fallbackBlogs";
 
 export default function BlogPostPage() {
@@ -36,38 +36,48 @@ export default function BlogPostPage() {
   useEffect(() => {
     const fetchBlog = async () => {
       setLoading(true);
-      // FORCE USE FALLBACK DATA ONLY
-      // const { data, error } = await supabase
-      //   .from("blogs")
-      //   .select("*")
-      //   .eq("id", postId)
-      //   .single();
+      try {
+        const { data, error } = await supabase
+          .from("blogs")
+          .select("*")
+          .eq("id", postId)
+          .single();
 
-      // if (error || !data) {
-        // Fallback to local data
+        if (error || !data) {
+          // Fallback to local data
+          const fallbackId = parseInt(postId, 10);
+          const fbData = getFallbackBlogs().find((b) => b.id === fallbackId);
+
+          if (fbData) {
+            setBlog(fbData);
+          } else {
+            setNotFound(true);
+          }
+        } else {
+          setBlog({
+            ...data,
+            image:
+              data.image ||
+              data.thumbnail_url ||
+              "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2340&auto=format",
+            timeToRead: data.time_to_read || "5 min read",
+            date: new Date(data.created_at).toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            }),
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch blog from Supabase:", err);
         const fallbackId = parseInt(postId, 10);
         const fbData = getFallbackBlogs().find((b) => b.id === fallbackId);
-
         if (fbData) {
           setBlog(fbData);
         } else {
           setNotFound(true);
         }
-      // } else {
-      //   setBlog({
-      //     ...data,
-      //     image:
-      //       data.image ||
-      //       data.thumbnail_url ||
-      //       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2340&auto=format",
-      //     timeToRead: data.time_to_read || "5 min read",
-      //     date: new Date(data.created_at).toLocaleDateString("en-US", {
-      //       month: "long",
-      //       day: "numeric",
-      //       year: "numeric",
-      //     }),
-      //   });
-      // }
+      }
       setLoading(false);
       window.scrollTo(0, 0);
     };
@@ -85,13 +95,13 @@ export default function BlogPostPage() {
   // Loading State
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-[#0a0a0a] flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-zinc-50 dark:bg-[#0a0a0a] flex items-center justify-center z-50 transition-colors duration-300">
         <div className="text-center">
           <div className="relative w-12 h-12 mx-auto mb-4">
-            <div className="absolute inset-0 rounded-full border-2 border-white/10"></div>
+            <div className="absolute inset-0 rounded-full border-2 border-zinc-900/10 dark:border-white/10"></div>
             <div className="absolute inset-0 rounded-full border-2 border-t-violet-500 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
           </div>
-          <p className="text-zinc-500 text-sm">Loading article...</p>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm">Loading article...</p>
         </div>
       </div>
     );
@@ -100,18 +110,18 @@ export default function BlogPostPage() {
   // Not Found
   if (notFound || !blog) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-zinc-50 dark:bg-[#0a0a0a] flex items-center justify-center transition-colors duration-300">
         <div className="text-center max-w-md px-6">
-          <div className="text-5xl mb-4 opacity-50">404</div>
-          <h2 className="text-xl font-semibold text-white mb-2">
+          <div className="text-5xl mb-4 opacity-50 text-zinc-950 dark:text-white">404</div>
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
             Article Not Found
           </h2>
-          <p className="text-zinc-500 text-sm mb-6">
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-6">
             The article you're looking for doesn't exist.
           </p>
           <button
             onClick={() => navigate("/blog")}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-violet-600 border border-white/10 rounded-lg text-white text-sm transition-all"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-100 hover:bg-violet-600 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-lg text-zinc-950 dark:text-white hover:text-white text-sm transition-all cursor-pointer"
           >
             <IconArrowLeft size={16} /> Back to Blog
           </button>
@@ -122,7 +132,7 @@ export default function BlogPostPage() {
 
   // MAIN RETURN - TEKS DI TENGAH IMAGE
   return (
-    <div ref={targetRef} className="min-h-screen bg-transparent text-white">
+    <div ref={targetRef} className="min-h-screen bg-transparent text-zinc-900 dark:text-white">
       {/* SCROLL PROGRESS BAR */}
       <div className="fixed top-0 left-0 right-0 h-0.5 z-50">
         <div
@@ -147,14 +157,14 @@ export default function BlogPostPage() {
             className="w-full h-full object-cover"
           />
           {/* Gradient Overlay untuk memastikan teks terbaca */}
-          <div className="absolute inset-0 bg-black/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-black/45" />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-50 dark:from-[#0a0a0a] via-transparent to-transparent transition-colors duration-300" />
         </motion.div>
 
         {/* BACK BUTTON - Posisi Absolute kiri atas */}
         <button
           onClick={() => navigate("/blog")}
-          className="absolute top-12 left-6 z-30 flex items-center gap-2 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full text-white text-xs hover:bg-violet-600/80 transition-all duration-300 border border-white/10"
+          className="absolute top-12 left-6 z-30 flex items-center gap-2 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full text-white text-xs hover:bg-violet-600/80 transition-all duration-300 border border-white/10 cursor-pointer"
         >
           <IconArrowLeft size={14} />
           <span className="hidden sm:inline">Back</span>
@@ -164,16 +174,16 @@ export default function BlogPostPage() {
         <div className="absolute top-6 right-6 z-20 flex gap-2">
           <button
             onClick={() => setIsSaved(!isSaved)}
-            className={`p-1.5 rounded-full backdrop-blur-md transition-all duration-300 border border-white/10 ${
-              isSaved ? "bg-violet-600" : "bg-black/50 hover:bg-violet-600/70"
+            className={`p-1.5 rounded-full backdrop-blur-md transition-all duration-300 border border-white/10 cursor-pointer ${
+              isSaved ? "bg-violet-600 text-white" : "bg-black/50 hover:bg-violet-600/70 text-white"
             }`}
           >
             <IconBookmark size={14} />
           </button>
           <button
             onClick={() => setIsLiked(!isLiked)}
-            className={`p-1.5 rounded-full backdrop-blur-md transition-all duration-300 border border-white/10 ${
-              isLiked ? "bg-red-500" : "bg-black/50 hover:bg-red-500/70"
+            className={`p-1.5 rounded-full backdrop-blur-md transition-all duration-300 border border-white/10 cursor-pointer ${
+              isLiked ? "bg-red-500 text-white" : "bg-black/50 hover:bg-red-500/70 text-white"
             }`}
           >
             <IconHeart size={14} className={isLiked ? "fill-current" : ""} />
@@ -190,7 +200,7 @@ export default function BlogPostPage() {
                 alert("Link copied!");
               }
             }}
-            className="p-1.5 rounded-full bg-black/50 backdrop-blur-md hover:bg-violet-600/70 transition-all duration-300 border border-white/10"
+            className="p-1.5 rounded-full bg-black/50 backdrop-blur-md hover:bg-violet-600/70 transition-all duration-300 border border-white/10 text-white cursor-pointer"
           >
             <IconShare size={14} />
           </button>
@@ -214,12 +224,12 @@ export default function BlogPostPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight max-w-4xl mx-auto"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight max-w-4xl mx-auto text-white"
           >
             {blog.title}
           </motion.h1>
 
-          {/* Optional: Metadata kecil di bawah title (bisa diaktifkan jika perlu) */}
+          {/* Optional: Metadata kecil di bawah title */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -247,66 +257,66 @@ export default function BlogPostPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-[#0f0f0f]/80 backdrop-blur-sm rounded-2xl border border-white/5 shadow-xl overflow-hidden"
+            className="bg-white/95 dark:bg-[#0f0f0f]/80 backdrop-blur-sm rounded-2xl border border-zinc-200 dark:border-white/5 shadow-xl overflow-hidden transition-all duration-300"
           >
             <div className="p-6 md:p-8 lg:p-10">
               {/* AUTHOR & METADATA DETAIL */}
-              <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-6 border-b border-white/10">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-6 border-b border-zinc-200 dark:border-white/10">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-violet-600/20 border border-violet-500/30 flex items-center justify-center">
-                    <IconUser size={18} className="text-violet-400" />
+                  <div className="w-10 h-10 rounded-full bg-violet-600/10 dark:bg-violet-600/20 border border-violet-500/20 dark:border-violet-500/30 flex items-center justify-center">
+                    <IconUser size={18} className="text-violet-600 dark:text-violet-400" />
                   </div>
                   <div>
-                    <p className="font-medium text-white text-sm">
+                    <p className="font-medium text-zinc-900 dark:text-white text-sm">
                       {blog.author || "FinLitGo"}
                     </p>
-                    <div className="flex items-center gap-2 text-xs text-zinc-500 mt-0.5">
+                    <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                       <span>{blog.date}</span>
-                      <span className="w-1 h-1 rounded-full bg-zinc-600"></span>
+                      <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600"></span>
                       <div className="flex items-center gap-1">
-                        <IconClock size={12} className="text-zinc-500" />
+                        <IconClock size={12} className="text-zinc-400 dark:text-zinc-500" />
                         <span>{blog.timeToRead}</span>
                       </div>
-                      <span className="w-1 h-1 rounded-full bg-zinc-600"></span>
+                      <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600"></span>
                       <div className="flex items-center gap-1">
-                        <IconEye size={12} className="text-zinc-500" />
+                        <IconEye size={12} className="text-zinc-400 dark:text-zinc-500" />
                         <span>1.2k views</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10">
                   <IconMessage size={12} className="text-zinc-500" />
-                  <span className="text-xs text-zinc-400">Discuss</span>
+                  <span className="text-xs text-zinc-600 dark:text-zinc-400">Discuss</span>
                 </div>
               </div>
 
               {/* BLOG CONTENT */}
               <div
-                className="prose prose-invert prose-lg max-w-none
-                  prose-headings:text-white prose-headings:font-semibold prose-headings:mt-8 prose-headings:mb-4
+                className="prose dark:prose-invert prose-lg max-w-none
+                  prose-headings:text-zinc-900 dark:prose-headings:text-white prose-headings:font-semibold prose-headings:mt-8 prose-headings:mb-4
                   prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h4:text-lg
-                  prose-p:text-zinc-300 prose-p:leading-relaxed prose-p:mb-5 prose-p:text-base
-                  prose-a:text-violet-400 prose-a:no-underline hover:prose-a:underline
-                  prose-strong:text-white prose-strong:font-semibold
-                  prose-code:text-violet-300 prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md
-                  prose-pre:bg-[#0a0a0a] prose-pre:border prose-pre:border-white/10 prose-pre:rounded-xl
-                  prose-blockquote:border-l-4 prose-blockquote:border-violet-500 prose-blockquote:bg-white/5 prose-blockquote:px-5 prose-blockquote:py-3 prose-blockquote:rounded-r-lg prose-blockquote:italic
+                  prose-p:text-zinc-700 dark:prose-p:text-zinc-300 prose-p:leading-relaxed prose-p:mb-5 prose-p:text-base
+                  prose-a:text-violet-600 dark:prose-a:text-violet-400 prose-a:no-underline hover:prose-a:underline
+                  prose-strong:text-zinc-900 dark:prose-strong:text-white prose-strong:font-semibold
+                  prose-code:text-violet-600 dark:prose-code:text-violet-300 prose-code:bg-zinc-100 dark:prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md
+                  prose-pre:bg-zinc-950 dark:prose-pre:bg-[#0a0a0a] prose-pre:border prose-pre:border-zinc-200 dark:prose-pre:border-white/10 prose-pre:rounded-xl
+                  prose-blockquote:border-l-4 prose-blockquote:border-violet-500 prose-blockquote:bg-zinc-50 dark:prose-blockquote:bg-white/5 prose-blockquote:px-5 prose-blockquote:py-3 prose-blockquote:rounded-r-lg prose-blockquote:italic
                   prose-img:rounded-xl prose-img:my-6
-                  prose-ul:text-zinc-300 prose-ul:list-disc prose-ul:pl-5
-                  prose-ol:text-zinc-300 prose-ol:list-decimal prose-ol:pl-5
-                  prose-li:text-zinc-300
+                  prose-ul:text-zinc-700 dark:prose-ul:text-zinc-300 prose-ul:list-disc prose-ul:pl-5
+                  prose-ol:text-zinc-700 dark:prose-ol:text-zinc-300 prose-ol:list-decimal prose-ol:pl-5
+                  prose-li:text-zinc-700 dark:prose-li:text-zinc-300
                   prose-table:w-full prose-table:text-sm
-                  prose-th:border prose-th:border-white/10 prose-th:p-2 prose-th:bg-white/5
-                  prose-td:border prose-td:border-white/10 prose-td:p-2
+                  prose-th:border prose-th:border-zinc-200 dark:prose-th:border-white/10 prose-th:p-2 prose-th:bg-zinc-100 dark:prose-th:bg-white/5
+                  prose-td:border prose-td:border-zinc-200 dark:prose-td:border-white/10 prose-td:p-2
                 "
                 dangerouslySetInnerHTML={{ __html: blog.content }}
               />
 
               {/* FOOTER */}
-              <div className="mt-10 pt-6 text-center border-t border-white/10">
-                <p className="text-zinc-600 text-xs">
+              <div className="mt-10 pt-6 text-center border-t border-zinc-200 dark:border-white/10">
+                <p className="text-zinc-400 dark:text-zinc-600 text-xs">
                   © 2026 FinLitGo — All rights reserved
                 </p>
               </div>

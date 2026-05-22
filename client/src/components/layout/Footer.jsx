@@ -10,7 +10,7 @@ const Footer = () => {
           <h2 className="text-2xl font-bold mb-2">FINLITGO</h2>
           <p className="text-sm text-gray-300 font-light italic mb-6">Invest step learning.</p>
           <p className="text-xs text-gray-400 leading-relaxed mb-8">
-            Platform belajar keuangan dengan 3 metode: Visual, Audio, dan Text. 
+            Platform belajar keuangan dengan 3 metode: Visual, Audio, dan Text.
             Telah membantu 250,000+ orang mengelola uang lebih baik.
           </p>
           {/* Socials */}

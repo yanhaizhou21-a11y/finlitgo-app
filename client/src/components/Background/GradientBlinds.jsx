@@ -290,7 +290,7 @@ void main() {
         uniforms.iMouse.value = [x, y];
       }
     };
-    canvas.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointermove', onPointerMove);
 
     const loop = t => {
       rafRef.current = requestAnimationFrame(loop);
@@ -323,7 +323,7 @@ void main() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       lastTimeRef.current = 0;
       firstResizeRef.current = true;
-      canvas.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointermove', onPointerMove);
       ro.disconnect();
       if (canvas.parentElement === container) {
         container.removeChild(canvas);

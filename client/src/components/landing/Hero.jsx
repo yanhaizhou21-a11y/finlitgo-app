@@ -20,7 +20,7 @@ const Hero = () => {
     <main className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-[#141414] via-[#6D28D9] to-[#A78BFA] pt-[120px] pb-10 px-6 relative overflow-hidden">
 
       {/* GradientBlinds Background */}
-      <div className="absolute inset-0 z-0 pointer-events-auto opacity-90">
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-90">
         <GradientBlinds
           gradientColors={['#FF9FFC', '#5227FF']}
           angle={0}

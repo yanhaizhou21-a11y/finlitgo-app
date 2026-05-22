@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark, .dark *));
+
 @theme {
   --animate-sweep: sweep 0.5s ease-in-out forwards;
   --font-orbitron: 'Orbitron', sans-serif;
@@ -53,8 +55,7 @@ html {
 
 :root {
   font-family: var(--font-inter);
-  color-scheme: dark;
-  color: #f8fafc;
+  color-scheme: light dark;
   font-size: 16px;
   line-height: 1.6;
   text-rendering: optimizeLegibility;
@@ -69,12 +70,18 @@ body {
   font-family: var(--font-inter);
   font-size: 1rem;
   line-height: 1.7;
-  color: #f8fafc;
-  background: #0a0a0a;
+  color: #18181b;
+  background: #f9fafb;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   width: 100%;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark body {
+  color: #f8fafc;
+  background: #0a0a0a;
 }
 
 p,
@@ -105,3 +112,21 @@ html.lenis, html.lenis body {
 .lenis.lenis-smooth iframe {
   pointer-events: none;
 }
+
+/* Hide number input spin buttons */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Hide scrollbar buttons (up/down arrows) */
+::-webkit-scrollbar-button {
+  display: none !important;
+  height: 0;
+  width: 0;
+}
+

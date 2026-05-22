@@ -27,18 +27,18 @@ const INTENT_LABELS = {
 
 // ─── Quick-action cards ───────────────────────────────────────────────────────
 const CATEGORIES = [
-  { intent: 'analyze_cashflow', title: 'Analyze Cash Flow',  icon: <IconChartBar size={22} />,  color: 'text-green-400 border-green-500/20 bg-green-500/5',  sub: 'Cashflow kamu sekarang' },
-  { intent: 'analyze_expenses', title: 'Analyze Expenses',   icon: <IconChartPie size={22} />,  color: 'text-orange-400 border-orange-500/20 bg-orange-500/5', sub: 'Breakdown pengeluaran' },
-  { intent: 'analyze_revenue',  title: 'Analyze Revenue',    icon: <IconTrendingUp size={22} />, color: 'text-blue-400 border-blue-500/20 bg-blue-500/5',   sub: 'Sumber pendapatanmu' },
-  { intent: 'analyze_budget',   title: 'Analyze Budget',     icon: <IconWallet size={22} />,    color: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/5',   sub: 'Budget vs aktual 50/30/20' },
+  { intent: 'analyze_cashflow', title: 'Analyze Cash Flow',  icon: <IconChartBar size={22} />,  color: 'text-emerald-600 dark:text-green-400 border-zinc-200 dark:border-green-500/20 bg-zinc-50 dark:bg-green-500/5',  sub: 'Cashflow kamu sekarang' },
+  { intent: 'analyze_expenses', title: 'Analyze Expenses',   icon: <IconChartPie size={22} />,  color: 'text-orange-600 dark:text-orange-400 border-zinc-200 dark:border-orange-500/20 bg-zinc-50 dark:bg-orange-50/5', sub: 'Breakdown pengeluaran' },
+  { intent: 'analyze_revenue',  title: 'Analyze Revenue',    icon: <IconTrendingUp size={22} />, color: 'text-blue-600 dark:text-blue-400 border-zinc-200 dark:border-blue-500/20 bg-zinc-50 dark:bg-blue-50/5',   sub: 'Sumber pendapatanmu' },
+  { intent: 'analyze_budget',   title: 'Analyze Budget',     icon: <IconWallet size={22} />,    color: 'text-cyan-600 dark:text-cyan-400 border-zinc-200 dark:border-cyan-500/20 bg-zinc-50 dark:bg-cyan-500/5',   sub: 'Budget vs aktual 50/30/20' },
   {
     intent: 'free_chat', title: 'Saving Strategy', icon: <IconPigMoney size={22} />,
-    color: 'text-violet-400 border-violet-500/20 bg-violet-500/5', sub: 'Strategi menabung',
+    color: 'text-violet-650 dark:text-violet-400 border-zinc-200 dark:border-violet-500/20 bg-zinc-50 dark:bg-violet-500/5', sub: 'Strategi menabung',
     customPrompt: 'Berikan strategi menabung dan investasi terbaik berdasarkan data keuangan saya.',
   },
   {
     intent: 'free_chat', title: 'Goal Planning', icon: <IconTarget size={22} />,
-    color: 'text-purple-400 border-purple-500/20 bg-purple-500/5', sub: 'Rencana tujuan keuangan',
+    color: 'text-purple-650 dark:text-purple-400 border-zinc-200 dark:border-purple-500/20 bg-zinc-50 dark:bg-purple-50/5', sub: 'Rencana tujuan keuangan',
     customPrompt: 'Bantu saya merencanakan cara mencapai tujuan keuangan lebih cepat berdasarkan data saya.',
   },
 ];
@@ -124,7 +124,7 @@ function renderText(text) {
       <span key={i} className="block mb-1.5 leading-relaxed">
         {parts.map((part, j) =>
           part.startsWith('**') && part.endsWith('**')
-            ? <strong key={j} className="text-white font-semibold">{part.slice(2, -2)}</strong>
+            ? <strong key={j} className="text-zinc-950 dark:text-white font-semibold">{part.slice(2, -2)}</strong>
             : part
         )}
       </span>
@@ -329,7 +329,7 @@ export default function AIAssistPage() {
       analyze_cashflow: 'Analisis posisi kas saya: pemasukan vs pengeluaran, tren, dan rekomendasi.',
       analyze_expenses:  'Analisis pengeluaran saya per kategori, temukan yang terbesar dan berikan saran.',
       analyze_revenue:   'Analisis sumber pendapatan saya dan berikan saran optimasi.',
-      analyze_budget:    'Evaluasi budget saya dengan aturan 50/30/20 dan tunjukkan over/under-spending.',
+      analyze_budget:    'Evaluasi budget saya dengan aturan 50/35/15 dan tunjukkan over/under-spending.',
     };
 
     const p = autoPrompts[intentParam];
@@ -352,29 +352,29 @@ export default function AIAssistPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 px-1 gap-3">
         <div>
-          <h2 className="text-2xl sm:text-4xl font-bold font-orbitron uppercase tracking-widest text-white">FinLitGo AI</h2>
-          <p className="text-zinc-400 mt-1 text-xs sm:text-sm">Your personal financial intelligence assistant.</p>
+          <h2 className="text-2xl sm:text-4xl font-bold font-orbitron uppercase tracking-widest text-zinc-900 dark:text-white">FinLitGo AI</h2>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-1 text-xs sm:text-sm">Your personal financial intelligence assistant.</p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           {/* Data sync status */}
           {dataLoading ? (
-            <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-[#1A1A1A] border border-zinc-800 rounded-xl text-[10px] sm:text-xs text-zinc-500">
+            <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-zinc-100 dark:bg-[#1A1A1A] border border-zinc-200 dark:border-zinc-800 rounded-xl text-[10px] sm:text-xs text-zinc-500">
               <IconLoader2 size={14} className="animate-spin" /><span>Loading...</span>
             </div>
           ) : financialContext ? (
-            <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-green-500/10 border border-green-500/20 rounded-xl text-[10px] sm:text-xs text-green-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" /><span>Synced</span>
+            <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-green-500/10 border border-green-500/20 rounded-xl text-[10px] sm:text-xs text-green-600 dark:text-green-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" /><span>Synced</span>
             </div>
           ) : null}
 
           {/* Daily counter */}
-          <div className="px-3 py-1.5 sm:py-2 bg-[#1A1A1A] border border-zinc-800 rounded-xl text-xs sm:text-sm font-mono">
-            <span className={limitReached ? 'text-red-400 font-bold' : 'text-violet-400 font-bold'}>
+          <div className="px-3 py-1.5 sm:py-2 bg-zinc-100 dark:bg-[#1A1A1A] border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs sm:text-sm font-mono text-zinc-800 dark:text-zinc-300">
+            <span className={limitReached ? 'text-red-500 dark:text-red-400 font-bold' : 'text-violet-600 dark:text-violet-400 font-bold'}>
               {usageCount}/{MAX_DAILY_LIMIT}
             </span>
           </div>
 
-          <button onClick={handleClearChat} className="p-2 text-zinc-500 hover:text-red-400 hover:bg-zinc-900 rounded-xl transition-colors border border-zinc-800" title="Clear Chat">
+          <button onClick={handleClearChat} className="p-2 text-zinc-500 dark:text-zinc-450 hover:text-red-650 dark:hover:text-red-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-xl transition-colors border border-zinc-200 dark:border-zinc-800" title="Clear Chat">
             <IconTrash size={16} />
           </button>
         </div>
@@ -387,17 +387,17 @@ export default function AIAssistPage() {
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-400 flex items-center justify-center mb-5 shadow-[0_0_40px_rgba(124,58,237,0.35)]">
             <IconRobot size={40} className="text-white" />
           </div>
-          <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
+          <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white mb-2">
             Halo, {user?.user_metadata?.full_name?.split(' ')[0] || 'Learner'} 👋
           </h3>
-          <p className="text-zinc-400 text-center max-w-md mb-6 sm:mb-10 text-xs sm:text-sm leading-relaxed">
+          <p className="text-zinc-600 dark:text-zinc-400 text-center max-w-md mb-6 sm:mb-10 text-xs sm:text-sm leading-relaxed">
             Saya bisa menganalisis cashflow, pengeluaran, budgeting, dan membantu merencanakan tujuan keuanganmu — semua berdasarkan data real dari dashboard kamu.
           </p>
 
           {!userId ? (
-            <p className="text-sm text-zinc-500 border border-zinc-800 rounded-xl px-4 py-3">Login dulu untuk pakai AI 🔒</p>
+            <p className="text-sm text-zinc-500 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3">Login dulu untuk pakai AI 🔒</p>
           ) : dataLoading ? (
-            <div className="flex items-center gap-2 text-zinc-500 text-sm">
+            <div className="flex items-center gap-2 text-zinc-550 dark:text-zinc-400 text-sm">
               <IconLoader2 size={16} className="animate-spin" /> Memuat data keuangan...
             </div>
           ) : (
@@ -413,8 +413,8 @@ export default function AIAssistPage() {
                   <div className={`p-2 sm:p-3 rounded-xl mb-2 sm:mb-3 border ${cat.color} group-hover:scale-110 transition-transform`}>
                     {cat.icon}
                   </div>
-                  <span className="font-semibold text-[11px] sm:text-sm text-white group-hover:text-violet-300 transition-colors leading-snug">{cat.title}</span>
-                  <span className="text-[10px] text-zinc-500 mt-1 line-clamp-2 sm:line-clamp-none">{cat.sub}</span>
+                  <span className="font-semibold text-[11px] sm:text-sm text-zinc-900 dark:text-white group-hover:text-violet-650 dark:group-hover:text-violet-300 transition-colors leading-snug">{cat.title}</span>
+                  <span className="text-[10px] text-zinc-550 dark:text-zinc-500 mt-1 line-clamp-2 sm:line-clamp-none">{cat.sub}</span>
                 </motion.button>
               ))}
             </div>
@@ -422,7 +422,7 @@ export default function AIAssistPage() {
         </motion.div>
       ) : (
         /* Chat thread */
-        <div className="flex-1 bg-[#1A1A1A] border border-zinc-800 rounded-3xl overflow-hidden mb-6 flex flex-col relative">
+        <div className="flex-1 bg-white dark:bg-[#1A1A1A] border border-zinc-200 dark:border-zinc-850 rounded-3xl overflow-hidden mb-6 flex flex-col relative shadow-sm dark:shadow-none">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-900/5 to-transparent pointer-events-none rounded-3xl" />
           <div ref={chatContainerRef} onScroll={handleScroll}
             className="flex-1 overflow-y-auto p-6 space-y-5"
@@ -433,13 +433,13 @@ export default function AIAssistPage() {
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.18 }}
                   className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <div className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center shadow-md ${
-                    msg.role === 'user' ? 'bg-zinc-800' : 'bg-gradient-to-br from-violet-600 to-purple-400'}`}>
-                    {msg.role === 'user' ? <IconUser size={18} className="text-zinc-400" /> : <IconRobot size={20} className="text-white" />}
+                    msg.role === 'user' ? 'bg-zinc-100 dark:bg-zinc-800' : 'bg-gradient-to-br from-violet-600 to-purple-400'}`}>
+                    {msg.role === 'user' ? <IconUser size={18} className="text-zinc-500 dark:text-zinc-400" /> : <IconRobot size={20} className="text-white" />}
                   </div>
                   <div className={`max-w-[85%] sm:max-w-[78%] rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-xs sm:text-sm ${
                     msg.role === 'user'
-                      ? 'bg-zinc-800 text-white rounded-tr-sm'
-                      : 'bg-zinc-900/80 border border-zinc-800/60 text-zinc-300 rounded-tl-sm'}`}>
+                      ? 'bg-zinc-100 dark:bg-zinc-850 border border-zinc-200/60 dark:border-zinc-800/40 text-zinc-800 dark:text-white rounded-tr-sm shadow-sm dark:shadow-none'
+                      : 'bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/60 text-zinc-700 dark:text-zinc-300 rounded-tl-sm shadow-sm dark:shadow-none'}`}>
                     {msg.role === 'user'
                       ? msg.content
                       : msg.content
@@ -457,7 +457,7 @@ export default function AIAssistPage() {
                   <div className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-violet-600 to-purple-400 shadow-md">
                     <IconRobot size={20} className="text-white" />
                   </div>
-                  <div className="bg-zinc-900/80 border border-zinc-800/60 rounded-2xl rounded-tl-sm px-5 py-4 flex items-center gap-1.5">
+                  <div className="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/60 rounded-2xl rounded-tl-sm px-5 py-4 flex items-center gap-1.5 shadow-sm dark:shadow-none">
                     {[0, 150, 300].map(d => <div key={d} className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: `${d}ms` }} />)}
                   </div>
                 </motion.div>
@@ -469,7 +469,7 @@ export default function AIAssistPage() {
 
       {/* Input bar */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        className="w-full bg-[#1A1A1A] border-2 border-zinc-800 focus-within:border-violet-500/40 transition-all rounded-3xl p-2 shadow-2xl shrink-0 sticky bottom-0 z-10">
+        className="w-full bg-white dark:bg-[#1A1A1A] border-2 border-zinc-200 dark:border-zinc-800 focus-within:border-violet-500/40 transition-all rounded-3xl p-2 shadow-xl dark:shadow-2xl shrink-0 sticky bottom-0 z-10">
         <textarea
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
@@ -482,12 +482,12 @@ export default function AIAssistPage() {
           }
           disabled={limitReached || !userId || dataLoading}
           rows={2}
-          className="w-full bg-transparent text-white placeholder-zinc-600 p-4 pb-2 focus:outline-none resize-none font-sans text-sm leading-relaxed"
+          className="w-full bg-transparent text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-650 p-4 pb-2 focus:outline-none resize-none font-sans text-sm leading-relaxed"
         />
         <div className="flex items-center justify-between px-4 pb-3 pt-1">
           <div className="flex items-center gap-2">
-            <IconSparkles size={14} className="text-violet-400" />
-            <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
+            <IconSparkles size={14} className="text-violet-500 dark:text-violet-400" />
+            <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-600 uppercase tracking-widest">
               Powered by Groq · Llama 3.3 · Data from Supabase
             </span>
           </div>
@@ -497,7 +497,7 @@ export default function AIAssistPage() {
             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
               prompt.trim() && !isTyping && !limitReached && userId && !dataLoading
                 ? 'bg-gradient-to-r from-violet-600 to-purple-400 text-white shadow-[0_0_15px_rgba(124,58,237,0.3)] hover:scale-105 cursor-pointer'
-                : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'}`}>
+                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed'}`}>
             <IconSend size={16} />
           </button>
         </div>

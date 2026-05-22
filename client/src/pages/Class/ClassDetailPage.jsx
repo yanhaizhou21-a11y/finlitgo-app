@@ -428,7 +428,7 @@ export default function ClassDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-[#0a0a0a]">
         <IconLoader2 className="animate-spin text-violet-500" size={48} />
       </div>
     );
@@ -436,7 +436,7 @@ export default function ClassDetailPage() {
 
   if (!classData) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0a] text-white">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-[#0a0a0a] text-zinc-900 dark:text-white">
         <h1 className="text-2xl font-bold mb-4">Kelas tidak ditemukan</h1>
         <button onClick={() => navigate('/class')} className="px-6 py-2 bg-violet-600 rounded-xl">Kembali ke Daftar Kelas</button>
       </div>
@@ -449,7 +449,7 @@ export default function ClassDetailPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-80px)] bg-[#0a0a0a] text-white relative">
+    <div className="flex min-h-screen bg-zinc-50 dark:bg-[#0a0a0a] text-zinc-900 dark:text-white relative">
 
       {/* Streak Popup */}
       <AnimatePresence>
@@ -459,7 +459,7 @@ export default function ClassDetailPage() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -40, scale: 0.9 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"
           >
             <div className="bg-gradient-to-br from-orange-500/90 via-amber-500/90 to-yellow-500/90 backdrop-blur-xl border border-orange-400/40 rounded-2xl px-5 sm:px-8 py-4 sm:py-5 shadow-[0_8px_40px_rgba(251,146,60,0.4)] flex items-center gap-3 sm:gap-4 max-w-[min(100%,22rem)]">
               <div className="text-4xl sm:text-5xl shrink-0" aria-hidden>🔥</div>
@@ -479,7 +479,7 @@ export default function ClassDetailPage() {
       </AnimatePresence>
 
       {/* Reading progress — slim neutral bar (no purple strip) */}
-      <div className="fixed top-[80px] left-0 right-0 z-50 h-0.5 bg-zinc-900/90">
+      <div className="fixed top-0 left-0 right-0 z-50 h-0.5 bg-zinc-900/90">
         <motion.div
           className="h-full bg-emerald-500/90"
           style={{ width: `${readingProgress}%` }}
@@ -501,35 +501,35 @@ export default function ClassDetailPage() {
           <motion.aside key="sidebar"
             initial={{ width:0, opacity:0 }} animate={{ width:340, opacity:1 }} exit={{ width:0, opacity:0 }}
             transition={{ type:'spring', stiffness:300, damping:30 }}
-            className="shrink-0 overflow-hidden border-r border-zinc-800 bg-[#111111] flex flex-col fixed lg:relative z-40 h-[calc(100dvh-80px)] max-h-[calc(100dvh-80px)]" style={{ overflowY:'auto' }}
+            className="shrink-0 overflow-hidden border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111111] flex flex-col fixed lg:relative z-40 h-dvh max-h-dvh" style={{ overflowY:'auto' }}
           >
             <div className="w-[340px] flex flex-col h-full min-h-0">
-              {/* Sidebar Header */}
-              <div className="p-5 border-b border-zinc-800">
+               {/* Sidebar Header */}
+              <div className="p-5 border-b border-zinc-200 dark:border-zinc-800">
                 <div className="flex items-center justify-between mb-4">
-                  <button onClick={() => navigate('/class')} className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm">
+                  <button onClick={() => navigate('/class')} className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors text-sm">
                     <IconArrowLeft size={16} /> Kembali
                   </button>
-                  <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-1 rounded-lg hover:bg-zinc-800 text-zinc-400">
+                  <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
                     <IconX size={18} />
                   </button>
                 </div>
-                <h2 className="text-sm font-bold text-white font-orbitron leading-snug mb-1">{classMeta.title}</h2>
+                <h2 className="text-sm font-bold text-zinc-900 dark:text-white font-orbitron leading-snug mb-1">{classMeta.title}</h2>
                 <div className="flex items-center gap-1 mb-4">
-                  {[1,2,3].map(s => <IconStar key={s} size={12} className={s<=classMeta.difficulty?'text-yellow-400 fill-yellow-400':'text-zinc-600'} />)}
-                  <span className="text-xs text-zinc-500 ml-1">{classMeta.category}</span>
+                  {[1,2,3].map(s => <IconStar key={s} size={12} className={s<=classMeta.difficulty?'text-yellow-400 fill-yellow-400':'text-zinc-300 dark:text-zinc-600'} />)}
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400 ml-1">{classMeta.category}</span>
                 </div>
 
                 {/* Overall Progress */}
-                <div className="bg-[#1a1a2e] border border-violet-500/30 rounded-xl p-4">
+                <div className="bg-violet-50/50 dark:bg-[#1a1a2e] border border-violet-200 dark:border-violet-500/30 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2"><IconTrophy size={16} className="text-yellow-400" /><span className="text-xs text-zinc-400">Progress Keseluruhan</span></div>
-                    <span className="text-xs font-bold font-mono text-violet-300">{completedCount}/{totalItems}</span>
+                    <div className="flex items-center gap-2"><IconTrophy size={16} className="text-yellow-400" /><span className="text-xs text-zinc-600 dark:text-zinc-400">Progress Keseluruhan</span></div>
+                    <span className="text-xs font-bold font-mono text-violet-600 dark:text-violet-300">{completedCount}/{totalItems}</span>
                   </div>
-                  <div className="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-zinc-200 dark:bg-zinc-800 rounded-full h-2 overflow-hidden">
                     <motion.div className="h-full bg-gradient-to-r from-violet-600 to-purple-400 rounded-full" initial={{ width:0 }} animate={{ width:`${progressPercent}%` }} transition={{ duration:0.6 }} />
                   </div>
-                  <p className="text-xs text-zinc-500 mt-2">{progressPercent}% selesai</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2">{progressPercent}% selesai</p>
                 </div>
               </div>
 
@@ -543,24 +543,24 @@ export default function ClassDetailPage() {
                   const finalPassed = quizHistory[level.finalQuiz.id]?.some(a => a.status === 'Lulus');
 
                   return (
-                    <div key={level.id} className={`rounded-xl overflow-hidden border ${unlocked ? 'border-zinc-800/80' : 'border-zinc-800/40 opacity-60'}`}>
+                    <div key={level.id} className={`rounded-xl overflow-hidden border ${unlocked ? 'border-zinc-200 dark:border-zinc-800/80' : 'border-zinc-100 dark:border-zinc-800/40 opacity-60'}`}>
                       {/* Level Header */}
                       <button
                         onClick={() => unlocked && setOpenLevels(prev => ({ ...prev, [level.id]: !prev[level.id] }))}
-                        className={`w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors ${unlocked ? 'bg-zinc-900 hover:bg-zinc-800/80 cursor-pointer' : 'bg-zinc-900/50 cursor-not-allowed'}`}
+                        className={`w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors ${unlocked ? 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800/80 cursor-pointer' : 'bg-zinc-100/50 dark:bg-zinc-900/50 cursor-not-allowed'}`}
                       >
                         <div className="flex items-center gap-3">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                            status === 'complete' ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                            : status === 'locked' ? 'bg-zinc-800/50 text-zinc-600 border border-zinc-700/50'
-                            : status === 'in-progress' ? 'bg-violet-500/20 text-violet-400 border border-violet-500/30'
-                            : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                            status === 'complete' ? 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border border-green-200 dark:border-green-500/30'
+                            : status === 'locked' ? 'bg-zinc-100 dark:bg-zinc-800/50 text-zinc-400 dark:text-zinc-600 border border-zinc-200 dark:border-zinc-700/50'
+                            : status === 'in-progress' ? 'bg-violet-50 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-500/30'
+                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700'
                           }`}>
                             {status === 'complete' ? <IconCheck size={14} /> : status === 'locked' ? <IconLock size={14} /> : li + 1}
                           </div>
                           <div className="min-w-0">
-                            <span className="text-sm font-semibold text-white leading-tight block truncate">{level.title}</span>
-                            <span className="text-[10px] text-zinc-500">{level.items.length} materi · {level.finalQuiz.questionCount} soal quiz</span>
+                            <span className="text-sm font-semibold text-zinc-900 dark:text-white leading-tight block truncate">{level.title}</span>
+                            <span className="text-[10px] text-zinc-500 dark:text-zinc-400">{level.items.length} materi · {level.finalQuiz.questionCount} soal quiz</span>
                           </div>
                         </div>
                         {unlocked && (
@@ -583,25 +583,25 @@ export default function ClassDetailPage() {
                               return (
                                 <button key={item.id}
                                   onClick={() => accessible && selectItem(item, level.id)}
-                                  className={`w-full flex items-center gap-3 px-4 py-3 text-left border-t border-zinc-800/60 transition-all ${
+                                  className={`w-full flex items-center gap-3 px-4 py-3 text-left border-t border-zinc-200 dark:border-zinc-800/60 transition-all ${
                                     !accessible ? 'opacity-40 cursor-not-allowed'
-                                    : isActive ? 'bg-violet-600/20 border-l-2 border-l-violet-500'
-                                    : 'hover:bg-zinc-800/50 cursor-pointer'
+                                    : isActive ? 'bg-violet-50 dark:bg-violet-600/20 border-l-2 border-l-violet-500'
+                                    : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer'
                                   }`}
                                 >
                                   <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                                    isDone ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                    : !accessible ? 'bg-zinc-800/50 text-zinc-700 border border-zinc-700/50'
-                                    : isActive ? 'bg-violet-500/30 border border-violet-500/50'
-                                    : 'bg-zinc-800 border border-zinc-700'
+                                    isDone ? 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border border-green-200 dark:border-green-500/30'
+                                    : !accessible ? 'bg-zinc-100 dark:bg-zinc-800/50 text-zinc-400 dark:text-zinc-700 border border-zinc-200 dark:border-zinc-700/50'
+                                    : isActive ? 'bg-violet-100 dark:bg-violet-500/30 border border-violet-300 dark:border-violet-500/50'
+                                    : 'bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700'
                                   }`}>
                                     {isDone ? <IconCheck size={11} /> : !accessible ? <IconLock size={9} /> : isActive ? <div className="w-2 h-2 rounded-full bg-violet-400" /> : null}
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <p className={`text-xs font-medium truncate ${isActive ? 'text-violet-300' : isDone ? 'text-zinc-300' : !accessible ? 'text-zinc-600' : 'text-zinc-400'}`}>
+                                    <p className={`text-xs font-medium truncate ${isActive ? 'text-violet-600 dark:text-violet-300' : isDone ? 'text-zinc-700 dark:text-zinc-300' : !accessible ? 'text-zinc-400 dark:text-zinc-600' : 'text-zinc-500 dark:text-zinc-400'}`}>
                                       {item.title}
                                     </p>
-                                    {item.duration && <p className="text-[10px] text-zinc-600 mt-0.5 flex items-center gap-1"><IconClock size={10} /> {item.duration}</p>}
+                                    {item.duration && <p className="text-[10px] text-zinc-500 dark:text-zinc-600 mt-0.5 flex items-center gap-1"><IconClock size={10} /> {item.duration}</p>}
                                     {isQuiz && <p className="text-[10px] text-violet-500 mt-0.5">{item.questions.length} soal</p>}
                                   </div>
                                 </button>
@@ -611,20 +611,20 @@ export default function ClassDetailPage() {
                             {/* Final Quiz Button */}
                             <button
                               onClick={() => allItemsDone && openFinalQuizLanding(level)}
-                              className={`w-full flex items-center gap-3 px-4 py-3.5 text-left border-t border-zinc-800/60 transition-all ${
-                                allItemsDone ? 'hover:bg-violet-600/10 cursor-pointer' : 'opacity-40 cursor-not-allowed'
-                              } ${finalPassed ? 'bg-green-500/5' : 'bg-gradient-to-r from-violet-900/10 to-purple-900/10'}`}
+                              className={`w-full flex items-center gap-3 px-4 py-3.5 text-left border-t border-zinc-200 dark:border-zinc-800/60 transition-all ${
+                                allItemsDone ? 'hover:bg-violet-50 dark:hover:bg-violet-600/10 cursor-pointer' : 'opacity-40 cursor-not-allowed'
+                              } ${finalPassed ? 'bg-green-500/5' : 'bg-gradient-to-r from-violet-50/30 to-purple-50/30 dark:from-violet-900/10 dark:to-purple-900/10'}`}
                             >
                               <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                                finalPassed ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-violet-500/20 text-violet-400 border border-violet-500/30'
+                                finalPassed ? 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border border-green-200 dark:border-green-500/30' : 'bg-violet-50 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-500/30'
                               }`}>
                                 {finalPassed ? <IconCheck size={11} /> : <IconPlayerPlay size={11} />}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className={`text-xs font-semibold truncate ${finalPassed ? 'text-green-300' : 'text-violet-300'}`}>
+                                <p className={`text-xs font-semibold truncate ${finalPassed ? 'text-green-600 dark:text-green-300' : 'text-violet-600 dark:text-violet-300'}`}>
                                   {level.finalQuiz.title}
                                 </p>
-                                <p className="text-[10px] text-zinc-500">{level.finalQuiz.questionCount} soal · {level.finalQuiz.duration}</p>
+                                <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{level.finalQuiz.questionCount} soal · {level.finalQuiz.duration}</p>
                               </div>
                             </button>
                           </motion.div>
@@ -642,12 +642,12 @@ export default function ClassDetailPage() {
       {/* ── MAIN CONTENT ── */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <div className="h-14 px-6 border-b border-zinc-800 bg-[#0f0f0f] flex items-center gap-4 shrink-0">
-          <button onClick={() => setSidebarOpen(v => !v)} className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors">
+        <div className="h-14 px-6 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0f0f0f] flex items-center gap-4 shrink-0">
+          <button onClick={() => setSidebarOpen(v => !v)} className="p-2 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
             {sidebarOpen ? <IconX size={18} /> : <IconMenu2 size={18} />}
           </button>
-          <div className="h-4 w-px bg-zinc-700" />
-          <span className="text-xs text-zinc-500 font-mono">{classMeta.category} · {classMeta.title}</span>
+          <div className="h-4 w-px bg-zinc-200 dark:bg-zinc-700" />
+          <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">{classMeta.category} · {classMeta.title}</span>
         </div>
 
         {/* Content Area */}
@@ -667,18 +667,18 @@ export default function ClassDetailPage() {
                 initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-10 }}
                 transition={{ duration:0.3 }} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-12"
               >
-                <div className="flex items-center gap-2 text-xs text-zinc-500 font-mono mb-6">
-                  <IconBookmark size={12} className="text-violet-400" />
+                <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-mono mb-6">
+                  <IconBookmark size={12} className="text-violet-500 dark:text-violet-400" />
                   <span>{currentLevel?.title}</span>
                   <IconChevronRight size={12} />
-                  <span className="text-violet-300">{activeItem.title}</span>
+                  <span className="text-violet-600 dark:text-violet-300">{activeItem.title}</span>
                 </div>
 
-                <h1 className="text-3xl md:text-4xl font-bold font-orbitron text-white mb-3 leading-tight">{activeItem.title}</h1>
-                <p className="text-zinc-500 text-sm font-mono mb-8 flex items-center gap-2"><IconClock size={14} /> Durasi: {activeItem.duration}</p>
+                <h1 className="text-3xl md:text-4xl font-bold font-orbitron text-zinc-900 dark:text-white mb-3 leading-tight">{activeItem.title}</h1>
+                <p className="text-zinc-500 dark:text-zinc-400 text-sm font-mono mb-8 flex items-center gap-2"><IconClock size={14} /> Durasi: {activeItem.duration}</p>
 
                 {/* YouTube Embed */}
-                <div className="relative w-full pb-[56.25%] rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-700 mb-8 shadow-2xl">
+                <div className="relative w-full pb-[56.25%] rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-200 dark:border-zinc-700 mb-8 shadow-2xl">
                   <iframe
                     className="absolute inset-0 w-full h-full"
                     src={`https://www.youtube.com/embed/${activeItem.videoId}?rel=0`}
@@ -688,20 +688,20 @@ export default function ClassDetailPage() {
                   />
                 </div>
 
-                <p className="text-zinc-300 text-base leading-relaxed mb-6">{activeItem.description}</p>
+                <p className="text-zinc-700 dark:text-zinc-300 text-base leading-relaxed mb-6">{activeItem.description}</p>
 
                 {/* Transcript */}
                 {activeItem.transcript && activeItem.transcript.length > 0 && (
                   <details className="mb-8 group">
-                    <summary className="cursor-pointer flex items-center gap-2 text-sm font-semibold text-violet-400 hover:text-violet-300 transition-colors py-2 select-none">
+                    <summary className="cursor-pointer flex items-center gap-2 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 transition-colors py-2 select-none">
                       <IconChevronRight size={14} className="transition-transform group-open:rotate-90" />
                       Transkrip Video
                     </summary>
-                    <div className="mt-3 space-y-0 bg-zinc-900/80 border border-zinc-700/50 rounded-xl overflow-hidden max-h-[400px] overflow-y-auto">
+                    <div className="mt-3 space-y-0 bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-700/50 rounded-xl overflow-hidden max-h-[400px] overflow-y-auto">
                       {activeItem.transcript.map((entry, i) => (
-                        <div key={i} className={`flex gap-3 px-4 py-3 ${i % 2 === 0 ? 'bg-zinc-900/50' : 'bg-zinc-800/30'}`}>
-                          <span className="text-violet-400 font-mono text-xs shrink-0 pt-0.5 min-w-[40px]">{entry.time}</span>
-                          <p className="text-zinc-300 text-sm leading-relaxed">{entry.text}</p>
+                        <div key={i} className={`flex gap-3 px-4 py-3 ${i % 2 === 0 ? 'bg-zinc-50 dark:bg-zinc-900/50' : 'bg-zinc-100/50 dark:bg-zinc-800/30'}`}>
+                          <span className="text-violet-600 dark:text-violet-400 font-mono text-xs shrink-0 pt-0.5 min-w-[40px]">{entry.time}</span>
+                          <p className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed">{entry.text}</p>
                         </div>
                       ))}
                     </div>
@@ -711,8 +711,8 @@ export default function ClassDetailPage() {
                 {completed.has(activeItemId) ? (
                   <motion.div initial={{ opacity:0, scale:0.9 }} animate={{ opacity:1, scale:1 }}
                     className="flex items-center gap-3 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">
-                    <IconCheck size={18} className="text-green-400 shrink-0" />
-                    <span className="text-sm text-green-300 font-medium">Video ini sudah kamu tonton!</span>
+                    <IconCheck size={18} className="text-green-600 dark:text-green-400 shrink-0" />
+                    <span className="text-sm text-green-700 dark:text-green-300 font-medium">Video ini sudah kamu tonton!</span>
                   </motion.div>
                 ) : (
                   <button
@@ -732,18 +732,18 @@ export default function ClassDetailPage() {
                 transition={{ duration:0.3 }} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-12"
               >
                 {/* Breadcrumb */}
-                <div className="flex items-center gap-2 text-xs text-zinc-500 font-mono mb-6">
-                  <IconBookmark size={12} className="text-violet-400" />
+                <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-mono mb-6">
+                  <IconBookmark size={12} className="text-violet-500 dark:text-violet-400" />
                   <span>{currentLevel?.title}</span>
                   <IconChevronRight size={12} />
-                  <span className="text-violet-300">{activeItem.title}</span>
+                  <span className="text-violet-600 dark:text-violet-300">{activeItem.title}</span>
                 </div>
 
-                <h1 className="text-3xl md:text-4xl font-bold font-orbitron text-white mb-3 leading-tight">{activeItem.content.heading}</h1>
-                <p className="text-zinc-500 text-sm font-mono mb-10 flex items-center gap-2"><IconClock size={14} /> Estimasi baca: {activeItem.duration}</p>
+                <h1 className="text-3xl md:text-4xl font-bold font-orbitron text-zinc-900 dark:text-white mb-3 leading-tight">{activeItem.content.heading}</h1>
+                <p className="text-zinc-500 dark:text-zinc-400 text-sm font-mono mb-10 flex items-center gap-2"><IconClock size={14} /> Estimasi baca: {activeItem.duration}</p>
 
                 {activeItem.content.videoId && (
-                  <div className="relative w-full pb-[56.25%] rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-700 mb-8 shadow-2xl">
+                  <div className="relative w-full pb-[56.25%] rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-200 dark:border-zinc-700 mb-8 shadow-2xl">
                     <iframe
                       className="absolute inset-0 w-full h-full"
                       src={`https://www.youtube.com/embed/${activeItem.content.videoId}?rel=0`}
@@ -754,33 +754,33 @@ export default function ClassDetailPage() {
                   </div>
                 )}
 
-                <div className="space-y-6 text-zinc-300 text-base leading-relaxed">
+                <div className="space-y-6 text-zinc-700 dark:text-zinc-300 text-base leading-relaxed">
                   {activeItem.content.body.map((para, i) => (
                     <motion.p key={i} initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1+i*0.08 }}>{para}</motion.p>
                   ))}
                 </div>
 
                 {activeItem.content.quote && (
-                  <div className="my-10 bg-zinc-900 border-l-4 border-violet-500 p-6 rounded-r-xl">
-                    <p className="text-white italic text-base">{activeItem.content.quote}</p>
+                  <div className="my-10 bg-zinc-100 dark:bg-zinc-900 border-l-4 border-violet-500 p-6 rounded-r-xl">
+                    <p className="text-zinc-800 dark:text-white italic text-base">{activeItem.content.quote}</p>
                   </div>
                 )}
 
                 {completed.has(activeItemId) && (
                   <motion.div initial={{ opacity:0, scale:0.9 }} animate={{ opacity:1, scale:1 }}
                     className="flex items-center gap-3 mt-6 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">
-                    <IconCheck size={18} className="text-green-400 shrink-0" />
-                    <span className="text-sm text-green-300 font-medium">Materi ini sudah kamu selesaikan!</span>
+                    <IconCheck size={18} className="text-green-600 dark:text-green-400 shrink-0" />
+                    <span className="text-sm text-green-700 dark:text-green-300 font-medium">Materi ini sudah kamu selesaikan!</span>
                   </motion.div>
                 )}
               </motion.div>
             </AnimatePresence>
           ) : (
             /* Empty / default state */
-            <div className="flex items-center justify-center h-full text-zinc-600">
+            <div className="flex items-center justify-center h-full text-zinc-400 dark:text-zinc-600">
               <div className="text-center">
-                <IconBookmark size={48} className="mx-auto mb-4 text-zinc-700" />
-                <p className="text-lg">Pilih materi dari sidebar untuk mulai belajar</p>
+                <IconBookmark size={48} className="mx-auto mb-4 text-zinc-300 dark:text-zinc-700" />
+                <p className="text-lg text-zinc-500 dark:text-zinc-400">Pilih materi dari sidebar untuk mulai belajar</p>
               </div>
             </div>
           )}
@@ -789,15 +789,15 @@ export default function ClassDetailPage() {
         {/* Bottom lesson nav — floating bar, no heavy purple */}
         {activeItem?.type === 'lesson' && !quizLandingData && (
           <div className="pointer-events-none sticky bottom-0 z-30 flex justify-center px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
-            <div className="pointer-events-auto flex w-full max-w-xl items-center gap-2 rounded-2xl border border-zinc-700/80 bg-zinc-950/95 px-3 py-2.5 shadow-[0_-8px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:gap-4 sm:px-5 sm:py-3">
+            <div className="pointer-events-auto flex w-full max-w-xl items-center gap-2 rounded-2xl border border-zinc-200 dark:border-zinc-700/80 bg-white/95 dark:bg-zinc-950/95 px-3 py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:gap-4 sm:px-5 sm:py-3">
               <button
                 type="button"
                 onClick={goPrev}
                 disabled={activeItemIndex <= 0}
                 className={`flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all sm:text-sm ${
                   activeItemIndex > 0
-                    ? 'text-zinc-200 hover:bg-zinc-800'
-                    : 'cursor-not-allowed text-zinc-600'
+                    ? 'text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                    : 'cursor-not-allowed text-zinc-300 dark:text-zinc-600'
                 }`}
               >
                 <IconChevronLeft size={18} stroke={2} />
@@ -805,10 +805,10 @@ export default function ClassDetailPage() {
               </button>
 
               <div className="flex min-w-0 flex-1 flex-col items-center justify-center px-1">
-                <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
                   Materi
                 </span>
-                <span className="font-mono text-xs text-zinc-300 sm:text-sm">
+                <span className="font-mono text-xs text-zinc-700 dark:text-zinc-300 sm:text-sm">
                   {activeItemIndex + 1} / {currentLevelItems.length}
                 </span>
               </div>
@@ -817,7 +817,7 @@ export default function ClassDetailPage() {
                 <button
                   type="button"
                   onClick={() => void goNext()}
-                  className="flex shrink-0 items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-xs font-bold text-zinc-900 shadow-lg shadow-black/30 transition hover:brightness-110 sm:px-5 sm:text-sm"
+                  className="flex shrink-0 items-center gap-2 rounded-xl bg-zinc-900 dark:bg-white px-4 py-2.5 text-xs font-bold text-white dark:text-zinc-900 shadow-lg shadow-black/10 dark:shadow-black/30 transition hover:brightness-110 sm:px-5 sm:text-sm"
                 >
                   Lanjut
                   <IconChevronRight size={18} stroke={2} />
@@ -826,7 +826,7 @@ export default function ClassDetailPage() {
                 <button
                   type="button"
                   onClick={() => void goNext()}
-                  className="flex shrink-0 items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-xs font-bold text-emerald-950 shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400 sm:px-5 sm:text-sm"
+                  className="flex shrink-0 items-center gap-2 rounded-xl bg-emerald-600 dark:bg-emerald-500 px-4 py-2.5 text-xs font-bold text-white dark:text-emerald-950 shadow-lg shadow-emerald-600/20 dark:shadow-emerald-500/20 transition hover:bg-emerald-500 dark:hover:bg-emerald-400 sm:px-5 sm:text-sm"
                 >
                   <IconCheck size={18} stroke={2} />
                   Selesai
@@ -848,13 +848,13 @@ export default function ClassDetailPage() {
             </div>
             <motion.div initial={{ scale:0.5, opacity:0, y:50 }} animate={{ scale:1, opacity:1, y:0 }} exit={{ scale:0.8, opacity:0 }}
               transition={{ type:'spring', stiffness:200, damping:20 }} onClick={e => e.stopPropagation()}
-              className="relative bg-gradient-to-br from-[#1A1A2E] via-[#2D1B69] to-[#1A1A2E] border border-violet-500/30 rounded-3xl p-10 text-center max-w-md mx-4 shadow-[0_0_80px_rgba(124,58,237,0.3)]">
+              className="relative bg-white dark:bg-gradient-to-br dark:from-[#1A1A2E] dark:via-[#2D1B69] dark:to-[#1A1A2E] border border-zinc-200 dark:border-violet-500/30 rounded-3xl p-10 text-center max-w-md mx-4 shadow-[0_10px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_0_80px_rgba(124,58,237,0.3)]">
               <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(251,191,36,0.4)]">
                 <IconTrophy size={40} className="text-white" />
               </div>
-              <h2 className="text-3xl font-bold font-orbitron text-white mb-3">Selamat!</h2>
-              <p className="text-zinc-300 mb-2">Kamu telah menyelesaikan kelas</p>
-              <p className="text-violet-300 font-bold text-lg mb-6">{classMeta.title}</p>
+              <h2 className="text-3xl font-bold font-orbitron text-zinc-900 dark:text-white mb-3">Selamat!</h2>
+              <p className="text-zinc-600 dark:text-zinc-300 mb-2">Kamu telah menyelesaikan kelas</p>
+              <p className="text-violet-600 dark:text-violet-300 font-bold text-lg mb-6">{classMeta.title}</p>
               <div className="flex items-center justify-center gap-1 mb-8">
                 {[1,2,3].map(s => <motion.div key={s} initial={{ scale:0, rotate:-180 }} animate={{ scale:1, rotate:0 }} transition={{ delay:0.3+s*0.15, type:'spring' }}>
                   <IconStar size={28} className="text-yellow-400 fill-yellow-400" />
