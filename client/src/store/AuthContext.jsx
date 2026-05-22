@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../services/supabase';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { supabase, clearSupabaseBrowserSession } from '../services/supabase';
 
 const AuthContext = createContext(null);
 
@@ -7,6 +7,19 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  /** Full logout: sign out in client + wipe all Supabase auth keys in storage (refresh must stay logged out). */
+  const logout = useCallback(async () => {
+    try {
+      await supabase.auth.signOut({ scope: 'local' });
+    } catch {
+      /* ignore */
+    }
+    clearSupabaseBrowserSession();
+    setUser(null);
+    setProfile(null);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     // Check active session on mount
@@ -76,7 +89,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, isAdmin, profileComplete, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, isAdmin, profileComplete, refreshProfile, logout }}>
       {children}
     </AuthContext.Provider>
   );

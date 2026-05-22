@@ -17,8 +17,28 @@
   --color-accent-light: #A78BFA;
   --color-accent-dark: #5B21B6;
   --color-text-primary: #FFFFFF;
-  --color-text-muted: #888888;
+  --color-text-muted: #A3A3A3;
   --color-danger: #FF4D4D;
+
+  /* Membuat teks yang redup menjadi lebih terang secara global */
+  --color-zinc-400: #e4e4e7;
+  --color-zinc-500: #d4d4d8;
+  --color-zinc-600: #a1a1aa;
+  
+  --color-gray-400: #e5e7eb;
+  --color-gray-500: #d1d5db;
+  --color-gray-600: #9ca3af;
+  
+  --color-neutral-400: #e5e5e5;
+  --color-neutral-500: #d4d4d4;
+  --color-neutral-600: #a3a3a3;
+
+  /* Menambahkan ukuran pada teks yang kecil */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.25rem;
+  
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.5rem;
 }
 
 @keyframes sweep {
@@ -34,6 +54,10 @@ html {
 :root {
   font-family: var(--font-inter);
   color-scheme: dark;
+  color: #f8fafc;
+  font-size: 16px;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -43,10 +67,19 @@ h1, h2, h3, h4, h5, h6 {
 body {
   margin: 0;
   font-family: var(--font-inter);
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #f8fafc;
+  background: #0a0a0a;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   width: 100%;
+}
+
+p,
+li {
+  line-height: 1.75;
 }
 
 #root {

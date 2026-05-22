@@ -94,15 +94,30 @@ export async function submitQuizResult({ userId, classId, score, total }) {
   });
   if (insertError) throw insertError;
 
+  // Points: 300 if score ≥ KKM (70) and every class_chapters row has progress (or no chapters row → legacy).
+  // Otherwise: round(percentage × 3).
+  let points = 0;
   if (score > 0) {
+    const [{ data: chRows }, { data: progRows }] = await Promise.all([
+      supabase.from('class_chapters').select('id').eq('class_id', classId),
+      supabase.from('class_progress').select('chapter_id').eq('user_id', userId).eq('class_id', classId),
+    ]);
+    const need = chRows?.length ?? 0;
+    const doneIds = new Set((progRows || []).map((r) => String(r.chapter_id)));
+    const allChaptersDone =
+      need === 0 ? true : chRows.every((ch) => doneIds.has(String(ch.id)));
+
+    if (percentage >= 70 && allChaptersDone) points = 300;
+    else points = Math.round(percentage * 3);
+
     const { error: rpcError } = await supabase.rpc('add_quiz_points', {
       p_user_id: userId,
-      p_points: score * 10,
+      p_points: points,
     });
     if (rpcError) console.warn('Failed to add points:', rpcError);
   }
 
-  return { percentage, passed };
+  return { percentage, passed, pointsAwarded: points };
 }
 
 export async function fetchUserQuizResults(userId) {

@@ -1,33 +1,135 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { IconArrowUpRight, IconBook2, IconTrendingUp, IconTrendingDown, IconCash } from '@tabler/icons-react';
+import { IconArrowUpRight, IconBook2, IconTrendingUp, IconTrendingDown, IconCash, IconLoader2 } from '@tabler/icons-react';
 import { useAuth } from '../../store/AuthContext';
-
-const TX_KEY = 'finlitgo_transactions';
+import { supabase } from '../../services/supabase';
+import { fetchClasses } from '../../services/classService';
 
 function formatRupiah(num) {
   return 'Rp ' + num.toLocaleString('id-ID');
 }
 
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
 export default function HistoryPage() {
   const { user } = useAuth();
-  const userId = user?.id || 'guest';
-  const txKey = `${TX_KEY}_${userId}`;
+  const userId = user?.id || null;
 
-  const [transactions, setTransactions] = useState(() => {
-    const saved = localStorage.getItem(txKey);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [transactions, setTransactions] = useState([]);
+  const [studyHistory, setStudyHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem(txKey);
-    setTransactions(saved ? JSON.parse(saved) : []);
-  }, [txKey]);
+    if (!userId) {
+      setTransactions([]);
+      setStudyHistory([]);
+      setLoading(false);
+      return;
+    }
 
-  const studyHistory = [
-    { id: 1, module: 'Money Management Basics', progress: '100%', date: 'Today, 10:00 AM', status: 'Completed' },
-    { id: 2, module: 'Investing for Beginners', progress: '45%', date: 'Yesterday, 20:00 PM', status: 'In Progress' }
-  ];
+    const fetchAll = async () => {
+      setLoading(true);
+      try {
+        // Fetch transactions from Supabase
+        const { data: txData, error: txErr } = await supabase
+          .from('transactions')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (!txErr && txData) {
+          setTransactions(txData.map(tx => ({
+            ...tx,
+            title: tx.title || tx.label || tx.description || 'Untitled',
+            type: tx.type || 'expense',
+            amount: Number(tx.amount || 0),
+            category: tx.category || 'Lainnya',
+            date: tx.date || tx.created_at?.split('T')[0] || '-',
+          })));
+        }
+
+        // Fetch study progress from Supabase
+        const [classesData, progressRes] = await Promise.all([
+          fetchClasses(),
+          supabase.from('class_progress').select('class_id, chapter_id, created_at').eq('user_id', userId),
+        ]);
+
+        const progressRows = progressRes.error ? [] : (progressRes.data || []);
+        const byClass = new Map();
+        const latestByClass = new Map();
+
+        for (const row of progressRows) {
+          byClass.set(row.class_id, (byClass.get(row.class_id) || 0) + 1);
+          const existing = latestByClass.get(row.class_id);
+          if (!existing || new Date(row.created_at) > new Date(existing)) {
+            latestByClass.set(row.class_id, row.created_at);
+          }
+        }
+
+        const studyCards = (classesData || []).map((cls) => {
+          let totalItems = 1;
+          if (cls.levels_data) {
+            const parsed = typeof cls.levels_data === 'string' ? JSON.parse(cls.levels_data) : cls.levels_data;
+            totalItems = parsed.reduce((acc, level) => acc + (level.items ? level.items.length : 0), 0);
+          } else {
+            totalItems = (cls.class_chapters || []).length || 1;
+          }
+          if (totalItems === 0) totalItems = 1;
+
+          let completedCount = byClass.get(cls.id) || 0;
+
+          // Check localStorage for additional progress
+          try {
+            const localKey = `finlitgo_progress_${userId}_class_${cls.id}`;
+            const localData = localStorage.getItem(localKey);
+            if (localData) {
+              const localSet = new Set(JSON.parse(localData));
+              if (localSet.size > completedCount) completedCount = localSet.size;
+            }
+          } catch (e) { /* ignore */ }
+
+          const progress = Math.min(100, Math.round((completedCount / totalItems) * 100));
+          const lastActivity = latestByClass.get(cls.id);
+
+          return {
+            id: cls.id,
+            module: cls.title,
+            progress: `${progress}%`,
+            date: lastActivity ? timeAgo(lastActivity) : 'Not started',
+            status: progress === 100 ? 'Completed' : progress > 0 ? 'In Progress' : 'Not Started',
+          };
+        });
+
+        setStudyHistory(studyCards);
+      } catch (err) {
+        console.error('History fetch error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAll();
+  }, [userId]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-zinc-500">
+        <IconLoader2 className="animate-spin mb-4" size={32} />
+        <p className="text-sm">Loading history...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -48,7 +150,7 @@ export default function HistoryPage() {
               <IconArrowUpRight className="text-violet-400" />
               Recent Transactions
             </h3>
-            <button className="text-xs text-zinc-400 hover:text-white transition-colors">View All</button>
+            <span className="text-xs text-zinc-500 font-mono">{transactions.length} items</span>
           </div>
           
           <div className="flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-2">
@@ -82,6 +184,7 @@ export default function HistoryPage() {
               <div className="text-center py-8 text-zinc-500">
                 <IconCash size={32} className="mx-auto mb-3 text-zinc-600" />
                 <p className="text-sm">No transactions yet.</p>
+                <p className="text-xs text-zinc-600 mt-1">Add cashflow from the Financial page to see history here.</p>
               </div>
             )}
           </div>
@@ -99,7 +202,7 @@ export default function HistoryPage() {
               <IconBook2 className="text-violet-400" />
               Study Progress
             </h3>
-            <button className="text-xs text-zinc-400 hover:text-white transition-colors">View All</button>
+            <a href="/class" className="text-xs text-violet-400 hover:text-violet-300 transition-colors">View Classes →</a>
           </div>
           
           <div className="flex flex-col gap-4">
@@ -112,7 +215,11 @@ export default function HistoryPage() {
                 className="flex items-center justify-between p-4 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-colors group cursor-pointer"
               >
                 <div className="flex items-center gap-4 w-full">
-                  <div className="w-12 h-12 bg-violet-500/10 text-violet-400 border border-violet-500/30 rounded-full flex items-center justify-center font-bold text-sm">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm border ${
+                    study.status === 'Completed' 
+                      ? 'bg-green-500/10 text-green-400 border-green-500/30' 
+                      : 'bg-violet-500/10 text-violet-400 border-violet-500/30'
+                  }`}>
                     {study.progress}
                   </div>
                   <div className="flex-1">
@@ -125,6 +232,13 @@ export default function HistoryPage() {
                 </div>
               </motion.div>
             ))}
+            {studyHistory.length === 0 && (
+              <div className="text-center py-8 text-zinc-500">
+                <IconBook2 size={32} className="mx-auto mb-3 text-zinc-600" />
+                <p className="text-sm">No study progress yet.</p>
+                <p className="text-xs text-zinc-600 mt-1">Start a class module to track your progress here.</p>
+              </div>
+            )}
           </div>
         </motion.div>
       </div>

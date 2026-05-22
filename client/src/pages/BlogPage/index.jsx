@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   IconArrowRight,
   IconSearch,
@@ -10,9 +9,11 @@ import {
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../store/AuthContext";
-// import { supabase } from "@/services/supabase"; // DISABLING SUPABASE FOR NOW
-import { getFallbackBlogs } from "../../data/fallbackBlogs";
+import { supabase } from "../../services/supabase";
 import Footer from "../../components/layout/Footer";
+
+const BLOG_IMG_FALLBACK =
+  "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&q=80";
 
 export default function BlogPage() {
   const navigate = useNavigate();
@@ -21,21 +22,35 @@ export default function BlogPage() {
   const [visibleCount, setVisibleCount] = useState(3);
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
 
   const streak = profile?.streak_count || 0;
 
   useEffect(() => {
     const fetchBlogs = async () => {
-      // FORCE USE LOCAL FALLBACK DATA
-      const data = getFallbackBlogs();
-      setBlogs(
-        data.map((b) => ({
-          ...b,
-          image: b.image || b.thumbnail_url || "",
-          timeToRead: b.timeToRead || "5 min read",
-          date: b.date || "Oct 10",
-        })),
-      );
+      setLoading(true);
+      setLoadError(null);
+      const { data, error } = await supabase
+        .from("blogs")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        setLoadError(error.message || "Tidak bisa memuat artikel.");
+        setBlogs([]);
+      } else if (data) {
+        setBlogs(
+          data.map((b) => ({
+            ...b,
+            image: (b.image || b.thumbnail_url || "").trim() || BLOG_IMG_FALLBACK,
+            timeToRead: b.time_to_read || "5 min read",
+            date: new Date(b.created_at).toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+            }),
+          })),
+        );
+      }
       setLoading(false);
     };
     fetchBlogs();
@@ -62,7 +77,7 @@ export default function BlogPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
-        <p className="text-zinc-500">Loading articles...</p>
+        <p className="text-zinc-300 text-base">Loading articles...</p>
       </div>
     );
   }
@@ -77,39 +92,40 @@ export default function BlogPage() {
         </div>
 
         <div className="relative z-10 flex flex-col w-full">
+          {loadError && (
+            <div className="relative z-20 mx-auto max-w-3xl px-4 pt-6">
+              <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+                <strong className="font-semibold">Gagal memuat blog:</strong> {loadError}
+                <span className="block mt-1 text-sm text-amber-50/90">
+                  Jika Anda admin: cek Supabase → Table Editor → blogs (RLS harus mengizinkan SELECT untuk role yang dipakai).
+                </span>
+              </div>
+            </div>
+          )}
           {/* Hero Section - identical to ClassPage */}
           <section className="relative z-10 w-full overflow-hidden bg-[#0a0a0a] px-6 py-24">
             <div className="relative z-10 max-w-6xl mx-auto text-center">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7 }}
-              >
+              <div>
                 <span className="text-violet-300 font-mono text-sm uppercase tracking-[0.3em] block mb-4">
                   FinLitGo Blog
                 </span>
-                <h1 className="text-4xl md:text-6xl font-bold font-orbitron text-white mb-6 leading-tight">
+                <h1 className="text-5xl md:text-7xl font-bold font-orbitron text-white mb-6 leading-tight">
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-purple-300">
                     Knowledge
                   </span>{" "}
                   Base
                 </h1>
-                <p className="text-zinc-300 max-w-2xl mx-auto text-lg leading-relaxed mb-10">
+                <p className="text-zinc-200 max-w-2xl mx-auto text-xl leading-relaxed mb-10">
                   Deep dives, guides, and insights to help you navigate the
                   complex world of personal finance, tailored for the younger
                   generation.
                 </p>
-              </motion.div>
+              </div>
 
               {/* Search Bar - identical to ClassPage */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="max-w-xl mx-auto relative"
-              >
+              <div className="max-w-xl mx-auto relative">
                 <IconSearch
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300"
                   size={20}
                 />
                 <input
@@ -122,32 +138,27 @@ export default function BlogPage() {
                   placeholder="Search articles..."
                   className="w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl py-4 px-12 text-white placeholder-zinc-400 focus:outline-none focus:border-violet-400 focus:shadow-[0_0_30px_rgba(124,58,237,0.2)] transition-all text-lg"
                 />
-              </motion.div>
+              </div>
 
               {/* Streak Badge — only show when logged in (same as ClassPage) */}
               {user && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="inline-flex items-center gap-3 mt-8 bg-black/40 backdrop-blur-xl border border-violet-500/30 px-6 py-3 rounded-2xl"
-                >
+                <div className="inline-flex items-center gap-3 mt-8 bg-black/40 backdrop-blur-xl border border-violet-500/30 px-6 py-3 rounded-2xl">
                   <IconFlame
                     size={24}
-                    className={`${streak > 0 ? "text-orange-500 animate-pulse" : "text-zinc-600"}`}
+                    className={`${streak > 0 ? "text-orange-400 animate-pulse" : "text-zinc-400"}`}
                   />
                   <div className="text-left">
-                    <span className="text-xl font-bold font-orbitron text-white">
+                    <span className="text-2xl font-bold font-orbitron text-white">
                       {streak}
                     </span>
-                    <span className="text-xs text-zinc-400 ml-2">
+                    <span className="text-sm text-zinc-200 ml-2">
                       Day Streak
                     </span>
                   </div>
-                  <span className="text-xs text-violet-300 font-mono ml-2">
+                  <span className="text-sm text-violet-200 font-mono ml-2">
                     {streakMessage}
                   </span>
-                </motion.div>
+                </div>
               )}
             </div>
           </section>
@@ -164,15 +175,13 @@ export default function BlogPage() {
                 </h2>
               </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+              <div
                 onClick={() => navigate(`/blog/${featured.id}`)}
                 className="group cursor-pointer bg-[#1A1A1A] border border-zinc-800 hover:border-violet-500/40 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-2xl hover:shadow-violet-500/10 flex flex-col md:flex-row h-auto md:h-96 w-full"
               >
                 <div className="w-full md:w-1/2 h-64 md:h-full overflow-hidden relative">
                   <img
-                    src={featured.image}
+                    src={featured.image || BLOG_IMG_FALLBACK}
                     alt={featured.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-70 group-hover:opacity-90"
                   />
@@ -187,7 +196,7 @@ export default function BlogPage() {
                   <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight group-hover:text-violet-300 transition-colors">
                     {featured.title}
                   </h2>
-                  <p className="text-zinc-400 mb-6 line-clamp-3">
+                  <p className="text-zinc-300 mb-6 line-clamp-3">
                     {featured.excerpt}
                   </p>
                   <div className="flex items-center justify-between mt-auto">
@@ -203,7 +212,7 @@ export default function BlogPage() {
                         <span className="text-sm text-white font-medium">
                           {featured.author}
                         </span>
-                        <span className="text-xs text-zinc-500 flex items-center gap-1">
+                        <span className="text-sm text-zinc-300 flex items-center gap-1">
                           <IconClock size={12} /> {featured.date} ·{" "}
                           {featured.timeToRead}
                         </span>
@@ -218,7 +227,7 @@ export default function BlogPage() {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </section>
           )}
 
@@ -250,16 +259,10 @@ export default function BlogPage() {
 
             {/* Blog Grid - with ClassPage card styling */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <AnimatePresence mode="popLayout">
-                {restPosts.map((post, i) => (
-                  <motion.div
+              <div>
+                {restPosts.map((post) => (
+                  <div
                     key={post.id}
-                    layout
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
                     onClick={() => navigate(`/blog/${post.id}`)}
                     className="bg-[#1A1A1A] border border-zinc-800 hover:border-violet-500/40 rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer group hover:-translate-y-1 shadow-lg hover:shadow-2xl hover:shadow-violet-500/10 flex flex-col h-full"
                   >
@@ -283,7 +286,7 @@ export default function BlogPage() {
                       <h3 className="text-lg font-bold text-white mb-2 leading-tight group-hover:text-violet-300 transition-colors line-clamp-2">
                         {post.title}
                       </h3>
-                      <p className="text-sm text-zinc-500 mb-4 line-clamp-2">
+                      <p className="text-base text-zinc-300 mb-4 line-clamp-2">
                         {post.excerpt}
                       </p>
 
@@ -300,29 +303,29 @@ export default function BlogPage() {
                           <span className="text-xs text-zinc-300 font-medium">
                             {post.author}
                           </span>
-                          <span className="text-[10px] text-zinc-600 font-mono flex items-center gap-1">
+                          <span className="text-xs text-zinc-400 font-mono flex items-center gap-1">
                             <IconClock size={10} /> {post.date} ·{" "}
                             {post.timeToRead}
                           </span>
                         </div>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
-              </AnimatePresence>
+              </div>
             </div>
 
             {filteredBlogs.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center py-16 text-zinc-500"
+              <div
+                className="text-center py-16 text-zinc-300"
               >
-                <IconSearch size={48} className="mx-auto mb-4 text-zinc-600" />
-                <p className="text-lg">
-                  No articles found matching your search.
+                <IconSearch size={48} className="mx-auto mb-4 text-zinc-300" />
+                <p className="text-xl text-white font-medium">
+                  {!loadError && blogs.length === 0 && !search.trim()
+                    ? "Belum ada artikel. Tambahkan dari Dashboard → Manage Blog."
+                    : "Tidak ada artikel yang cocok dengan pencarian."}
                 </p>
-              </motion.div>
+              </div>
             )}
           </section>
 
@@ -334,10 +337,10 @@ export default function BlogPage() {
                 <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-purple-600/20 rounded-full blur-[80px] pointer-events-none" />
 
                 <div className="relative z-10">
-                  <h2 className="text-3xl font-bold font-orbitron text-white mb-4">
+                  <h2 className="text-4xl font-bold font-orbitron text-white mb-4">
                     Stay Updated
                   </h2>
-                  <p className="text-zinc-400 max-w-lg mx-auto mb-8">
+                  <p className="text-zinc-200 text-lg max-w-lg mx-auto mb-8">
                     Get the latest financial insights delivered to your inbox.
                     Sign up now and never miss an article.
                   </p>

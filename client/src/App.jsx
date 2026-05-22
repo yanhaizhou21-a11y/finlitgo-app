@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import SmoothScroll from './components/common/SmoothScroll';
 import HomePage from './pages/HomePage';
@@ -37,9 +37,47 @@ import Footer from './components/layout/Footer';
 
 function PublicLayout({ children }) {
   const { pathname } = useLocation();
-  const useLearningGradient = pathname.startsWith('/class') || pathname.startsWith('/blog');
+  /* Purple glow only on class list + blog — not on /class/:id (reader/quiz stays clean) */
+  const useLearningGradient =
+    pathname === '/class' || pathname.startsWith('/blog');
   const showFooter = !(pathname.startsWith('/class/') && pathname !== '/class') && pathname !== '/blog';
   const navbarVariant = pathname.startsWith('/class/') ? 'learning' : 'default';
+  const isClassDetail = /^\/class\/.+/.test(pathname);
+
+  // Auto-hide navbar on class detail pages
+  const [navVisible, setNavVisible] = useState(true);
+  const hideTimer = useRef(null);
+
+  const resetHideTimer = useCallback(() => {
+    setNavVisible(true);
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    if (isClassDetail) {
+      hideTimer.current = setTimeout(() => setNavVisible(false), 3000);
+    }
+  }, [isClassDetail]);
+
+  useEffect(() => {
+    if (!isClassDetail) { setNavVisible(true); return; }
+    resetHideTimer();
+    return () => { if (hideTimer.current) clearTimeout(hideTimer.current); };
+  }, [isClassDetail, resetHideTimer]);
+
+  // Show navbar when mouse enters top area
+  const handleMouseMove = useCallback((e) => {
+    if (!isClassDetail) return;
+    if (e.clientY < 80) {
+      setNavVisible(true);
+      if (hideTimer.current) clearTimeout(hideTimer.current);
+    } else {
+      resetHideTimer();
+    }
+  }, [isClassDetail, resetHideTimer]);
+
+  useEffect(() => {
+    if (!isClassDetail) return;
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [isClassDetail, handleMouseMove]);
 
   return (
     <div className="relative w-full min-h-screen bg-[#0a0a0a] text-white flex flex-col font-sans">
@@ -51,7 +89,19 @@ function PublicLayout({ children }) {
           <div className="absolute bottom-[-90px] left-1/2 h-[260px] w-[1180px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(200,175,255,0.34)_0%,rgba(200,175,255,0)_72%)] blur-2xl" />
         </div>
       )}
-      <Navbar variant={navbarVariant} />
+      <div
+        className="transition-all duration-300"
+        style={{
+          transform: isClassDetail && !navVisible ? 'translateY(-100%)' : 'translateY(0)',
+          opacity: isClassDetail && !navVisible ? 0 : 1,
+          position: isClassDetail ? 'fixed' : 'relative',
+          top: 0, left: 0, right: 0, zIndex: 50,
+        }}
+        onMouseEnter={() => isClassDetail && setNavVisible(true)}
+      >
+        <Navbar variant={navbarVariant} />
+      </div>
+      {isClassDetail && <div className="h-16" />}
       <div className="">{children}</div>
       {showFooter && (
         <div className="relative">
