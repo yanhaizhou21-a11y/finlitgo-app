@@ -7,6 +7,7 @@ import AuthPage from './pages/AuthPage';
 import DashboardLayout from './components/layout/DashboardLayout';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { useAuth } from './store/AuthContext';
+import { useTheme } from './store/ThemeContext';
 
 // Dashboard pages
 import OverviewPage from './pages/Dashboard/OverviewPage';
@@ -36,6 +37,7 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 
 function PublicLayout({ children }) {
+  const { isDarkMode } = useTheme();
   const { pathname } = useLocation();
   /* Purple glow only on class list + blog — not on /class/:id (reader/quiz stays clean) */
   const useLearningGradient =
@@ -44,44 +46,9 @@ function PublicLayout({ children }) {
   const navbarVariant = pathname.startsWith('/class/') ? 'learning' : 'default';
   const isClassDetail = /^\/class\/.+/.test(pathname);
 
-  // Auto-hide navbar on class detail pages
-  const [navVisible, setNavVisible] = useState(true);
-  const hideTimer = useRef(null);
-
-  const resetHideTimer = useCallback(() => {
-    setNavVisible(true);
-    if (hideTimer.current) clearTimeout(hideTimer.current);
-    if (isClassDetail) {
-      hideTimer.current = setTimeout(() => setNavVisible(false), 3000);
-    }
-  }, [isClassDetail]);
-
-  useEffect(() => {
-    if (!isClassDetail) { setNavVisible(true); return; }
-    resetHideTimer();
-    return () => { if (hideTimer.current) clearTimeout(hideTimer.current); };
-  }, [isClassDetail, resetHideTimer]);
-
-  // Show navbar when mouse enters top area
-  const handleMouseMove = useCallback((e) => {
-    if (!isClassDetail) return;
-    if (e.clientY < 80) {
-      setNavVisible(true);
-      if (hideTimer.current) clearTimeout(hideTimer.current);
-    } else {
-      resetHideTimer();
-    }
-  }, [isClassDetail, resetHideTimer]);
-
-  useEffect(() => {
-    if (!isClassDetail) return;
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [isClassDetail, handleMouseMove]);
-
   return (
-    <div className="relative w-full min-h-screen bg-[#0a0a0a] text-white flex flex-col font-sans">
-      {useLearningGradient && (
+    <div className="relative w-full min-h-screen bg-zinc-50 dark:bg-[#0a0a0a] text-zinc-900 dark:text-white flex flex-col font-sans transition-colors duration-300">
+      {useLearningGradient && isDarkMode && (
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,#06070c_0%,#090b14_22%,#0a0a0a_52%,#0a0a0a_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(95,56,220,0.62)_0%,rgba(47,30,112,0.36)_20%,rgba(10,10,10,0)_48%)]" />
@@ -89,19 +56,14 @@ function PublicLayout({ children }) {
           <div className="absolute bottom-[-90px] left-1/2 h-[260px] w-[1180px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(200,175,255,0.34)_0%,rgba(200,175,255,0)_72%)] blur-2xl" />
         </div>
       )}
-      <div
-        className="transition-all duration-300"
-        style={{
-          transform: isClassDetail && !navVisible ? 'translateY(-100%)' : 'translateY(0)',
-          opacity: isClassDetail && !navVisible ? 0 : 1,
-          position: isClassDetail ? 'fixed' : 'relative',
-          top: 0, left: 0, right: 0, zIndex: 50,
-        }}
-        onMouseEnter={() => isClassDetail && setNavVisible(true)}
-      >
-        <Navbar variant={navbarVariant} />
-      </div>
-      {isClassDetail && <div className="h-16" />}
+      {useLearningGradient && !isDarkMode && (
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,#fcfdff_0%,#f5f7ff_22%,#fafafa_52%,#fafafa_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(230,220,255,0.5)_0%,rgba(240,235,255,0.2)_20%,rgba(250,250,250,0)_48%)]" />
+          <div className="absolute bottom-[-280px] left-1/2 h-[740px] w-[1650px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(167,139,250,0.25)_0%,rgba(167,139,250,0.1)_38%,rgba(250,250,250,0)_78%)] blur-3xl" />
+        </div>
+      )}
+      {!isClassDetail && <Navbar variant={navbarVariant} />}
       <div className="">{children}</div>
       {showFooter && (
         <div className="relative">
