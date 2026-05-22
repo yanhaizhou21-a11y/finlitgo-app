@@ -19,7 +19,11 @@ import logoUrl from "../assets/logo.svg";
 
 type NavbarVariant = "default" | "learning";
 
-export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVariant }) {
+export default function NavbarDemo({
+  variant = "default",
+}: {
+  variant?: NavbarVariant;
+}) {
   const navItems = [
     { name: "Home", link: "/" },
     { name: "Class", link: "/class" },
@@ -153,6 +157,7 @@ export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVa
                 >
                   Logout
                 </button>
+                {/* {ThemeToggleButton} */}
               </>
             ) : (
               <>
@@ -217,6 +222,7 @@ export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVa
               <>
                 <NavbarButton variant="secondary" href="/login">Login</NavbarButton>
                 <NavbarButton variant="primary" href="/register">Sign Up</NavbarButton>
+                {/* {ThemeToggleButton} */}
               </>
             )}
           </div>
@@ -246,6 +252,10 @@ export default function NavbarDemo({ variant = "default" }: { variant?: NavbarVa
                 <span className="block">{item.name}</span>
               </a>
             ))}
+
+            <div className="w-full px-2">
+              {/* {ThemeToggleButton} */}
+            </div>
             
             <div className="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800 flex w-full flex-col gap-4">
               {user ? (

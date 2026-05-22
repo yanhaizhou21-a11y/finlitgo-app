@@ -11,7 +11,8 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { supabase } from "@/services/supabase";
+// import { supabase } from "@/services/supabase"; // DISABLING SUPABASE FOR NOW
+import { getFallbackBlogs } from "../../data/fallbackBlogs";
 
 export default function BlogPostPage() {
   const { postId } = useParams();
@@ -35,29 +36,38 @@ export default function BlogPostPage() {
   useEffect(() => {
     const fetchBlog = async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("blogs")
-        .select("*")
-        .eq("id", postId)
-        .single();
+      // FORCE USE FALLBACK DATA ONLY
+      // const { data, error } = await supabase
+      //   .from("blogs")
+      //   .select("*")
+      //   .eq("id", postId)
+      //   .single();
 
-      if (error || !data) {
-        setNotFound(true);
-      } else {
-        setBlog({
-          ...data,
-          image:
-            data.image ||
-            data.thumbnail_url ||
-            "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2340&auto=format",
-          timeToRead: data.time_to_read || "5 min read",
-          date: new Date(data.created_at).toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          }),
-        });
-      }
+      // if (error || !data) {
+        // Fallback to local data
+        const fallbackId = parseInt(postId, 10);
+        const fbData = getFallbackBlogs().find((b) => b.id === fallbackId);
+
+        if (fbData) {
+          setBlog(fbData);
+        } else {
+          setNotFound(true);
+        }
+      // } else {
+      //   setBlog({
+      //     ...data,
+      //     image:
+      //       data.image ||
+      //       data.thumbnail_url ||
+      //       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2340&auto=format",
+      //     timeToRead: data.time_to_read || "5 min read",
+      //     date: new Date(data.created_at).toLocaleDateString("en-US", {
+      //       month: "long",
+      //       day: "numeric",
+      //       year: "numeric",
+      //     }),
+      //   });
+      // }
       setLoading(false);
       window.scrollTo(0, 0);
     };
@@ -282,7 +292,7 @@ export default function BlogPostPage() {
                   prose-strong:text-white prose-strong:font-semibold
                   prose-code:text-violet-300 prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md
                   prose-pre:bg-[#0a0a0a] prose-pre:border prose-pre:border-white/10 prose-pre:rounded-xl
-                  prose-blockquote:border-l-2 prose-blockquote:border-violet-500 prose-blockquote:bg-white/5 prose-blockquote:px-5 prose-blockquote:py-3 prose-blockquote:rounded-lg
+                  prose-blockquote:border-l-4 prose-blockquote:border-violet-500 prose-blockquote:bg-white/5 prose-blockquote:px-5 prose-blockquote:py-3 prose-blockquote:rounded-r-lg prose-blockquote:italic
                   prose-img:rounded-xl prose-img:my-6
                   prose-ul:text-zinc-300 prose-ul:list-disc prose-ul:pl-5
                   prose-ol:text-zinc-300 prose-ol:list-decimal prose-ol:pl-5
