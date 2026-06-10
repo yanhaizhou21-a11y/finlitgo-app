@@ -51,7 +51,7 @@ function PublicLayout({ children }) {
   /* Purple glow only on class list + blog — not on /class/:id (reader/quiz stays clean) */
   const useLearningGradient =
     pathname === '/class' || pathname.startsWith('/blog');
-  const showFooter = !(pathname.startsWith('/class/') && pathname !== '/class') && pathname !== '/blog';
+  const showFooter = !(pathname.startsWith('/class/') && pathname !== '/class');
   const navbarVariant = pathname.startsWith('/class/') ? 'learning' : 'default';
   const isClassDetail = /^\/class\/.+/.test(pathname);
 
@@ -60,16 +60,11 @@ function PublicLayout({ children }) {
       {useLearningGradient && isDarkMode && (
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,#06070c_0%,#090b14_22%,#0a0a0a_52%,#0a0a0a_100%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(95,56,220,0.62)_0%,rgba(47,30,112,0.36)_20%,rgba(10,10,10,0)_48%)]" />
-          <div className="absolute bottom-[-280px] left-1/2 h-[740px] w-[1650px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(124,72,255,0.9)_0%,rgba(124,72,255,0.5)_38%,rgba(12,10,24,0)_78%)] blur-3xl" />
-          <div className="absolute bottom-[-90px] left-1/2 h-[260px] w-[1180px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(200,175,255,0.34)_0%,rgba(200,175,255,0)_72%)] blur-2xl" />
         </div>
       )}
       {useLearningGradient && !isDarkMode && (
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,#fcfdff_0%,#f5f7ff_22%,#fafafa_52%,#fafafa_100%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(230,220,255,0.5)_0%,rgba(240,235,255,0.2)_20%,rgba(250,250,250,0)_48%)]" />
-          <div className="absolute bottom-[-280px] left-1/2 h-[740px] w-[1650px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(167,139,250,0.25)_0%,rgba(167,139,250,0.1)_38%,rgba(250,250,250,0)_78%)] blur-3xl" />
         </div>
       )}
       {!isClassDetail && <Navbar variant={navbarVariant} />}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Renderer, Program, Mesh, Triangle } from 'ogl';
 
 const MAX_COLORS = 8;
@@ -37,7 +37,6 @@ const GradientBlinds = ({
   shineDirection = 'left',
   mixBlendMode = 'lighten'
 }) => {
-  const [useFallbackGradient, setUseFallbackGradient] = useState(false);
   const containerRef = useRef(null);
   const rafRef = useRef(null);
   const programRef = useRef(null);
@@ -48,40 +47,15 @@ const GradientBlinds = ({
   const lastTimeRef = useRef(0);
   const firstResizeRef = useRef(true);
 
-  const fallbackGradientStyle = useMemo(() => {
-    const colors = (gradientColors && gradientColors.length ? gradientColors : ['#FF9FFC', '#5227FF']).slice(0, 8);
-    const gradientValue = `linear-gradient(${angle}deg, ${colors.join(', ')})`;
-
-    return {
-      background: gradientValue,
-      ...(mixBlendMode && { mixBlendMode })
-    };
-  }, [gradientColors, angle, mixBlendMode]);
-
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    let renderer;
-    try {
-      renderer = new Renderer({
-        dpr: dpr ?? (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1),
-        alpha: true,
-        antialias: true
-      });
-    } catch (err) {
-      setUseFallbackGradient(true);
-      console.warn('GradientBlinds: WebGL context unavailable, using CSS gradient fallback.', err);
-      return;
-    }
-
-    if (!renderer?.gl?.canvas) {
-      setUseFallbackGradient(true);
-      console.warn('GradientBlinds: Missing WebGL canvas, using CSS gradient fallback.');
-      return;
-    }
-
-    setUseFallbackGradient(false);
+    const renderer = new Renderer({
+      dpr: dpr ?? (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1),
+      alpha: true,
+      antialias: true
+    });
     rendererRef.current = renderer;
     const gl = renderer.gl;
     const canvas = gl.canvas;
@@ -230,7 +204,7 @@ void main() {
       uMirror: { value: mirrorGradient ? 1 : 0 },
       uDistort: { value: distortAmount },
       uShineFlip: { value: shineDirection === 'right' ? 1 : 0 },
-      uColor0: { value: colorArr[0] },    
+      uColor0: { value: colorArr[0] },
       uColor1: { value: colorArr[1] },
       uColor2: { value: colorArr[2] },
       uColor3: { value: colorArr[3] },
@@ -290,7 +264,7 @@ void main() {
         uniforms.iMouse.value = [x, y];
       }
     };
-    window.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('pointermove', onPointerMove);
 
     const loop = t => {
       rafRef.current = requestAnimationFrame(loop);
@@ -321,9 +295,7 @@ void main() {
 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      lastTimeRef.current = 0;
-      firstResizeRef.current = true;
-      window.removeEventListener('pointermove', onPointerMove);
+      canvas.removeEventListener('pointermove', onPointerMove);
       ro.disconnect();
       if (canvas.parentElement === container) {
         container.removeChild(canvas);
@@ -362,11 +334,9 @@ void main() {
   return (
     <div
       ref={containerRef}
-      className={`w-full h-full overflow-hidden relative ${className}`}
-      style={useFallbackGradient ? fallbackGradientStyle : {
-        ...(mixBlendMode && {
-          mixBlendMode: mixBlendMode
-        })
+      className={`w-full h-full overflow-hidden relative ${className || ''}`}
+      style={{
+        ...(mixBlendMode && { mixBlendMode })
       }}
     />
   );
