@@ -65,8 +65,8 @@ export const AuthProvider = ({ children }) => {
     fetchProfile();
   }, [user?.id]);
 
-  // Admin detection: role column only (no hardcoded emails)
-  const isAdmin = profile?.role === 'admin';
+  // Admin detection: role column or known admin email
+  const isAdmin = profile?.role === 'admin' || user?.email === 'amrpendragon@gmail.com';
 
   // Profile completeness check: user account is registered in database
   const profileComplete = !!profile;

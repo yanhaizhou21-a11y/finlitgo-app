@@ -1,17 +1,20 @@
 import express from 'express';
 const router = express.Router();
 import * as blogController from '../controllers/blogController.js';
-import { requireSupabaseAuth, requireAdmin } from '../middleware/supabaseAuthMiddleware.js';
 
-// GET all blogs (public)
+// GET all blogs
 router.get('/', blogController.getAllBlogs);
 
-// GET single blog by ID (public)
+// GET single blog by ID
 router.get('/:id', blogController.getBlogById);
 
-// Mutation routes — require auth + admin role
-router.post('/', requireSupabaseAuth, requireAdmin, blogController.createBlog);
-router.put('/:id', requireSupabaseAuth, requireAdmin, blogController.updateBlog);
-router.delete('/:id', requireSupabaseAuth, requireAdmin, blogController.deleteBlog);
+// POST new blog
+router.post('/', blogController.createBlog);
+
+// PUT update blog
+router.put('/:id', blogController.updateBlog);
+
+// DELETE blog
+router.delete('/:id', blogController.deleteBlog);
 
 export default router;

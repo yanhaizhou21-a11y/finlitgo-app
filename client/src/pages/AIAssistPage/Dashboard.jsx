@@ -9,8 +9,10 @@ import {
 import { useAuth } from '../../store/AuthContext';
 import { supabase } from '../../services/supabase';
 
-// ─── Server AI proxy config (no API key exposed in client) ─────────────────────
-const API_URL = import.meta.env.VITE_API_URL || '';
+// ─── Groq config ─────────────────────────────────────────────────────────────
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+const GROQ_MODEL = 'llama-3.3-70b-versatile'; // 30 RPM · 14,400 RPD · 6,000 TPM free
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const MAX_TOKENS = 700;   // keeps each request ≤ ~2,000 tokens total → well under TPM
 const MAX_DAILY_LIMIT = 10; // per-user app-level daily cap
 
@@ -222,6 +224,7 @@ export default function AIAssistPage() {
     const raw = overridePrompt || prompt;
     if (!raw.trim() || isTyping) return;
     if (usageCount >= MAX_DAILY_LIMIT) { alert('Daily limit 10 chat sudah habis. Coba lagi besok.'); return; }
+    if (!GROQ_API_KEY) { alert('Groq API key belum dikonfigurasi.'); return; }
 
     const wireText = intentTag ? `[INTENT: ${intentTag}] ${raw}` : raw;
     const displayText = intentTag ? (INTENT_LABELS[intentTag] || raw) : raw;
@@ -242,18 +245,18 @@ export default function AIAssistPage() {
     try {
       const systemPrompt = buildSystemPrompt(financialCtxRef.current);
 
-      // Get Supabase auth token for server authentication
-      const { data: { session } } = await supabase.auth.getSession();
-      const accessToken = session?.access_token;
-
-      const res = await fetch(`${API_URL}/api/chat/stream`, {
+      const res = await fetch(GROQ_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}),
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
         },
         body: JSON.stringify({
+          model: GROQ_MODEL,
           messages: [{ role: 'system', content: systemPrompt }, ...chatHistoryRef.current],
+          stream: true,
+          temperature: 0.65,
+          max_tokens: MAX_TOKENS,
         }),
       });
 
@@ -437,8 +440,8 @@ export default function AIAssistPage() {
                     {msg.role === 'user' ? <IconUser size={18} className="text-zinc-500 dark:text-zinc-400" /> : <IconRobot size={20} className="text-white" />}
                   </div>
                   <div className={`max-w-[85%] sm:max-w-[78%] rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-xs sm:text-sm ${msg.role === 'user'
-                      ? 'bg-zinc-100 dark:bg-zinc-850 border border-zinc-200/60 dark:border-zinc-800/40 text-zinc-800 dark:text-white rounded-tr-sm shadow-sm dark:shadow-none'
-                      : 'bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/60 text-zinc-700 dark:text-zinc-300 rounded-tl-sm shadow-sm dark:shadow-none'}`}>
+                    ? 'bg-zinc-100 dark:bg-zinc-850 border border-zinc-200/60 dark:border-zinc-800/40 text-zinc-800 dark:text-white rounded-tr-sm shadow-sm dark:shadow-none'
+                    : 'bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/60 text-zinc-700 dark:text-zinc-300 rounded-tl-sm shadow-sm dark:shadow-none'}`}>
                     {msg.role === 'user'
                       ? msg.content
                       : msg.content
@@ -494,8 +497,8 @@ export default function AIAssistPage() {
             onClick={() => handleSend()}
             disabled={!prompt.trim() || isTyping || limitReached || !userId || dataLoading}
             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${prompt.trim() && !isTyping && !limitReached && userId && !dataLoading
-                ? 'bg-gradient-to-r from-violet-600 to-purple-400 text-white shadow-[0_0_15px_rgba(124,58,237,0.3)] hover:scale-105 cursor-pointer'
-                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed'}`}>
+              ? 'bg-gradient-to-r from-violet-600 to-purple-400 text-white shadow-[0_0_15px_rgba(124,58,237,0.3)] hover:scale-105 cursor-pointer'
+              : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed'}`}>
             <IconSend size={16} />
           </button>
         </div>
