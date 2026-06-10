@@ -1,3 +1,7 @@
+import CLASS_4_RAW from '../../class4.json';
+import CLASS_5_RAW from '../../class5.json';
+import CLASS_6_RAW from '../../class6.json';
+
 const CLASS_1_LEVELS = [
   {
     id: 'level-0',
@@ -163,6 +167,11 @@ const CLASS_3_LEVELS = [
   }
 ];
 
+// Classes 4-6: Use imported JSON data
+const CLASS_4_LEVELS = CLASS_4_RAW;
+const CLASS_5_LEVELS = CLASS_5_RAW;
+const CLASS_6_LEVELS = CLASS_6_RAW;
+
 export const CLASS_META = {
   1: {
     id: 1,
@@ -191,10 +200,40 @@ export const CLASS_META = {
     quizzes: 20,
     levels: CLASS_3_LEVELS,
   },
+  4: {
+    id: 4,
+    title: 'Keuangan Syariah: Prinsip, Produk & Zakat',
+    level: 'Beginner',
+    duration: '90 menit',
+    modules: 4,
+    quizzes: 12,
+    levels: CLASS_4_LEVELS,
+  },
+  5: {
+    id: 5,
+    title: 'Smart Spending Habits untuk Remaja',
+    level: 'Beginner',
+    duration: '80 menit',
+    modules: 4,
+    quizzes: 12,
+    levels: CLASS_5_LEVELS,
+  },
+  6: {
+    id: 6,
+    title: 'Digital Finance & Fintech: Bank Digital, Crypto & P2P',
+    level: 'Intermediate',
+    duration: '100 menit',
+    modules: 4,
+    quizzes: 12,
+    levels: CLASS_6_LEVELS,
+  },
 };
 
 export const CLASS_LEVELS = {
   1: CLASS_1_LEVELS,
   2: CLASS_2_LEVELS,
-  3: CLASS_3_LEVELS
+  3: CLASS_3_LEVELS,
+  4: CLASS_4_LEVELS,
+  5: CLASS_5_LEVELS,
+  6: CLASS_6_LEVELS,
 };

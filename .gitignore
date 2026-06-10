@@ -21,3 +21,9 @@ et --hard HEAD@{1}
 /supabase*
 changelog.md
 changelog.csv
+class1.json
+class2.json
+class3.json
+class4.json
+class5.json
+class6.json
