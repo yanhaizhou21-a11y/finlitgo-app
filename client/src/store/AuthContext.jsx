@@ -32,8 +32,8 @@ export const AuthProvider = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (!session?.user) {
-         setProfile(null);
-         setLoading(false);
+        setProfile(null);
+        setLoading(false);
       }
     });
 
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
           .select('*')
           .eq('id', user.id)
           .maybeSingle();
-          
+
         if (!error && data) {
           setProfile(data);
         }
@@ -61,13 +61,13 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       }
     };
-    
+
     fetchProfile();
   }, [user?.id]);
-  
-  // Admin detection: role column or known admin email
-  const isAdmin = profile?.role === 'admin' || user?.email === 'amrpendragon@gmail.com';
-  
+
+  // Admin detection: role column only (no hardcoded emails)
+  const isAdmin = profile?.role === 'admin';
+
   // Profile completeness check: user account is registered in database
   const profileComplete = !!profile;
 

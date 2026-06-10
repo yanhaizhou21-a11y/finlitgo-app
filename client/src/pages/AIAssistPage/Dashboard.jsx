@@ -9,28 +9,26 @@ import {
 import { useAuth } from '../../store/AuthContext';
 import { supabase } from '../../services/supabase';
 
-// ─── Groq config ─────────────────────────────────────────────────────────────
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
-const GROQ_MODEL   = 'llama-3.3-70b-versatile'; // 30 RPM · 14,400 RPD · 6,000 TPM free
-const GROQ_URL     = 'https://api.groq.com/openai/v1/chat/completions';
-const MAX_TOKENS   = 700;   // keeps each request ≤ ~2,000 tokens total → well under TPM
+// ─── Server AI proxy config (no API key exposed in client) ─────────────────────
+const API_URL = import.meta.env.VITE_API_URL || '';
+const MAX_TOKENS = 700;   // keeps each request ≤ ~2,000 tokens total → well under TPM
 const MAX_DAILY_LIMIT = 10; // per-user app-level daily cap
 
 // ─── Intent label map ─────────────────────────────────────────────────────────
 const INTENT_LABELS = {
   analyze_cashflow: 'Analyze Cash Flow',
   analyze_expenses: 'Analyze Expenses',
-  analyze_revenue:  'Analyze Revenue',
-  analyze_budget:   'Analyze Budget',
-  free_chat:        'Chat',
+  analyze_revenue: 'Analyze Revenue',
+  analyze_budget: 'Analyze Budget',
+  free_chat: 'Chat',
 };
 
 // ─── Quick-action cards ───────────────────────────────────────────────────────
 const CATEGORIES = [
-  { intent: 'analyze_cashflow', title: 'Analyze Cash Flow',  icon: <IconChartBar size={22} />,  color: 'text-emerald-600 dark:text-green-400 border-zinc-200 dark:border-green-500/20 bg-zinc-50 dark:bg-green-500/5',  sub: 'Cashflow kamu sekarang' },
-  { intent: 'analyze_expenses', title: 'Analyze Expenses',   icon: <IconChartPie size={22} />,  color: 'text-orange-600 dark:text-orange-400 border-zinc-200 dark:border-orange-500/20 bg-zinc-50 dark:bg-orange-50/5', sub: 'Breakdown pengeluaran' },
-  { intent: 'analyze_revenue',  title: 'Analyze Revenue',    icon: <IconTrendingUp size={22} />, color: 'text-blue-600 dark:text-blue-400 border-zinc-200 dark:border-blue-500/20 bg-zinc-50 dark:bg-blue-50/5',   sub: 'Sumber pendapatanmu' },
-  { intent: 'analyze_budget',   title: 'Analyze Budget',     icon: <IconWallet size={22} />,    color: 'text-cyan-600 dark:text-cyan-400 border-zinc-200 dark:border-cyan-500/20 bg-zinc-50 dark:bg-cyan-500/5',   sub: 'Budget vs aktual 50/30/20' },
+  { intent: 'analyze_cashflow', title: 'Analyze Cash Flow', icon: <IconChartBar size={22} />, color: 'text-emerald-600 dark:text-green-400 border-zinc-200 dark:border-green-500/20 bg-zinc-50 dark:bg-green-500/5', sub: 'Cashflow kamu sekarang' },
+  { intent: 'analyze_expenses', title: 'Analyze Expenses', icon: <IconChartPie size={22} />, color: 'text-orange-600 dark:text-orange-400 border-zinc-200 dark:border-orange-500/20 bg-zinc-50 dark:bg-orange-50/5', sub: 'Breakdown pengeluaran' },
+  { intent: 'analyze_revenue', title: 'Analyze Revenue', icon: <IconTrendingUp size={22} />, color: 'text-blue-600 dark:text-blue-400 border-zinc-200 dark:border-blue-500/20 bg-zinc-50 dark:bg-blue-50/5', sub: 'Sumber pendapatanmu' },
+  { intent: 'analyze_budget', title: 'Analyze Budget', icon: <IconWallet size={22} />, color: 'text-cyan-600 dark:text-cyan-400 border-zinc-200 dark:border-cyan-500/20 bg-zinc-50 dark:bg-cyan-500/5', sub: 'Budget vs aktual 50/30/20' },
   {
     intent: 'free_chat', title: 'Saving Strategy', icon: <IconPigMoney size={22} />,
     color: 'text-violet-650 dark:text-violet-400 border-zinc-200 dark:border-violet-500/20 bg-zinc-50 dark:bg-violet-500/5', sub: 'Strategi menabung',
@@ -54,15 +52,15 @@ async function fetchFinancialContextText(userId) {
     supabase.from('pockets').select('name,balance').eq('user_id', userId),
   ]);
 
-  const txs     = txRes.data     || [];
-  const goals   = goalsRes.data  || [];
+  const txs = txRes.data || [];
+  const goals = goalsRes.data || [];
   const pockets = pocketsRes.data || [];
 
-  const incomes  = txs.filter(t => t.type === 'income');
+  const incomes = txs.filter(t => t.type === 'income');
   const expenses = txs.filter(t => t.type === 'expense');
-  const totalIn  = incomes.reduce((s, t) => s + Number(t.amount), 0);
-  const totalEx  = expenses.reduce((s, t) => s + Number(t.amount), 0);
-  const balance  = totalIn - totalEx;
+  const totalIn = incomes.reduce((s, t) => s + Number(t.amount), 0);
+  const totalEx = expenses.reduce((s, t) => s + Number(t.amount), 0);
+  const balance = totalIn - totalEx;
   const savingsRate = totalIn > 0 ? Math.round(((totalIn - totalEx) / totalIn) * 100) : 0;
 
   const byCategory = (arr) => {
@@ -74,9 +72,9 @@ async function fetchFinancialContextText(userId) {
 
   const goalsText = goals.length
     ? goals.map(g => {
-        const pct = g.target > 0 ? Math.round((g.current / g.target) * 100) : 0;
-        return `${g.name} (${pct}% dari Rp${Number(g.target).toLocaleString('id-ID')})`;
-      }).join('; ')
+      const pct = g.target > 0 ? Math.round((g.current / g.target) * 100) : 0;
+      return `${g.name} (${pct}% dari Rp${Number(g.target).toLocaleString('id-ID')})`;
+    }).join('; ')
     : 'belum ada';
 
   const pocketsText = pockets.length
@@ -135,17 +133,17 @@ function renderText(text) {
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function AIAssistPage() {
   const { user } = useAuth();
-  const userId   = user?.id || null;
+  const userId = user?.id || null;
   const [searchParams] = useSearchParams();
 
-  const chatKey  = `finlitgo_ai_chat_${userId}`;
+  const chatKey = `finlitgo_ai_chat_${userId}`;
   const usageKey = `finlitgo_ai_usage_${userId}`;
 
-  const [prompt, setPrompt]       = useState('');
-  const [isTyping, setIsTyping]   = useState(false);
+  const [prompt, setPrompt] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
   const [financialContext, setFinancialContext] = useState(null);
-  const [messages, setMessages]   = useState(() => {
+  const [messages, setMessages] = useState(() => {
     if (!userId) return [];
     try { const s = localStorage.getItem(`finlitgo_ai_chat_${userId}`); return s ? JSON.parse(s) || [] : []; }
     catch { return []; }
@@ -153,11 +151,11 @@ export default function AIAssistPage() {
   const [usageCount, setUsageCount] = useState(0);
 
   // Groq needs full message history sent each request
-  const chatHistoryRef   = useRef([]); // [{role, content}]
+  const chatHistoryRef = useRef([]); // [{role, content}]
   const chatContainerRef = useRef(null);
-  const isAtBottomRef    = useRef(true);
+  const isAtBottomRef = useRef(true);
   const autoTriggeredRef = useRef(false);
-  const financialCtxRef  = useRef(null); // sync ref for handlers
+  const financialCtxRef = useRef(null); // sync ref for handlers
 
   // ── Load Supabase financial data ──────────────────────────────────────────
   useEffect(() => {
@@ -186,7 +184,7 @@ export default function AIAssistPage() {
 
   const incrementUsage = () => {
     const today = new Date().toISOString().split('T')[0];
-    const next  = usageCount + 1;
+    const next = usageCount + 1;
     setUsageCount(next);
     localStorage.setItem(usageKey, JSON.stringify({ date: today, count: next }));
   };
@@ -224,9 +222,8 @@ export default function AIAssistPage() {
     const raw = overridePrompt || prompt;
     if (!raw.trim() || isTyping) return;
     if (usageCount >= MAX_DAILY_LIMIT) { alert('Daily limit 10 chat sudah habis. Coba lagi besok.'); return; }
-    if (!GROQ_API_KEY) { alert('Groq API key belum dikonfigurasi.'); return; }
 
-    const wireText    = intentTag ? `[INTENT: ${intentTag}] ${raw}` : raw;
+    const wireText = intentTag ? `[INTENT: ${intentTag}] ${raw}` : raw;
     const displayText = intentTag ? (INTENT_LABELS[intentTag] || raw) : raw;
 
     setPrompt('');
@@ -245,18 +242,18 @@ export default function AIAssistPage() {
     try {
       const systemPrompt = buildSystemPrompt(financialCtxRef.current);
 
-      const res = await fetch(GROQ_URL, {
+      // Get Supabase auth token for server authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+
+      const res = await fetch(`${API_URL}/api/chat/stream`, {
         method: 'POST',
         headers: {
-          'Content-Type':  'application/json',
-          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+          ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({
-          model:       GROQ_MODEL,
-          messages:    [{ role: 'system', content: systemPrompt }, ...chatHistoryRef.current],
-          stream:      true,
-          temperature: 0.65,
-          max_tokens:  MAX_TOKENS,
+          messages: [{ role: 'system', content: systemPrompt }, ...chatHistoryRef.current],
         }),
       });
 
@@ -266,9 +263,9 @@ export default function AIAssistPage() {
         throw new Error(msg);
       }
 
-      const reader  = res.body.getReader();
+      const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let fullText  = '';
+      let fullText = '';
       let lastScroll = 0;
 
       // eslint-disable-next-line no-constant-condition
@@ -314,7 +311,7 @@ export default function AIAssistPage() {
     } finally {
       setIsTyping(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prompt, isTyping, usageCount, scrollToBottom]);
 
   // ── URL auto-trigger (from Financial page shortcuts) ──────────────────────
@@ -327,9 +324,9 @@ export default function AIAssistPage() {
 
     const autoPrompts = {
       analyze_cashflow: 'Analisis posisi kas saya: pemasukan vs pengeluaran, tren, dan rekomendasi.',
-      analyze_expenses:  'Analisis pengeluaran saya per kategori, temukan yang terbesar dan berikan saran.',
-      analyze_revenue:   'Analisis sumber pendapatan saya dan berikan saran optimasi.',
-      analyze_budget:    'Evaluasi budget saya dengan aturan 50/35/15 dan tunjukkan over/under-spending.',
+      analyze_expenses: 'Analisis pengeluaran saya per kategori, temukan yang terbesar dan berikan saran.',
+      analyze_revenue: 'Analisis sumber pendapatan saya dan berikan saran optimasi.',
+      analyze_budget: 'Evaluasi budget saya dengan aturan 50/35/15 dan tunjukkan over/under-spending.',
     };
 
     const p = autoPrompts[intentParam];
@@ -347,7 +344,7 @@ export default function AIAssistPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col min-h-[calc(100dvh-100px)] max-w-5xl mx-auto py-4 sm:py-8 px-3 sm:px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div className="flex flex-col min-h-[calc(100dvh-100px)] max-w-5xl mx-auto pt-20 sm:pt-28 pb-4 sm:pb-8 px-3 sm:px-4 mb-[max(1rem,env(safe-area-inset-bottom))]">
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 px-1 gap-3">
@@ -355,27 +352,31 @@ export default function AIAssistPage() {
           <h2 className="text-2xl sm:text-4xl font-bold font-orbitron uppercase tracking-widest text-zinc-900 dark:text-white">FinLitGo AI</h2>
           <p className="text-zinc-500 dark:text-zinc-400 mt-1 text-xs sm:text-sm">Your personal financial intelligence assistant.</p>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-          {/* Data sync status */}
+        <div className="flex items-center bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-full p-1 shadow-sm backdrop-blur-md">
           {dataLoading ? (
-            <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-zinc-100 dark:bg-[#1A1A1A] border border-zinc-200 dark:border-zinc-800 rounded-xl text-[10px] sm:text-xs text-zinc-500">
-              <IconLoader2 size={14} className="animate-spin" /><span>Loading...</span>
+            <div className="flex items-center gap-1.5 px-3 py-1">
+              <IconLoader2 size={12} className="animate-spin text-zinc-500" />
+              <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider">Syncing</span>
             </div>
           ) : financialContext ? (
-            <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-green-500/10 border border-green-500/20 rounded-xl text-[10px] sm:text-xs text-green-600 dark:text-green-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" /><span>Synced</span>
+            <div className="flex items-center gap-1.5 px-3 py-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
+              <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Synced</span>
             </div>
           ) : null}
 
-          {/* Daily counter */}
-          <div className="px-3 py-1.5 sm:py-2 bg-zinc-100 dark:bg-[#1A1A1A] border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs sm:text-sm font-mono text-zinc-800 dark:text-zinc-300">
-            <span className={limitReached ? 'text-red-500 dark:text-red-400 font-bold' : 'text-violet-600 dark:text-violet-400 font-bold'}>
+          <div className="w-[1px] h-4 bg-zinc-300 dark:bg-white/10" />
+
+          <div className="px-3 py-1">
+            <span className={`text-[11px] font-mono font-medium ${limitReached ? 'text-red-500' : 'text-zinc-600 dark:text-zinc-300'}`}>
               {usageCount}/{MAX_DAILY_LIMIT}
             </span>
           </div>
 
-          <button onClick={handleClearChat} className="p-2 text-zinc-500 dark:text-zinc-450 hover:text-red-650 dark:hover:text-red-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-xl transition-colors border border-zinc-200 dark:border-zinc-800" title="Clear Chat">
-            <IconTrash size={16} />
+          <div className="w-[1px] h-4 bg-zinc-300 dark:bg-white/10" />
+
+          <button onClick={handleClearChat} className="p-1.5 mx-1 text-zinc-500 dark:text-zinc-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-full transition-all" title="Clear Chat">
+            <IconTrash size={14} />
           </button>
         </div>
       </div>
@@ -432,12 +433,10 @@ export default function AIAssistPage() {
                 <motion.div key={idx}
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.18 }}
                   className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <div className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center shadow-md ${
-                    msg.role === 'user' ? 'bg-zinc-100 dark:bg-zinc-800' : 'bg-gradient-to-br from-violet-600 to-purple-400'}`}>
+                  <div className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center shadow-md ${msg.role === 'user' ? 'bg-zinc-100 dark:bg-zinc-800' : 'bg-gradient-to-br from-violet-600 to-purple-400'}`}>
                     {msg.role === 'user' ? <IconUser size={18} className="text-zinc-500 dark:text-zinc-400" /> : <IconRobot size={20} className="text-white" />}
                   </div>
-                  <div className={`max-w-[85%] sm:max-w-[78%] rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-xs sm:text-sm ${
-                    msg.role === 'user'
+                  <div className={`max-w-[85%] sm:max-w-[78%] rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-xs sm:text-sm ${msg.role === 'user'
                       ? 'bg-zinc-100 dark:bg-zinc-850 border border-zinc-200/60 dark:border-zinc-800/40 text-zinc-800 dark:text-white rounded-tr-sm shadow-sm dark:shadow-none'
                       : 'bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/60 text-zinc-700 dark:text-zinc-300 rounded-tl-sm shadow-sm dark:shadow-none'}`}>
                     {msg.role === 'user'
@@ -445,8 +444,8 @@ export default function AIAssistPage() {
                       : msg.content
                         ? renderText(msg.content)
                         : <span className="flex gap-1.5 items-center py-1">
-                            {[0, 150, 300].map(d => <span key={d} className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: `${d}ms` }} />)}
-                          </span>
+                          {[0, 150, 300].map(d => <span key={d} className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: `${d}ms` }} />)}
+                        </span>
                     }
                   </div>
                 </motion.div>
@@ -476,9 +475,9 @@ export default function AIAssistPage() {
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
           placeholder={
             !userId ? 'Login untuk menggunakan AI...'
-            : limitReached ? 'Daily limit 10 sudah habis. Coba lagi besok.'
-            : dataLoading ? 'Memuat data keuangan...'
-            : 'Tanya tentang keuanganmu... (Enter kirim · Shift+Enter baris baru)'
+              : limitReached ? 'Daily limit 10 sudah habis. Coba lagi besok.'
+                : dataLoading ? 'Memuat data keuangan...'
+                  : 'Tanya tentang keuanganmu... (Enter kirim · Shift+Enter baris baru)'
           }
           disabled={limitReached || !userId || dataLoading}
           rows={2}
@@ -494,8 +493,7 @@ export default function AIAssistPage() {
           <button
             onClick={() => handleSend()}
             disabled={!prompt.trim() || isTyping || limitReached || !userId || dataLoading}
-            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
-              prompt.trim() && !isTyping && !limitReached && userId && !dataLoading
+            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${prompt.trim() && !isTyping && !limitReached && userId && !dataLoading
                 ? 'bg-gradient-to-r from-violet-600 to-purple-400 text-white shadow-[0_0_15px_rgba(124,58,237,0.3)] hover:scale-105 cursor-pointer'
                 : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed'}`}>
             <IconSend size={16} />

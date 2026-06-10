@@ -1,9 +1,9 @@
-import express from 'express'
-import { postChat } from '../controllers/chatController.js'
+import express from 'express';
+import { postChat, streamChat } from '../controllers/chatController.js';
 
-const router = express.Router()
+const router = express.Router();
 
-router.post('/', postChat)
+router.post('/', postChat);
+router.post('/stream', streamChat);
 
-export default router
-
+export default router;

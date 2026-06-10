@@ -13,7 +13,7 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconLogout } from "@tabler/icons-react";
+import { IconLogout, IconMenu2, IconX } from "@tabler/icons-react";
 import { useAuth } from "../store/AuthContext";
 import logoUrl from "../assets/logo.svg";
 import ThemeToggle from "./ui/ThemeToggle";
@@ -115,210 +115,272 @@ export default function NavbarDemo({
   if (variant === "learning") {
     return (
       <>
-      <div className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#0a0a0a]/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          <a href="/" className="flex items-center gap-2 shrink-0">
-            <img src={logoUrl} alt="FinLitGo Logo" className="h-8 w-8 object-contain" />
-            <span className="font-bold text-white" style={{ fontFamily: "'Orbitron', sans-serif" }}>FinLitGo</span>
-          </a>
+        {/* Desktop Learning Navbar */}
+        <div className="hidden md:block fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#0a0a0a]/85 backdrop-blur-xl">
+          <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+            <a href="/" className="flex items-center gap-2 shrink-0">
+              <img src={logoUrl} alt="FinLitGo Logo" className="h-8 w-8 object-contain" />
+              <span className="font-bold text-white" style={{ fontFamily: "'Orbitron', sans-serif" }}>FinLitGo</span>
+            </a>
 
-          <nav className="hidden items-center gap-6 text-sm font-medium text-zinc-300 md:flex">
-            {navItems.map((item) => (
-              <a key={item.name} href={item.link} className="transition-colors hover:text-white">
-                {item.name}
-              </a>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-3 shrink-0">
-            {/* Theme Toggle */}
-            <ThemeToggle />
-
-            {user ? (
-              <>
-                <div className="hidden items-center gap-2 sm:flex">
-                  <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-violet-400/30 bg-gradient-to-br from-violet-600 to-purple-400 shadow-[0_0_10px_rgba(124,58,237,0.2)]">
-                    {photoURL ? (
-                      <img src={photoURL} alt="Profile" className="h-full w-full object-cover" />
-                    ) : (
-                      <span className="text-xs font-bold text-white">{initial}</span>
-                    )}
-                  </div>
-                  <span className="max-w-[120px] truncate text-sm font-medium text-white">{displayName}</span>
-                </div>
-
-                <a
-                  href="/dashboard"
-                  className="rounded-full bg-white px-4 py-2 text-sm font-bold text-black transition hover:-translate-y-0.5"
-                >
-                  Dashboard
+            <nav className="flex items-center gap-6 text-sm font-medium text-zinc-300">
+              {navItems.map((item) => (
+                <a key={item.name} href={item.link} className="transition-colors hover:text-white">
+                  {item.name}
                 </a>
+              ))}
+            </nav>
 
-                <button
-                  type="button"
-                  onClick={() => setShowLogoutConfirm(true)}
-                  className="px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:text-red-400"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <a href="/login" className="text-sm font-medium text-zinc-300 transition-colors hover:text-white">
-                  Login
-                </a>
-                <a
-                  href="/register"
-                  className="rounded-full bg-white px-4 py-2 text-sm font-bold text-black transition hover:-translate-y-0.5"
-                >
-                  Sign Up
-                </a>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-      {logoutModal}
-      </>
-    );
-  }
-
-  return (
-    <>
-    <div className="relative w-full z-50">
-      <Navbar className="bg-transparent border-none">
-        {/* Desktop Navigation */}
-        <NavBody>
-          <NavbarLogo />
-          <NavItems items={navItems} />
-          
-          <div className="relative z-20 flex shrink-0 items-center gap-3">
-            {/* Theme Toggle */}
-            <ThemeToggle />
-
-            {user ? (
-              <div className="flex items-center gap-3">
-                {/* Profile Avatar */}
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-purple-400 overflow-hidden flex items-center justify-center border-2 border-violet-400/30 shadow-[0_0_10px_rgba(124,58,237,0.2)]">
-                    {photoURL ? (
-                      <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-white font-bold text-xs">{initial}</span>
-                    )}
-                  </div>
-                  <span className="hidden max-w-[120px] truncate text-sm font-medium text-white xl:block">{displayName}</span>
-                </div>
-                
-                {/* Dashboard Button */}
-                <NavbarButton variant="primary" href="/dashboard">
-                  Dashboard
-                </NavbarButton>
-                
-                {/* Logout */}
-                <button 
-                  type="button"
-                  onClick={() => setShowLogoutConfirm(true)}
-                  className="px-3 py-2 text-sm font-medium text-gray-400 hover:text-red-400 transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <>
-                <NavbarButton variant="secondary" href="/login">Login</NavbarButton>
-                <NavbarButton variant="primary" href="/register">Sign Up</NavbarButton>
-              </>
-            )}
-          </div>
-        </NavBody>
-
-        {/* Mobile Navigation */}
-        <MobileNav>
-          <MobileNavHeader>
-            <NavbarLogo />
-            <MobileNavToggle
-              isOpen={isMobileMenuOpen}
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            />
-          </MobileNavHeader>
-
-          <MobileNavMenu
-            isOpen={isMobileMenuOpen}
-            onClose={() => setIsMobileMenuOpen(false)}
-          >
-            {navItems.map((item, idx) => (
-              <a
-                key={`mobile-link-${idx}`}
-                href={item.link}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="relative text-neutral-600 dark:text-neutral-300"
-              >
-                <span className="block">{item.name}</span>
-              </a>
-            ))}
-
-            <div className="w-full px-2 flex justify-start">
+            <div className="flex items-center gap-3 shrink-0">
               <ThemeToggle />
-            </div>
-            
-            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800 flex w-full flex-col gap-4">
+
               {user ? (
                 <>
-                  <div className="flex items-center gap-3 px-2 mb-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-purple-400 overflow-hidden flex items-center justify-center">
+                  <div className="hidden items-center gap-2 sm:flex">
+                    <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-violet-400/30 bg-gradient-to-br from-violet-600 to-purple-400 shadow-[0_0_10px_rgba(124,58,237,0.2)]">
                       {photoURL ? (
-                        <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
+                        <img src={photoURL} alt="Profile" className="h-full w-full object-cover" />
                       ) : (
-                        <span className="text-white font-bold text-lg">{initial}</span>
+                        <span className="text-xs font-bold text-white">{initial}</span>
                       )}
                     </div>
-                    <span className="font-medium dark:text-white">{displayName}</span>
+                    <span className="max-w-[120px] truncate text-sm font-medium text-white">{displayName}</span>
                   </div>
-                  
-                  <NavbarButton
+
+                  <a
                     href="/dashboard"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    variant="primary"
-                    className="w-full text-center"
+                    className="rounded-full bg-white px-4 py-2 text-sm font-bold text-black transition hover:-translate-y-0.5"
                   >
                     Dashboard
-                  </NavbarButton>
-                  
+                  </a>
+
                   <button
                     type="button"
                     onClick={() => setShowLogoutConfirm(true)}
-                    className="w-full text-center py-2 px-4 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg font-medium hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"
+                    className="px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:text-red-400"
                   >
                     Logout
                   </button>
                 </>
               ) : (
                 <>
-                  <NavbarButton
-                    href="/login"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    variant="secondary"
-                    className="w-full text-center"
-                  >
+                  <a href="/login" className="text-sm font-medium text-zinc-300 transition-colors hover:text-white">
                     Login
-                  </NavbarButton>
-                  <NavbarButton
+                  </a>
+                  <a
                     href="/register"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    variant="primary"
-                    className="w-full text-center"
+                    className="rounded-full bg-white px-4 py-2 text-sm font-bold text-black transition hover:-translate-y-0.5"
                   >
                     Sign Up
-                  </NavbarButton>
+                  </a>
                 </>
               )}
             </div>
-          </MobileNavMenu>
-        </MobileNav>
-      </Navbar>
-    </div>
-    {logoutModal}
+          </div>
+        </div>
+
+        {/* Mobile Learning Navbar */}
+        <div className="md:hidden fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#0a0a0a]/85 backdrop-blur-xl">
+          <div className="flex h-14 w-full items-center justify-between px-4">
+            <a href="/" className="flex items-center gap-2 shrink-0">
+              <img src={logoUrl} alt="FinLitGo Logo" className="h-7 w-7 object-contain" />
+              <span className="font-bold text-white text-sm" style={{ fontFamily: "'Orbitron', sans-serif" }}>FinLitGo</span>
+            </a>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-white"
+              >
+                {isMobileMenuOpen ? <IconX size={22} /> : <IconMenu2 size={22} />}
+              </button>
+            </div>
+          </div>
+          <AnimatePresence>
+            {isMobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden bg-[#0f0f14] border-t border-white/10"
+              >
+                <div className="flex flex-col gap-3 p-4">
+                  {navItems.map((item) => (
+                    <a
+                      key={item.name}
+                      href={item.link}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-zinc-300 hover:text-white text-sm font-medium py-2"
+                    >
+                      {item.name}
+                    </a>
+                  ))}
+                  <div className="pt-3 border-t border-white/10 flex flex-col gap-3">
+                    {user ? (
+                      <>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-purple-400 overflow-hidden flex items-center justify-center">
+                            {photoURL ? <img src={photoURL} alt="Profile" className="w-full h-full object-cover" /> : <span className="text-xs font-bold text-white">{initial}</span>}
+                          </div>
+                          <span className="text-sm font-medium text-white truncate">{displayName}</span>
+                        </div>
+                        <a href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="w-full text-center rounded-full bg-white px-4 py-2 text-sm font-bold text-black">Dashboard</a>
+                        <button type="button" onClick={() => setShowLogoutConfirm(true)} className="w-full text-center py-2 px-4 bg-red-500/10 text-red-400 rounded-lg font-medium">Logout</button>
+                      </>
+                    ) : (
+                      <>
+                        <a href="/login" onClick={() => setIsMobileMenuOpen(false)} className="w-full text-center text-sm font-medium text-zinc-300 py-2">Login</a>
+                        <a href="/register" onClick={() => setIsMobileMenuOpen(false)} className="w-full text-center rounded-full bg-white px-4 py-2 text-sm font-bold text-black">Sign Up</a>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        {logoutModal}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="relative w-full z-50">
+        <Navbar className="bg-transparent border-none">
+          {/* Desktop Navigation */}
+          <NavBody>
+            <NavbarLogo />
+            <NavItems items={navItems} />
+
+            <div className="relative z-20 flex shrink-0 items-center gap-3">
+              {/* Theme Toggle */}
+              <ThemeToggle />
+
+              {user ? (
+                <div className="flex items-center gap-3">
+                  {/* Profile Avatar */}
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-purple-400 overflow-hidden flex items-center justify-center border-2 border-violet-400/30 shadow-[0_0_10px_rgba(124,58,237,0.2)]">
+                      {photoURL ? (
+                        <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-white font-bold text-xs">{initial}</span>
+                      )}
+                    </div>
+                    <span className="hidden max-w-[120px] truncate text-sm font-medium text-white xl:block">{displayName}</span>
+                  </div>
+
+                  {/* Dashboard Button */}
+                  <NavbarButton variant="primary" href="/dashboard">
+                    Dashboard
+                  </NavbarButton>
+
+                  {/* Logout */}
+                  <button
+                    type="button"
+                    onClick={() => setShowLogoutConfirm(true)}
+                    className="px-3 py-2 text-sm font-medium text-gray-400 hover:text-red-400 transition-colors"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <NavbarButton variant="secondary" href="/login">Login</NavbarButton>
+                  <NavbarButton variant="primary" href="/register">Sign Up</NavbarButton>
+                </>
+              )}
+            </div>
+          </NavBody>
+
+          {/* Mobile Navigation */}
+          <MobileNav>
+            <MobileNavHeader>
+              <NavbarLogo />
+              <MobileNavToggle
+                isOpen={isMobileMenuOpen}
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              />
+            </MobileNavHeader>
+
+            <MobileNavMenu
+              isOpen={isMobileMenuOpen}
+              onClose={() => setIsMobileMenuOpen(false)}
+            >
+              {navItems.map((item, idx) => (
+                <a
+                  key={`mobile-link-${idx}`}
+                  href={item.link}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="relative text-neutral-600 dark:text-neutral-300"
+                >
+                  <span className="block">{item.name}</span>
+                </a>
+              ))}
+
+              <div className="w-full px-2 flex justify-start">
+                <ThemeToggle />
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800 flex w-full flex-col gap-4">
+                {user ? (
+                  <>
+                    <div className="flex items-center gap-3 px-2 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-purple-400 overflow-hidden flex items-center justify-center">
+                        {photoURL ? (
+                          <img src={photoURL} alt="Profile" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-white font-bold text-lg">{initial}</span>
+                        )}
+                      </div>
+                      <span className="font-medium dark:text-white">{displayName}</span>
+                    </div>
+
+                    <NavbarButton
+                      href="/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      variant="primary"
+                      className="w-full text-center"
+                    >
+                      Dashboard
+                    </NavbarButton>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowLogoutConfirm(true)}
+                      className="w-full text-center py-2 px-4 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg font-medium hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <NavbarButton
+                      href="/login"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      variant="secondary"
+                      className="w-full text-center"
+                    >
+                      Login
+                    </NavbarButton>
+                    <NavbarButton
+                      href="/register"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      variant="primary"
+                      className="w-full text-center"
+                    >
+                      Sign Up
+                    </NavbarButton>
+                  </>
+                )}
+              </div>
+            </MobileNavMenu>
+          </MobileNav>
+        </Navbar>
+      </div>
+      {logoutModal}
     </>
   );
 }

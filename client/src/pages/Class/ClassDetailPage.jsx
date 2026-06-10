@@ -34,15 +34,15 @@ function getYouTubeId(url) {
 
 // ── Confetti ──
 function ConfettiParticle({ delay }) {
-  const colors = ['#a78bfa','#c084fc','#34d399','#fbbf24','#f472b6','#60a5fa'];
-  const c = colors[Math.floor(Math.random()*colors.length)];
-  const l = Math.random()*100, s = 6+Math.random()*8, d = 2+Math.random()*2;
+  const colors = ['#a78bfa', '#c084fc', '#34d399', '#fbbf24', '#f472b6', '#60a5fa'];
+  const c = colors[Math.floor(Math.random() * colors.length)];
+  const l = Math.random() * 100, s = 6 + Math.random() * 8, d = 2 + Math.random() * 2;
   return (
     <motion.div
-      initial={{ y:-20, x:0, opacity:1, rotate:0 }}
-      animate={{ y:[0,400,800], x:[0,(Math.random()-0.5)*200], opacity:[1,1,0], rotate:[0,360*(Math.random()>0.5?1:-1)] }}
-      transition={{ duration:d, delay, ease:'easeOut' }}
-      style={{ position:'absolute', top:0, left:`${l}%`, width:s, height:s, backgroundColor:c, borderRadius: Math.random()>0.5?'50%':'2px' }}
+      initial={{ y: -20, x: 0, opacity: 1, rotate: 0 }}
+      animate={{ y: [0, 400, 800], x: [0, (Math.random() - 0.5) * 200], opacity: [1, 1, 0], rotate: [0, 360 * (Math.random() > 0.5 ? 1 : -1)] }}
+      transition={{ duration: d, delay, ease: 'easeOut' }}
+      style={{ position: 'absolute', top: 0, left: `${l}%`, width: s, height: s, backgroundColor: c, borderRadius: Math.random() > 0.5 ? '50%' : '2px' }}
     />
   );
 }
@@ -60,7 +60,7 @@ export default function ClassDetailPage() {
   const [loading, setLoading] = useState(true);
   const [classData, setClassData] = useState(null);
   const [isDbClass, setIsDbClass] = useState(false);
-  
+
   // Derive userId for per-user progress isolation
   const userId = user?.id || 'guest';
 
@@ -150,10 +150,12 @@ export default function ClassDetailPage() {
       dataList = JSON.parse(saved);
     } else {
       dataList = [
-        { id: 1, title: 'Money Management Basics', category: 'Foundation', description: 'Learn the fundamentals of managing your money wisely.', chapters: 12, youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500&q=80', quizzes: [
-          { question: 'What percentage of income should go to Needs in the 50/30/20 rule?', options: ['20%', '30%', '50%', '10%'], correctAnswer: 2 },
-          { question: 'Which is considered a "Want"?', options: ['Rent', 'Groceries', 'Dining Out', 'Electricity'], correctAnswer: 2 }
-        ]},
+        {
+          id: 1, title: 'Money Management Basics', category: 'Foundation', description: 'Learn the fundamentals of managing your money wisely.', chapters: 12, youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500&q=80', quizzes: [
+            { question: 'What percentage of income should go to Needs in the 50/30/20 rule?', options: ['20%', '30%', '50%', '10%'], correctAnswer: 2 },
+            { question: 'Which is considered a "Want"?', options: ['Rent', 'Groceries', 'Dining Out', 'Electricity'], correctAnswer: 2 }
+          ]
+        },
         { id: 2, title: 'Investing for Beginners', category: 'Growth', description: 'Start your investment journey with confidence.', chapters: 8, youtubeUrl: 'https://www.youtube.com/watch?v=PHe0bXAIuk0', image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=500&q=80', quizzes: [] },
         { id: 3, title: 'Crypto & Digital Assets', category: 'Advanced', description: 'Understand the world of cryptocurrency and blockchain.', chapters: 10, youtubeUrl: '', image: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=500&q=80', quizzes: [] },
       ];
@@ -163,7 +165,7 @@ export default function ClassDetailPage() {
       setClassData({
         ...found,
         chapters: [
-           { id: 1, title: 'Bab 1: Pendahuluan', quizzes: found.quizzes || [] }
+          { id: 1, title: 'Bab 1: Pendahuluan', quizzes: found.quizzes || [] }
         ]
       });
       setOpenLevels({ [1]: true });
@@ -191,7 +193,7 @@ export default function ClassDetailPage() {
     if (!el) return;
     const h = () => {
       const { scrollTop, scrollHeight, clientHeight } = el;
-      setReadingProgress(scrollHeight <= clientHeight ? 100 : Math.round((scrollTop/(scrollHeight-clientHeight))*100));
+      setReadingProgress(scrollHeight <= clientHeight ? 100 : Math.round((scrollTop / (scrollHeight - clientHeight)) * 100));
     };
     el.addEventListener('scroll', h);
     return () => el.removeEventListener('scroll', h);
@@ -242,7 +244,7 @@ export default function ClassDetailPage() {
 
   const isLevelUnlocked = (lvlId) => {
     // For now, always unlock. You could use levelUnlockKey logic here.
-    return true; 
+    return true;
   };
   const getLevelIndex = (lvlId) => levels.findIndex(l => l.id === lvlId);
 
@@ -490,7 +492,7 @@ export default function ClassDetailPage() {
       {/* Mobile Backdrop */}
       <AnimatePresence>
         {sidebarOpen && (
-          <motion.div key="backdrop" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
+          <motion.div key="backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setSidebarOpen(false)} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden" />
         )}
       </AnimatePresence>
@@ -499,12 +501,12 @@ export default function ClassDetailPage() {
       <AnimatePresence initial={false}>
         {sidebarOpen && (
           <motion.aside key="sidebar"
-            initial={{ width:0, opacity:0 }} animate={{ width:340, opacity:1 }} exit={{ width:0, opacity:0 }}
-            transition={{ type:'spring', stiffness:300, damping:30 }}
-            className="shrink-0 overflow-hidden border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111111] flex flex-col fixed lg:relative z-40 h-dvh max-h-dvh" style={{ overflowY:'auto' }}
+            initial={{ width: 0, opacity: 0 }} animate={{ width: 340, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="shrink-0 overflow-hidden border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111111] flex flex-col fixed lg:relative z-40 h-dvh max-h-dvh" style={{ overflowY: 'auto' }}
           >
             <div className="w-[340px] flex flex-col h-full min-h-0">
-               {/* Sidebar Header */}
+              {/* Sidebar Header */}
               <div className="p-5 border-b border-zinc-200 dark:border-zinc-800">
                 <div className="flex items-center justify-between mb-4">
                   <button onClick={() => navigate('/class')} className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors text-sm">
@@ -516,7 +518,7 @@ export default function ClassDetailPage() {
                 </div>
                 <h2 className="text-sm font-bold text-zinc-900 dark:text-white font-orbitron leading-snug mb-1">{classMeta.title}</h2>
                 <div className="flex items-center gap-1 mb-4">
-                  {[1,2,3].map(s => <IconStar key={s} size={12} className={s<=classMeta.difficulty?'text-yellow-400 fill-yellow-400':'text-zinc-300 dark:text-zinc-600'} />)}
+                  {[1, 2, 3].map(s => <IconStar key={s} size={12} className={s <= classMeta.difficulty ? 'text-yellow-400 fill-yellow-400' : 'text-zinc-300 dark:text-zinc-600'} />)}
                   <span className="text-xs text-zinc-500 dark:text-zinc-400 ml-1">{classMeta.category}</span>
                 </div>
 
@@ -527,7 +529,7 @@ export default function ClassDetailPage() {
                     <span className="text-xs font-bold font-mono text-violet-600 dark:text-violet-300">{completedCount}/{totalItems}</span>
                   </div>
                   <div className="w-full bg-zinc-200 dark:bg-zinc-800 rounded-full h-2 overflow-hidden">
-                    <motion.div className="h-full bg-gradient-to-r from-violet-600 to-purple-400 rounded-full" initial={{ width:0 }} animate={{ width:`${progressPercent}%` }} transition={{ duration:0.6 }} />
+                    <motion.div className="h-full bg-gradient-to-r from-violet-600 to-purple-400 rounded-full" initial={{ width: 0 }} animate={{ width: `${progressPercent}%` }} transition={{ duration: 0.6 }} />
                   </div>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2">{progressPercent}% selesai</p>
                 </div>
@@ -550,12 +552,11 @@ export default function ClassDetailPage() {
                         className={`w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors ${unlocked ? 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800/80 cursor-pointer' : 'bg-zinc-100/50 dark:bg-zinc-900/50 cursor-not-allowed'}`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                            status === 'complete' ? 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border border-green-200 dark:border-green-500/30'
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${status === 'complete' ? 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border border-green-200 dark:border-green-500/30'
                             : status === 'locked' ? 'bg-zinc-100 dark:bg-zinc-800/50 text-zinc-400 dark:text-zinc-600 border border-zinc-200 dark:border-zinc-700/50'
-                            : status === 'in-progress' ? 'bg-violet-50 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-500/30'
-                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700'
-                          }`}>
+                              : status === 'in-progress' ? 'bg-violet-50 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-500/30'
+                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700'
+                            }`}>
                             {status === 'complete' ? <IconCheck size={14} /> : status === 'locked' ? <IconLock size={14} /> : li + 1}
                           </div>
                           <div className="min-w-0">
@@ -564,7 +565,7 @@ export default function ClassDetailPage() {
                           </div>
                         </div>
                         {unlocked && (
-                          <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration:0.2 }}>
+                          <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
                             <IconChevronDown size={16} className="text-zinc-500" />
                           </motion.div>
                         )}
@@ -573,7 +574,7 @@ export default function ClassDetailPage() {
                       {/* Items */}
                       <AnimatePresence initial={false}>
                         {isOpen && unlocked && (
-                          <motion.div key="items" initial={{ height:0, opacity:0 }} animate={{ height:'auto', opacity:1 }} exit={{ height:0, opacity:0 }} transition={{ duration:0.25 }} className="overflow-hidden">
+                          <motion.div key="items" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
                             {level.items.map((item) => {
                               const isActive = activeItemId === item.id;
                               const isDone = completed.has(item.id);
@@ -583,18 +584,16 @@ export default function ClassDetailPage() {
                               return (
                                 <button key={item.id}
                                   onClick={() => accessible && selectItem(item, level.id)}
-                                  className={`w-full flex items-center gap-3 px-4 py-3 text-left border-t border-zinc-200 dark:border-zinc-800/60 transition-all ${
-                                    !accessible ? 'opacity-40 cursor-not-allowed'
+                                  className={`w-full flex items-center gap-3 px-4 py-3 text-left border-t border-zinc-200 dark:border-zinc-800/60 transition-all ${!accessible ? 'opacity-40 cursor-not-allowed'
                                     : isActive ? 'bg-violet-50 dark:bg-violet-600/20 border-l-2 border-l-violet-500'
-                                    : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer'
-                                  }`}
+                                      : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer'
+                                    }`}
                                 >
-                                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                                    isDone ? 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border border-green-200 dark:border-green-500/30'
+                                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${isDone ? 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border border-green-200 dark:border-green-500/30'
                                     : !accessible ? 'bg-zinc-100 dark:bg-zinc-800/50 text-zinc-400 dark:text-zinc-700 border border-zinc-200 dark:border-zinc-700/50'
-                                    : isActive ? 'bg-violet-100 dark:bg-violet-500/30 border border-violet-300 dark:border-violet-500/50'
-                                    : 'bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700'
-                                  }`}>
+                                      : isActive ? 'bg-violet-100 dark:bg-violet-500/30 border border-violet-300 dark:border-violet-500/50'
+                                        : 'bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700'
+                                    }`}>
                                     {isDone ? <IconCheck size={11} /> : !accessible ? <IconLock size={9} /> : isActive ? <div className="w-2 h-2 rounded-full bg-violet-400" /> : null}
                                   </div>
                                   <div className="flex-1 min-w-0">
@@ -611,13 +610,11 @@ export default function ClassDetailPage() {
                             {/* Final Quiz Button */}
                             <button
                               onClick={() => allItemsDone && openFinalQuizLanding(level)}
-                              className={`w-full flex items-center gap-3 px-4 py-3.5 text-left border-t border-zinc-200 dark:border-zinc-800/60 transition-all ${
-                                allItemsDone ? 'hover:bg-violet-50 dark:hover:bg-violet-600/10 cursor-pointer' : 'opacity-40 cursor-not-allowed'
-                              } ${finalPassed ? 'bg-green-500/5' : 'bg-gradient-to-r from-violet-50/30 to-purple-50/30 dark:from-violet-900/10 dark:to-purple-900/10'}`}
+                              className={`w-full flex items-center gap-3 px-4 py-3.5 text-left border-t border-zinc-200 dark:border-zinc-800/60 transition-all ${allItemsDone ? 'hover:bg-violet-50 dark:hover:bg-violet-600/10 cursor-pointer' : 'opacity-40 cursor-not-allowed'
+                                } ${finalPassed ? 'bg-green-500/5' : 'bg-gradient-to-r from-violet-50/30 to-purple-50/30 dark:from-violet-900/10 dark:to-purple-900/10'}`}
                             >
-                              <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                                finalPassed ? 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border border-green-200 dark:border-green-500/30' : 'bg-violet-50 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-500/30'
-                              }`}>
+                              <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${finalPassed ? 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border border-green-200 dark:border-green-500/30' : 'bg-violet-50 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-500/30'
+                                }`}>
                                 {finalPassed ? <IconCheck size={11} /> : <IconPlayerPlay size={11} />}
                               </div>
                               <div className="flex-1 min-w-0">
@@ -664,8 +661,8 @@ export default function ClassDetailPage() {
             /* Video View */
             <AnimatePresence mode="wait">
               <motion.div key={activeItemId}
-                initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-10 }}
-                transition={{ duration:0.3 }} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-12"
+                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-12"
               >
                 <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-mono mb-6">
                   <IconBookmark size={12} className="text-violet-500 dark:text-violet-400" />
@@ -708,19 +705,12 @@ export default function ClassDetailPage() {
                   </details>
                 )}
 
-                {completed.has(activeItemId) ? (
-                  <motion.div initial={{ opacity:0, scale:0.9 }} animate={{ opacity:1, scale:1 }}
+                {completed.has(activeItemId) && (
+                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                     className="flex items-center gap-3 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">
                     <IconCheck size={18} className="text-green-600 dark:text-green-400 shrink-0" />
                     <span className="text-sm text-green-700 dark:text-green-300 font-medium">Video ini sudah kamu tonton!</span>
                   </motion.div>
-                ) : (
-                  <button
-                    onClick={() => { markComplete(activeItemId); goNext(); }}
-                    className="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-500 hover:from-violet-500 hover:to-purple-400 text-white rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2"
-                  >
-                    <IconCheck size={16} /> Tandai Sudah Ditonton & Lanjut
-                  </button>
                 )}
               </motion.div>
             </AnimatePresence>
@@ -728,8 +718,8 @@ export default function ClassDetailPage() {
             /* Lesson View */
             <AnimatePresence mode="wait">
               <motion.div key={activeItemId}
-                initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-10 }}
-                transition={{ duration:0.3 }} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-12"
+                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-12"
               >
                 {/* Breadcrumb */}
                 <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 font-mono mb-6">
@@ -756,7 +746,7 @@ export default function ClassDetailPage() {
 
                 <div className="space-y-6 text-zinc-700 dark:text-zinc-300 text-base leading-relaxed">
                   {activeItem.content.body.map((para, i) => (
-                    <motion.p key={i} initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1+i*0.08 }}>{para}</motion.p>
+                    <motion.p key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.08 }}>{para}</motion.p>
                   ))}
                 </div>
 
@@ -767,7 +757,7 @@ export default function ClassDetailPage() {
                 )}
 
                 {completed.has(activeItemId) && (
-                  <motion.div initial={{ opacity:0, scale:0.9 }} animate={{ opacity:1, scale:1 }}
+                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                     className="flex items-center gap-3 mt-6 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">
                     <IconCheck size={18} className="text-green-600 dark:text-green-400 shrink-0" />
                     <span className="text-sm text-green-700 dark:text-green-300 font-medium">Materi ini sudah kamu selesaikan!</span>
@@ -787,18 +777,17 @@ export default function ClassDetailPage() {
         </div>
 
         {/* Bottom lesson nav — floating bar, no heavy purple */}
-        {activeItem?.type === 'lesson' && !quizLandingData && (
+        {(activeItem?.type === 'lesson' || activeItem?.type === 'video') && !quizLandingData && (
           <div className="pointer-events-none sticky bottom-0 z-30 flex justify-center px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
             <div className="pointer-events-auto flex w-full max-w-xl items-center gap-2 rounded-2xl border border-zinc-200 dark:border-zinc-700/80 bg-white/95 dark:bg-zinc-950/95 px-3 py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_-8px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:gap-4 sm:px-5 sm:py-3">
               <button
                 type="button"
                 onClick={goPrev}
                 disabled={activeItemIndex <= 0}
-                className={`flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all sm:text-sm ${
-                  activeItemIndex > 0
-                    ? 'text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                    : 'cursor-not-allowed text-zinc-300 dark:text-zinc-600'
-                }`}
+                className={`flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all sm:text-sm ${activeItemIndex > 0
+                  ? 'text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                  : 'cursor-not-allowed text-zinc-300 dark:text-zinc-600'
+                  }`}
               >
                 <IconChevronLeft size={18} stroke={2} />
                 <span className="hidden sm:inline">Mundur</span>
@@ -840,14 +829,14 @@ export default function ClassDetailPage() {
       {/* Celebration Modal */}
       <AnimatePresence>
         {showCelebration && (
-          <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md"
             onClick={() => setShowCelebration(false)}>
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              {Array.from({ length:50 }).map((_, i) => <ConfettiParticle key={i} delay={i*0.05} />)}
+              {Array.from({ length: 50 }).map((_, i) => <ConfettiParticle key={i} delay={i * 0.05} />)}
             </div>
-            <motion.div initial={{ scale:0.5, opacity:0, y:50 }} animate={{ scale:1, opacity:1, y:0 }} exit={{ scale:0.8, opacity:0 }}
-              transition={{ type:'spring', stiffness:200, damping:20 }} onClick={e => e.stopPropagation()}
+            <motion.div initial={{ scale: 0.5, opacity: 0, y: 50 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 20 }} onClick={e => e.stopPropagation()}
               className="relative bg-white dark:bg-gradient-to-br dark:from-[#1A1A2E] dark:via-[#2D1B69] dark:to-[#1A1A2E] border border-zinc-200 dark:border-violet-500/30 rounded-3xl p-10 text-center max-w-md mx-4 shadow-[0_10px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_0_80px_rgba(124,58,237,0.3)]">
               <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(251,191,36,0.4)]">
                 <IconTrophy size={40} className="text-white" />
@@ -856,7 +845,7 @@ export default function ClassDetailPage() {
               <p className="text-zinc-600 dark:text-zinc-300 mb-2">Kamu telah menyelesaikan kelas</p>
               <p className="text-violet-600 dark:text-violet-300 font-bold text-lg mb-6">{classMeta.title}</p>
               <div className="flex items-center justify-center gap-1 mb-8">
-                {[1,2,3].map(s => <motion.div key={s} initial={{ scale:0, rotate:-180 }} animate={{ scale:1, rotate:0 }} transition={{ delay:0.3+s*0.15, type:'spring' }}>
+                {[1, 2, 3].map(s => <motion.div key={s} initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.3 + s * 0.15, type: 'spring' }}>
                   <IconStar size={28} className="text-yellow-400 fill-yellow-400" />
                 </motion.div>)}
               </div>

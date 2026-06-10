@@ -8,7 +8,7 @@
   --font-exo: 'Exo 2', sans-serif;
   --font-inter: 'Inter', sans-serif;
   --font-space: 'Space Grotesk', sans-serif;
-  
+
   --font-sans: 'Inter', sans-serif;
 
   --color-primary-dark: #121212;
@@ -22,30 +22,35 @@
   --color-text-muted: #A3A3A3;
   --color-danger: #FF4D4D;
 
-  /* Membuat teks yang redup menjadi lebih terang secara global */
-  --color-zinc-400: #e4e4e7;
-  --color-zinc-500: #d4d4d8;
-  --color-zinc-600: #a1a1aa;
-  
-  --color-gray-400: #e5e7eb;
-  --color-gray-500: #d1d5db;
-  --color-gray-600: #9ca3af;
-  
-  --color-neutral-400: #e5e5e5;
-  --color-neutral-500: #d4d4d4;
-  --color-neutral-600: #a3a3a3;
-
   /* Menambahkan ukuran pada teks yang kecil */
   --text-xs: 0.8125rem;
   --text-xs--line-height: 1.25rem;
-  
+
   --text-sm: 0.9375rem;
   --text-sm--line-height: 1.5rem;
 }
 
 @keyframes sweep {
-  0% { left: -100%; }
-  100% { left: 100%; }
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+/* Dark-mode-only: lighten muted text colors for better readability on dark backgrounds */
+.dark {
+  --color-zinc-400: #e4e4e7;
+  --color-zinc-500: #d4d4d8;
+  --color-zinc-600: #a1a1aa;
+  --color-gray-400: #e5e7eb;
+  --color-gray-500: #d1d5db;
+  --color-gray-600: #9ca3af;
+  --color-neutral-400: #e5e5e5;
+  --color-neutral-500: #d4d4d4;
+  --color-neutral-600: #a3a3a3;
 }
 
 html {
@@ -61,7 +66,12 @@ html {
   text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-orbitron);
 }
 
@@ -70,8 +80,9 @@ body {
   font-family: var(--font-inter);
   font-size: 1rem;
   line-height: 1.7;
-  color: #18181b;
-  background: #f9fafb;
+  color: #09090b;
+  /* Deep noir color for light mode */
+  background: #fafafa;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -80,8 +91,9 @@ body {
 }
 
 html.dark body {
-  color: #f8fafc;
+  color: #fafafa;
   background: #0a0a0a;
+  /* True dark noir */
 }
 
 p,
@@ -97,18 +109,23 @@ li {
 }
 
 /* Lenis */
-html.lenis, html.lenis body {
+html.lenis,
+html.lenis body {
   height: auto;
 }
+
 .lenis.lenis-smooth {
   scroll-behavior: auto !important;
 }
+
 .lenis.lenis-smooth [data-lenis-prevent] {
   overscroll-behavior: contain;
 }
+
 .lenis.lenis-stopped {
   overflow: hidden;
 }
+
 .lenis.lenis-smooth iframe {
   pointer-events: none;
 }
@@ -119,6 +136,7 @@ input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
 input[type="number"] {
   -moz-appearance: textfield;
 }
@@ -130,3 +148,16 @@ input[type="number"] {
   width: 0;
 }
 
+/* Hide all scrollbars globally */
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+* {
+  scrollbar-width: none !important;
+  /* Firefox */
+  -ms-overflow-style: none !important;
+  /* IE and Edge */
+}

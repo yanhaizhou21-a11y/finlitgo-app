@@ -1,103 +1,116 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import gsap from 'gsap';
 
 const Footer = () => {
-  return (
-    <footer className="w-full bg-transparent text-white py-16 px-6 md:px-12 lg:px-24">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12">
+  const containerRef = useRef(null);
+  const titleRef = useRef(null);
+  const contentRef = useRef(null);
+  const hugeTextRef = useRef(null);
 
-        {/* Brand Area */}
-        <div className="flex flex-col max-w-xs">
-          <h2 className="text-2xl font-bold mb-2">FINLITGO</h2>
-          <p className="text-sm text-gray-300 font-light italic mb-6">Invest step learning.</p>
-          <p className="text-xs text-gray-400 leading-relaxed mb-8">
-            Platform belajar keuangan dengan 3 metode: Visual, Audio, dan Text.
-            Telah membantu 250,000+ orang mengelola uang lebih baik.
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            gsap.fromTo(titleRef.current, 
+              { opacity: 0, y: 40 }, 
+              { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
+            );
+            gsap.fromTo(contentRef.current.children, 
+              { opacity: 0, y: 20 }, 
+              { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power2.out', delay: 0.3 }
+            );
+            gsap.fromTo(hugeTextRef.current, 
+              { opacity: 0, scale: 0.95, y: 50 }, 
+              { opacity: 0.05, scale: 1, y: 0, duration: 1.5, ease: 'power3.out', delay: 0.5 }
+            );
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.2 }
+      );
+
+      if (containerRef.current) {
+        observer.observe(containerRef.current);
+      }
+      return () => observer.disconnect();
+    }, containerRef);
+    
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <footer ref={containerRef} className="w-full bg-[#111111] text-white pt-24 pb-8 px-6 md:px-12 lg:px-24 relative overflow-hidden flex flex-col font-inter">
+      
+      {/* Top Text / Tagline */}
+      <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end mb-24 relative z-10" ref={titleRef}>
+        <div className="flex flex-col">
+          <p className="text-[10px] md:text-xs text-zinc-400 tracking-[0.2em] uppercase mb-6 md:mb-8 font-medium">
+            Let's build work that inspires.
           </p>
-          {/* Socials */}
-          <div className="flex gap-4 mb-8">
-            <a
-              href="#"
-              aria-label="Instagram"
-              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
-            >
-              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" aria-hidden="true">
-                <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5a4.25 4.25 0 0 0 4.25 4.25h8.5a4.25 4.25 0 0 0 4.25-4.25v-8.5a4.25 4.25 0 0 0-4.25-4.25h-8.5Zm8.88 2.12a1 1 0 1 1 0 2 1 1 0 0 1 0-2ZM12 6.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
-              </svg>
-            </a>
-            <a
-              href="#"
-              aria-label="YouTube"
-              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
-            >
-              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" aria-hidden="true">
-                <path d="M21.58 7.19a2.95 2.95 0 0 0-2.08-2.08C17.75 4.6 12 4.6 12 4.6s-5.75 0-7.5.51A2.95 2.95 0 0 0 2.42 7.2C1.9 8.95 1.9 12 1.9 12s0 3.05.52 4.8a2.95 2.95 0 0 0 2.08 2.08c1.75.51 7.5.51 7.5.51s5.75 0 7.5-.51a2.95 2.95 0 0 0 2.08-2.08c.52-1.75.52-4.8.52-4.8s0-3.05-.52-4.81ZM10.2 15.01V8.99L15.4 12l-5.2 3.01Z" />
-              </svg>
-            </a>
-            <a
-              href="#"
-              aria-label="Facebook"
-              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
-            >
-              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" aria-hidden="true">
-                <path d="M13.5 21.5v-8h2.7l.4-3h-3.1V8.6c0-.87.24-1.46 1.5-1.46h1.7V4.46c-.3-.04-1.33-.12-2.54-.12-2.51 0-4.23 1.53-4.23 4.34v1.82H7v3h2.87v8h3.63Z" />
-              </svg>
-            </a>
-            <a
-              href="#"
-              aria-label="X"
-              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
-            >
-              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" aria-hidden="true">
-                <path d="M18.9 3h2.98l-6.5 7.42L23 21h-5.93l-4.64-6.08L7.1 21H4.1l6.95-7.94L1 3h6.08l4.19 5.54L18.9 3Zm-1.04 16.2h1.65L6.18 4.7H4.4L17.86 19.2Z" />
-              </svg>
-            </a>
-          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-[72px] font-medium leading-[1.05] tracking-tight text-white max-w-2xl mb-12 md:mb-0">
+            Ready to build <br/> something bold?
+          </h2>
         </div>
 
-        {/* Links Area */}
-        <div className="flex gap-16 flex-wrap">
+        <div className="flex flex-col items-start md:items-end">
+          <p className="hidden md:block text-[10px] text-zinc-500 tracking-widest uppercase mb-auto">IDT → 20:03</p>
+          <a href="#contact" className="group flex items-center gap-4 text-xs font-medium tracking-widest uppercase border-b border-zinc-700 pb-2 hover:border-white transition-colors duration-300 mt-8 md:mt-24">
+            Start a collaboration
+            <span className="transform group-hover:translate-x-1 transition-transform duration-300">→</span>
+          </a>
+        </div>
+      </div>
+
+      {/* Grid Content */}
+      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-24 relative z-10" ref={contentRef}>
+        
+        {/* Column 1: Info */}
+        <div className="col-span-1 md:col-span-2 flex flex-col">
+          <p className="text-[10px] text-zinc-500 tracking-widest uppercase mb-4">©FINLITGO 2026</p>
+          <p className="text-[10px] text-zinc-500 tracking-widest uppercase">SOUND ON ♪ HOVER THE LINES.</p>
+        </div>
+
+        {/* Column 2: Business */}
+        <div className="col-span-1 flex flex-col">
+          <h3 className="text-[10px] text-zinc-500 tracking-widest uppercase mb-6">Business Enquiry</h3>
+          <p className="text-sm text-zinc-300 mb-2">E: hello@finlitgo.com</p>
+          <p className="text-sm text-zinc-300">P: +62 812-3456-7890</p>
+        </div>
+
+        {/* Column 3: Quick Links & Socials */}
+        <div className="col-span-1 grid grid-cols-2 gap-4">
           <div className="flex flex-col">
-            <h3 className="font-semibold text-sm mb-4">Quick Links</h3>
-            <ul className="flex flex-col gap-3 text-xs text-gray-300">
-              <li className="hover:text-white cursor-pointer transition">› Home</li>
-              <li className="hover:text-white cursor-pointer transition">› Semua Kelas</li>
-              <li className="hover:text-white cursor-pointer transition">› Blog</li>
-              <li className="hover:text-white cursor-pointer transition">› Tentang Kami</li>
-              <li className="hover:text-white cursor-pointer transition">› Karir</li>
-              <li className="hover:text-white cursor-pointer transition">› FAQ</li>
+            <h3 className="text-[10px] text-zinc-500 tracking-widest uppercase mb-6">Quick Links</h3>
+            <ul className="flex flex-col gap-3 text-sm text-zinc-300">
+              <li><a href="/" className="hover:text-white transition-colors">Home</a></li>
+              <li><a href="/class" className="hover:text-white transition-colors">Classes</a></li>
+              <li><a href="/blog" className="hover:text-white transition-colors">Blog</a></li>
             </ul>
           </div>
-
           <div className="flex flex-col">
-            <h3 className="font-semibold text-sm mb-4">Kategori Kelas</h3>
-            <ul className="flex flex-col gap-3 text-xs text-gray-300">
-              <li className="hover:text-white cursor-pointer transition">› Manajemen Keuangan</li>
-              <li className="hover:text-white cursor-pointer transition">› Dana Darurat</li>
-              <li className="hover:text-white cursor-pointer transition">› Debt Principal</li>
-              <li className="hover:text-white cursor-pointer transition">› Perencanaan Pensiun</li>
-              <li className="hover:text-white cursor-pointer transition">› Manajemen Hutang</li>
-              <li className="hover:text-white cursor-pointer transition">› Financial Planning</li>
+            <h3 className="text-[10px] text-zinc-500 tracking-widest uppercase mb-6">Social</h3>
+            <ul className="flex flex-col gap-3 text-sm text-zinc-300">
+              <li><a href="#" className="hover:text-white transition-colors">Instagram</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Twitter</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">LinkedIn</a></li>
             </ul>
-          </div>
-
-          <div className="flex flex-col">
-            <h3 className="font-semibold text-sm mb-4">Hubungi Kami</h3>
-            <ul className="flex flex-col gap-4 text-xs text-gray-300">
-              <li className="flex items-center gap-2"><span>✉</span> hello@finlitgo.com</li>
-              <li className="flex items-center gap-2"><span>📞</span> +62 812-3456-7890</li>
-              <li className="flex items-center gap-2"><span>📍</span> Jakarta, Indonesia</li>
-              <li className="flex items-center gap-2"><span>🕒</span> Senin - Jumat, 09:00 - 17:00</li>
-            </ul>
-
-            <div className="flex items-center gap-6 mt-8">
-              <div className="flex flex-col text-center"><span className="font-bold text-xl text-white">250K+</span><span className="text-[10px] text-gray-400">Users</span></div>
-              <div className="flex flex-col text-center"><span className="font-bold text-xl text-white">15+</span><span className="text-[10px] text-gray-400">Kelas</span></div>
-              <div className="flex flex-col text-center"><span className="font-bold text-xl text-white">4.8</span><span className="text-[10px] text-gray-400">Rating</span></div>
-            </div>
           </div>
         </div>
 
       </div>
+
+      {/* Huge Background Text */}
+      <div className="w-full flex justify-center items-center pointer-events-none absolute bottom-0 left-0 right-0 overflow-hidden">
+        <h1 
+          ref={hugeTextRef} 
+          className="text-[15vw] md:text-[18vw] leading-none font-bold text-white tracking-tighter opacity-5 select-none"
+          style={{ marginBottom: '-3vw' }}
+        >
+          FINLITGO
+        </h1>
+      </div>
+      
     </footer>
   );
 };

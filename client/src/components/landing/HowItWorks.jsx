@@ -100,20 +100,20 @@ function StepMedia({ section }) {
   }, [section.imageSrc]);
 
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[#0d0f16]/85 p-4 shadow-[0_24px_70px_rgba(0,0,0,0.25)] backdrop-blur-sm transition-transform duration-300 hover:-translate-y-1">
-      <div className="overflow-hidden rounded-[22px] border border-white/5 bg-[#11131d]">
-        <div className="flex items-center justify-between border-b border-white/5 bg-[#0f1118] px-4 py-3">
+    <div className="rounded-[28px] border border-zinc-200 dark:border-white/10 bg-zinc-50/90 dark:bg-[#0d0f16]/85 p-4 shadow-[0_24px_70px_rgba(0,0,0,0.25)] backdrop-blur-sm transition-transform duration-300 hover:-translate-y-1">
+      <div className="overflow-hidden rounded-[22px] border border-zinc-100 dark:border-white/5 bg-white dark:bg-[#11131d]">
+        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-white/5 bg-zinc-50 dark:bg-[#0f1118] px-4 py-3">
           <div className="flex items-center gap-2">
             <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
             <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
             <span className="h-3 w-3 rounded-full bg-[#28c840]" />
           </div>
-          <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/50">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-zinc-500 dark:text-white/50">
             Preview
           </span>
         </div>
 
-        <div className="relative h-[320px] overflow-hidden bg-[#05070d] sm:h-[360px]">
+        <div className="relative h-[320px] overflow-hidden bg-zinc-100 dark:bg-[#05070d] sm:h-[360px]">
             {section.imageSrc && !hasImageError ? (
               <img
                 src={section.imageSrc}
@@ -123,8 +123,8 @@ function StepMedia({ section }) {
                 onError={() => setHasImageError(true)}
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0d1120] via-[#14173a] to-[#22164a] p-5 text-center">
-                <div className="rounded-2xl border border-white/20 bg-white/10 px-6 py-4 text-sm text-white/80 backdrop-blur-sm">
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-100 dark:from-[#0d1120] dark:via-[#14173a] dark:to-[#22164a] p-5 text-center">
+                <div className="rounded-2xl border border-zinc-200 dark:border-white/20 bg-zinc-100 dark:bg-white/10 px-6 py-4 text-sm text-zinc-700 dark:text-white/80 backdrop-blur-sm">
                   Gambar untuk {section.eyebrow} belum tersedia.
                 </div>
               </div>
@@ -142,13 +142,13 @@ const HowItWorks = () => {
     <section className="w-full bg-transparent py-24 px-6 md:px-12 flex justify-center">
       <div className="w-full max-w-6xl">
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <p className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[11px] font-semibold tracking-[0.28em] text-white/70">
+          <p className="inline-flex items-center justify-center rounded-full border border-zinc-200 dark:border-white/15 bg-zinc-100 dark:bg-white/5 px-4 py-2 text-[11px] font-semibold tracking-[0.28em] text-zinc-600 dark:text-white/70">
             HOW FINLITGO WORKS
           </p>
-          <h2 className="mt-6 text-3xl md:text-5xl font-semibold text-white tracking-tight">
+          <h2 className="mt-6 text-3xl md:text-5xl font-semibold text-zinc-900 dark:text-white tracking-tight">
             Mulai Perjalanan Finansialmu Hari Ini
           </h2>
-          <p className="mt-4 text-base md:text-lg text-white/70 leading-relaxed">
+          <p className="mt-4 text-base md:text-lg text-zinc-600 dark:text-white/70 leading-relaxed">
             Empat langkah sederhana untuk memulai transformasi finansial. Dari assessment awal hingga AI Assistant, semuanya dirancang untuk Gen Z.
           </p>
         </div>
@@ -160,15 +160,15 @@ const HowItWorks = () => {
               className={`grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12 items-center ${section.reverse ? 'lg:[&>div:first-child]:order-2 lg:[&>div:last-child]:order-1' : ''}`}
             >
               <div className={section.reverse ? 'lg:pl-6' : 'lg:pr-6'}>
-                <p className="inline-flex rounded-full border border-white/10 bg-black/25 px-4 py-2 text-[10px] font-semibold tracking-[0.28em] text-white/75 shadow-[0_10px_30px_rgba(0,0,0,0.2)]">
+                <p className="inline-flex rounded-full border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-black/25 px-4 py-2 text-[10px] font-semibold tracking-[0.28em] text-zinc-500 dark:text-white/75 shadow-[0_10px_30px_rgba(0,0,0,0.2)]">
                   {section.eyebrow}
                 </p>
 
-                <h3 className="mt-6 text-3xl md:text-4xl font-medium text-white leading-tight max-w-xl">
+                <h3 className="mt-6 text-3xl md:text-4xl font-medium text-zinc-900 dark:text-white leading-tight max-w-xl">
                   {section.title}
                 </h3>
 
-                <p className="mt-5 max-w-xl text-base md:text-lg leading-8 text-white/70">
+                <p className="mt-5 max-w-xl text-base md:text-lg leading-8 text-zinc-600 dark:text-white/70">
                   {section.description}
                 </p>
 
@@ -176,7 +176,7 @@ const HowItWorks = () => {
                   {section.bullets.map((bullet) => (
                     <span
                       key={bullet}
-                      className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80"
+                      className="rounded-full border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-4 py-2 text-sm text-zinc-700 dark:text-white/80"
                     >
                       {bullet}
                     </span>
@@ -186,7 +186,7 @@ const HowItWorks = () => {
                 <button
                   type="button"
                   onClick={() => navigate(section.ctaPath)}
-                  className="mt-10 inline-flex items-center gap-2 text-base font-medium text-white transition-transform duration-300 hover:translate-x-1"
+                  className="mt-10 inline-flex items-center gap-2 text-base font-medium text-zinc-900 dark:text-white transition-transform duration-300 hover:translate-x-1"
                 >
                   {section.ctaLabel}
                   <span aria-hidden="true">→</span>

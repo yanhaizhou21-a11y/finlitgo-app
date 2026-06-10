@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import SmoothScroll from './components/common/SmoothScroll';
 import HomePage from './pages/HomePage';
@@ -9,32 +9,41 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import { useAuth } from './store/AuthContext';
 import { useTheme } from './store/ThemeContext';
 
-// Dashboard pages
-import OverviewPage from './pages/Dashboard/OverviewPage';
-import AdminOverview from './pages/Dashboard/AdminOverview';
-import FinancialPage from './pages/Dashboard/FinancialPage';
-import HistoryPage from './pages/Dashboard/HistoryPage';
-import SettingsPage from './pages/Dashboard/SettingsPage';
-import ClassProgressPage from './pages/Dashboard/ClassProgressPage';
+// Lazy-loaded dashboard pages
+const OverviewPage = lazy(() => import('./pages/Dashboard/OverviewPage'));
+const AdminOverview = lazy(() => import('./pages/Dashboard/AdminOverview'));
+const FinancialPage = lazy(() => import('./pages/Dashboard/FinancialPage'));
+const HistoryPage = lazy(() => import('./pages/Dashboard/HistoryPage'));
+const SettingsPage = lazy(() => import('./pages/Dashboard/SettingsPage'));
+const ClassProgressPage = lazy(() => import('./pages/Dashboard/ClassProgressPage'));
 
-// Admin CRUD pages
-import AdminClassCRUD from './pages/Dashboard/AdminClassCRUD';
-import AdminBlogCRUD from './pages/Dashboard/AdminBlogCRUD';
+// Lazy-loaded admin CRUD pages
+const AdminClassCRUD = lazy(() => import('./pages/Dashboard/AdminClassCRUD'));
+const AdminBlogCRUD = lazy(() => import('./pages/Dashboard/AdminBlogCRUD'));
 
-// Landing pages (public, with Navbar)
-import ClassPage from './pages/ClassPage';
-import BlogPage from './pages/BlogPage';
+// Lazy-loaded landing pages
+const ClassPage = lazy(() => import('./pages/ClassPage'));
+const BlogPage = lazy(() => import('./pages/BlogPage'));
 
-// Detail pages
-import ClassDetailPage from './pages/Class/ClassDetailPage';
-import BlogPostPage from './pages/Blog/BlogPostPage';
+// Lazy-loaded detail pages
+const ClassDetailPage = lazy(() => import('./pages/Class/ClassDetailPage'));
+const BlogPostPage = lazy(() => import('./pages/Blog/BlogPostPage'));
 
-// AI Assist landing
-import AIAssistPage from './pages/AIAssistPage/Dashboard';
+// Lazy-loaded AI Assist
+const AIAssistPage = lazy(() => import('./pages/AIAssistPage/Dashboard'));
 
 // Layout for public pages
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+
+// Suspense fallback
+function PageLoader() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-[#0a0a0a]">
+      <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
 
 function PublicLayout({ children }) {
   const { isDarkMode } = useTheme();
@@ -98,37 +107,39 @@ function App() {
   return (
     <Router>
       <SmoothScroll />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<AuthPage />} />
-        <Route path="/register" element={<AuthPage />} />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/register" element={<AuthPage />} />
 
-        {/* Public landing pages with Navbar + Footer */}
-        <Route path="/class" element={<PublicLayout><ClassPage /></PublicLayout>} />
-        <Route path="/class/:moduleId" element={<PublicLayout><ClassDetailPage /></PublicLayout>} />
-        <Route path="/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
-        <Route path="/blog/:postId" element={<PublicLayout><BlogPostPage /></PublicLayout>} />
-        <Route path="/ai-assist" element={<PublicLayout><AIAssistPage /></PublicLayout>} />
+          {/* Public landing pages with Navbar + Footer */}
+          <Route path="/class" element={<PublicLayout><ClassPage /></PublicLayout>} />
+          <Route path="/class/:moduleId" element={<PublicLayout><ClassDetailPage /></PublicLayout>} />
+          <Route path="/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
+          <Route path="/blog/:postId" element={<PublicLayout><BlogPostPage /></PublicLayout>} />
+          <Route path="/ai-assist" element={<PublicLayout><AIAssistPage /></PublicLayout>} />
 
-        {/* Dashboard routes (protected, with sidebar, profile must be complete) */}
-        <Route path="/" element={<ProtectedRoute><ProfileGuard><DashboardLayout /></ProfileGuard></ProtectedRoute>}>
-          <Route path="dashboard" element={<DashboardSwitch />} />
-          <Route path="dashboard/finance" element={<FinancialPage />} />
-          <Route path="dashboard/history" element={<HistoryPage />} />
-          <Route path="dashboard/classes" element={<ClassProgressPage />} />
-          <Route path="dashboard/settings" element={<SettingsPage />} />
-          
-          {/* Admin-only CRUD routes */}
-          <Route path="dashboard/manage-classes" element={
-            <ProtectedRoute requireAdmin={true}><AdminClassCRUD /></ProtectedRoute>
-          } />
-          <Route path="dashboard/manage-blog" element={
-            <ProtectedRoute requireAdmin={true}><AdminBlogCRUD /></ProtectedRoute>
-          } />
+          {/* Dashboard routes (protected, with sidebar, profile must be complete) */}
+          <Route path="/" element={<ProtectedRoute><ProfileGuard><DashboardLayout /></ProfileGuard></ProtectedRoute>}>
+            <Route path="dashboard" element={<DashboardSwitch />} />
+            <Route path="dashboard/finance" element={<FinancialPage />} />
+            <Route path="dashboard/history" element={<HistoryPage />} />
+            <Route path="dashboard/classes" element={<ClassProgressPage />} />
+            <Route path="dashboard/settings" element={<SettingsPage />} />
 
-          <Route path="*" element={<Navigate to="/dashboard" />} />
-        </Route>
-      </Routes>
+            {/* Admin-only CRUD routes */}
+            <Route path="dashboard/manage-classes" element={
+              <ProtectedRoute requireAdmin={true}><AdminClassCRUD /></ProtectedRoute>
+            } />
+            <Route path="dashboard/manage-blog" element={
+              <ProtectedRoute requireAdmin={true}><AdminBlogCRUD /></ProtectedRoute>
+            } />
+
+            <Route path="*" element={<Navigate to="/dashboard" />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </Router>
   );
 }
