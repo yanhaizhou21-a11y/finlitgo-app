@@ -1,10 +1,11 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import AdminSidebar from './AdminSidebar';
 import TopHeader from './TopHeader';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../store/AuthContext';
+import gsap from 'gsap';
 
 export default function DashboardLayout() {
   const location = useLocation();
@@ -12,6 +13,76 @@ export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const edgeTouchStartX = useRef(0);
   const edgeTouchStartY = useRef(0);
+  const mainRef = useRef(null);
+
+  // GSAP smooth scroll for the nested main container
+  useEffect(() => {
+    const el = mainRef.current;
+    if (!el) return;
+
+    let scrollTarget = el.scrollTop;
+    let currentScroll = el.scrollTop;
+    let rafId = null;
+
+    const onWheel = (e) => {
+      // Check if the event target is inside a scrollable child element
+      let target = e.target;
+      while (target && target !== el) {
+        if (target.scrollHeight > target.clientHeight + 2) {
+          // This element has its own scroll — let it handle the event naturally
+          return;
+        }
+        target = target.parentElement;
+      }
+
+      e.preventDefault();
+      const maxScroll = el.scrollHeight - el.clientHeight;
+      scrollTarget = Math.max(0, Math.min(maxScroll, scrollTarget + e.deltaY));
+
+      if (!rafId) {
+        const animate = () => {
+          currentScroll += (scrollTarget - currentScroll) * 0.12;
+
+          if (Math.abs(scrollTarget - currentScroll) < 0.5) {
+            currentScroll = scrollTarget;
+            el.scrollTop = currentScroll;
+            rafId = null;
+            return;
+          }
+
+          el.scrollTop = currentScroll;
+          rafId = requestAnimationFrame(animate);
+        };
+        rafId = requestAnimationFrame(animate);
+      }
+    };
+
+    // Sync when content changes (route change, etc.)
+    const observer = new MutationObserver(() => {
+      scrollTarget = el.scrollTop;
+      currentScroll = el.scrollTop;
+    });
+    observer.observe(el, { childList: true, subtree: true });
+
+    el.addEventListener('wheel', onWheel, { passive: false });
+
+    return () => {
+      el.removeEventListener('wheel', onWheel);
+      observer.disconnect();
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  // Reset scroll position on route change
+  useEffect(() => {
+    if (mainRef.current) {
+      gsap.to(mainRef.current, {
+        scrollTop: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+      });
+    }
+  }, [location.pathname]);
 
   // Swipe-right-from-left-edge to open sidebar
   const handleEdgeTouchStart = useCallback((e) => {
@@ -22,7 +93,6 @@ export default function DashboardLayout() {
   const handleEdgeTouchEnd = useCallback((e) => {
     const dx = e.changedTouches[0].clientX - edgeTouchStartX.current;
     const dy = Math.abs(e.changedTouches[0].clientY - edgeTouchStartY.current);
-    // Only trigger if started from left 30px, swiped right >60px, and mostly horizontal
     if (edgeTouchStartX.current <= 30 && dx > 60 && dy < 80) {
       setSidebarOpen(true);
     }
@@ -53,6 +123,7 @@ export default function DashboardLayout() {
           onMenuToggle={() => setSidebarOpen(prev => !prev)}
         />
         <main
+          ref={mainRef}
           className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 relative"
           onTouchStart={handleEdgeTouchStart}
           onTouchEnd={handleEdgeTouchEnd}
