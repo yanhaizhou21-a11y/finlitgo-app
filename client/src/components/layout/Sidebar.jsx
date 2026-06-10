@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  IconLayoutDashboard, 
-  IconChartBar, 
-  IconHistory, 
-  IconSettings, 
+import {
+  IconLayoutDashboard,
+  IconChartBar,
+  IconHistory,
+  IconSettings,
   IconLogout,
   IconX
 } from '@tabler/icons-react';
@@ -14,15 +14,14 @@ import { useAuth } from '../../store/AuthContext';
 
 const AnimatedNavItem = ({ to, icon: Icon, label, onClick }) => {
   return (
-    <NavLink 
+    <NavLink
       to={to}
       end
       onClick={onClick}
-      className={({ isActive }) => 
-        `relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl mb-4 transition-all duration-300 group ${
-          isActive 
-            ? 'bg-gradient-to-br from-violet-600 to-purple-400 text-white shadow-lg shadow-violet-500/30' 
-            : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800'
+      className={({ isActive }) =>
+        `relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl mb-4 transition-all duration-300 group ${isActive
+          ? 'bg-gradient-to-br from-violet-600 to-purple-400 text-white shadow-lg shadow-violet-500/30'
+          : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800'
         }`
       }
       title={label}
@@ -50,7 +49,7 @@ export default function Sidebar({ isOpen, onClose }) {
     if (isOpen && onClose) {
       onClose();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   // Touch swipe to close
@@ -84,7 +83,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const sidebarContent = (
     <>
       {/* Logo → Landing Page */}
-      <div 
+      <div
         className="mb-10 w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-violet-500/30 cursor-pointer hover:border-violet-400 transition-colors hover:shadow-[0_0_12px_rgba(124,58,237,0.3)]"
         onClick={() => navigate('/')}
         title="Go to Home"
@@ -124,10 +123,10 @@ export default function Sidebar({ isOpen, onClose }) {
   return (
     <>
       {/* Desktop Sidebar — always visible on md+ */}
-      <motion.aside 
+      <motion.aside
         initial={{ x: -100 }}
         animate={{ x: 0 }}
-        className="hidden md:flex w-20 min-h-screen bg-white dark:bg-[var(--color-primary-dark)] flex-col items-center py-6 border-r border-zinc-200 dark:border-zinc-800 shrink-0 sticky top-0 transition-colors duration-300 z-50"
+        className="hidden md:flex w-20 h-screen bg-white dark:bg-[var(--color-primary-dark)] flex-col items-center py-6 border-r border-zinc-200 dark:border-zinc-800 shrink-0 transition-colors duration-300 z-50"
       >
         {sidebarContent}
       </motion.aside>

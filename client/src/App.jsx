@@ -64,7 +64,7 @@ function PublicLayout({ children }) {
       )}
       {useLearningGradient && !isDarkMode && (
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,#fcfdff_0%,#f5f7ff_22%,#fafafa_52%,#fafafa_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,#ffffff_0%,#f8f6ff_22%,#f3f0ff_52%,#ede8ff_84%,#e8e0ff_100%)]" />
         </div>
       )}
       {!isClassDetail && <Navbar variant={navbarVariant} />}

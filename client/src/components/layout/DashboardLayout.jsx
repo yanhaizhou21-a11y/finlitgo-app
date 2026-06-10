@@ -47,7 +47,7 @@ export default function DashboardLayout() {
         ? <AdminSidebar />
         : <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       }
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
         <TopHeader
           title={getHeaderTitle()}
           onMenuToggle={() => setSidebarOpen(prev => !prev)}
@@ -64,7 +64,7 @@ export default function DashboardLayout() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="h-full w-full max-w-7xl mx-auto"
+              className="w-full max-w-7xl mx-auto"
             >
               <Outlet />
             </motion.div>

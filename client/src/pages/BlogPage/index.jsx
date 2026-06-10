@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../store/AuthContext";
 import { supabase } from "../../services/supabase";
 import { getFallbackBlogs } from "../../data/fallbackBlogs";
-import Footer from "../../components/layout/Footer";
 
 const BLOG_IMG_FALLBACK =
   "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&q=80";
@@ -131,7 +130,7 @@ export default function BlogPage() {
                   FinLitGo Blog
                 </span>
                 <h1 className="text-5xl md:text-7xl font-bold font-orbitron text-zinc-900 dark:text-white mb-6 leading-tight">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-650 to-purple-550 dark:from-violet-400 dark:to-purple-300">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-purple-500 dark:from-violet-400 dark:to-purple-300">
                     Knowledge
                   </span>{" "}
                   Base
@@ -374,7 +373,6 @@ export default function BlogPage() {
             </section>
           )}
 
-          <Footer />
         </div>
       </div>
     </div>

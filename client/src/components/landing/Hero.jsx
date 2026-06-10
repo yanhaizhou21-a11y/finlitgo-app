@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import GradientBlinds from '../Background/GradientBlinds';
@@ -43,27 +43,35 @@ const Hero = () => {
     navigate('/login?redirect=/dashboard');
   };
 
-  // Use the same gradient colors in both modes — only opacity differs
-  const gradientColors = ['#FF9FFC', '#5227FF'];
+  // Light mode: dark-on-light blinds (darker non-spotlight areas)
+  // Dark mode: midnight purple gradient
+  const gradientColors = isDarkMode
+    ? ['#6B21A8', '#A855F7', '#7C3AED', '#4C1D95']
+    : ['#999999', '#cccccc'];
 
   return (
-    <main ref={heroContainerRef} className="min-h-screen w-full flex flex-col items-center justify-center bg-zinc-50 dark:bg-gradient-to-br dark:from-[#141414] dark:via-[#6D28D9] dark:to-[#A78BFA] pt-[120px] pb-10 px-6 relative overflow-hidden transition-colors duration-500">
-
-      {/* GradientBlinds Background — same visual in both modes */}
-      <div className={`absolute inset-0 z-0 pointer-events-none ${isDarkMode ? 'opacity-90' : 'opacity-70'}`}>
+    <main
+      ref={heroContainerRef}
+      className={`min-h-screen w-full flex flex-col items-center justify-center pt-[120px] pb-10 px-6 relative overflow-hidden transition-colors duration-500 ${isDarkMode
+        ? 'bg-gradient-to-b from-[#0a0014] via-[#1a0533] to-[#2d1b69]'
+        : 'bg-[#fafafa]'
+        }`}
+    >
+      {/* GradientBlinds Background — different colors per mode */}
+      <div className={`absolute inset-0 z-0 ${isDarkMode ? 'opacity-80' : 'opacity-60'}`}>
         <GradientBlinds
           gradientColors={gradientColors}
-          angle={0}
-          noise={0.3}
-          blindCount={12}
-          blindMinWidth={50}
+          angle={239}
+          noise={isDarkMode ? 0.58 : 0.1}
+          blindCount={8}
+          blindMinWidth={95}
           spotlightRadius={0.5}
           spotlightSoftness={1}
           spotlightOpacity={1}
-          mouseDampening={0.15}
-          distortAmount={0}
-          shineDirection="left"
-          mixBlendMode="screen"
+          mouseDampening={0.34}
+          distortAmount={4}
+          shineDirection="right"
+          mixBlendMode={isDarkMode ? 'screen' : 'darken'}
         />
       </div>
 
@@ -76,11 +84,14 @@ const Hero = () => {
           borderRadius={50}
           borderWidth={0.05}
           opacity={isDarkMode ? 0.9 : 0.95}
-          backgroundOpacity={isDarkMode ? 0.05 : 0.15}
+          backgroundOpacity={isDarkMode ? 0.08 : 0.15}
         >
           <div className="flex flex-col justify-between w-full h-full min-h-[300px]">
             <div className="relative max-w-3xl z-10" ref={titleRef}>
-              <h1 className="text-4xl md:text-5xl lg:text-[64px] leading-[1.1] font-bold text-zinc-900 dark:text-white mb-4 drop-shadow-sm" style={{ fontFamily: '"Roboto Flex", sans-serif' }}>
+              <h1
+                className="text-4xl md:text-5xl lg:text-[64px] leading-[1.1] font-bold text-zinc-900 dark:text-white mb-4 drop-shadow-sm"
+                style={{ fontFamily: '"Roboto Flex", sans-serif' }}
+              >
                 <VariableProximity
                   label="Manage Money In The Most Fun Way"
                   className="text-4xl md:text-5xl lg:text-[64px] leading-[1.1] font-bold text-zinc-900 dark:text-white"
@@ -94,7 +105,10 @@ const Hero = () => {
             </div>
 
             <div className="relative z-10 flex flex-col md:flex-row justify-between flex-1 items-start md:items-end gap-6 border-transparent mt-4 md:mt-0">
-              <p ref={subtitleRef} className="text-base md:text-lg lg:text-[19px] text-zinc-700 dark:text-white font-medium max-w-xl leading-snug drop-shadow-sm pb-2">
+              <p
+                ref={subtitleRef}
+                className="text-base md:text-lg lg:text-[19px] text-zinc-700 dark:text-white font-medium max-w-xl leading-snug drop-shadow-sm pb-2"
+              >
                 Belajar literasi finansial sambil nge-track pemasukan,
                 target, dan quiz seru — khusus Gen Z.
               </p>
