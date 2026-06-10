@@ -68,7 +68,6 @@ async function migrate() {
         title: meta.title,
         description: meta.description,
         level: meta.level,
-        chapters_count: 4,
       })
       .select('id, title')
       .single();
